@@ -1,1 +1,1 @@
-# SD-ChatApp
+# Smart Design 2006 Chat Application Project
