@@ -1,0 +1,26 @@
+{
+  "name": "sd-chatapp",
+  "version": "1.0.0",
+  "description": "Smart Design 2006 ChatApp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartdesign2006/SD-ChatApp.git"
+  },
+  "author": "Gergan Ruschev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smartdesign2006/SD-ChatApp/issues"
+  },
+  "homepage": "https://github.com/smartdesign2006/SD-ChatApp#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  }
+}
