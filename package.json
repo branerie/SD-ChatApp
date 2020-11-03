@@ -4,7 +4,7 @@
   "description": "Smart Design 2006 ChatApp",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server"
   },
   "repository": {
     "type": "git",

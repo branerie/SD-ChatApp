@@ -4,8 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css/style.css">
   <title>SmartChat</title>
+
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+  
+  <script defer src="/socket.io/socket.io.js"></script>
+  <script defer src="js/client.js"></script>
 </head>
 
 <body>
@@ -67,18 +72,30 @@
           <li>Кръстю</li>
           <li>Гичка</li>
           <li>Цеца</li>
+          <li>Gogo</li>
+          <li>RandomGuy</li>
+          <li>Asan</li>
+          <li>Unufri</li>
+          <li>Кръстю</li>
+          <li>Гичка</li>
+          <li>Цеца</li>
+          <li>Gogo</li>
+          <li>RandomGuy</li>
+          <li>Asan</li>
+          <li>Unufri</li>
+          <li>Кръстю</li>
+          <li>Гичка</li>
+          <li>Цеца</li>
         </ul>
       </aside>
     </main>
     <div class="chat-form-container">
       <form id="chat-form">
-        <input id="msg" type="text" required autocomplete="off" />
+        <input id="msg-input" type="text" required autocomplete="off"/>
         <button class="btn">Send</button>
       </form>
     </div>
   </div>
-
-  <script src="vanilla.js"></script>
 </body>
 
 </html>

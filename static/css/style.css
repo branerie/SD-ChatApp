@@ -64,6 +64,8 @@ a {
 	color: #fff;
 	padding: 20px 10px 60px;
 	overflow-y: scroll;
+	max-height: 500px;
+	scrollbar-width: none;
 }
 
 .chat-sidebar h2 {
@@ -121,7 +123,7 @@ a {
 
 /* Login Form Page */
 .login-container {
-	max-width: 500px;
+	max-width: 600px;
 	margin: 80px auto;
 	color: #fff;
 }
@@ -130,11 +132,15 @@ a {
 	text-align: center;
 	padding: 20px;
 	background: var(--color-a);
+	border-top-left-radius: 20px;
+	border-top-right-radius: 20px;
 }
 
 .login-main {
 	padding: 30px 40px;
 	background: var(--color-b);
+	border-bottom-left-radius: 20px;
+	border-bottom-right-radius: 20px;
 }
 
 .login-main p {
