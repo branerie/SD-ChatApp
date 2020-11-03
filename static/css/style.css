@@ -100,7 +100,6 @@ a {
 .chat-messages .message .timestamp {
 	font-size: 15px;
 	font-weight: bold;
-	color: var(--color-b);
 	opacity: 0.7;
 	margin-bottom: 7px;
 }

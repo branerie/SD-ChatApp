@@ -6,9 +6,9 @@ const html = {
 }
 
 
-socket.on('welcome-message', (msg1, msg2) => {
-    console.log(msg1)
-    console.log(msg2)
+socket.on('welcome-message', data => {
+    console.log(data.msg)
+    attachMsg(data, true)
 })
 
 socket.on('goodbye-message', msg => {
@@ -20,9 +20,9 @@ socket.on('notice-message', (msg1, msg2) => {
     console.log(msg2)
 })
 
-socket.on('chat-message', msg => {
-    console.log(msg)
-    attachMsg(msg, false)
+socket.on('chat-message', data => {
+    console.log(data)
+    attachMsg(data, false)
 })
 
 
@@ -33,27 +33,37 @@ html.sendMsg.addEventListener('submit', e => {
 
     // Send message to server
     socket.emit('chat-message', msg)
-    attachMsg(msg, true)
+
+    // get current time
+    let time = new Date()
+    let data = {
+        time: time.toLocaleTimeString(),
+        user: "Me",
+        msg
+    }
+
+    // should be in gray color until confirmed
+    attachMsg(data, true)
     html.msgInput.value = ''
     html.msgInput.focus()
 })
 
-function attachMsg(msg, self) {
-    let msgWrapper = document.createElement("div")
-    let msgText = document.createElement("p")
-    let msgLabel = document.createElement("span")
+function attachMsg({time, user, msg}, self) {
+    let msgWrapper = document.createElement('div')
+    let msgText = document.createElement('p')
+    let msgLabel = document.createElement('span')
     let textNode = document.createTextNode(msg)
     
     
-    msgLabel.classList.add("timestamp")
-    msgLabel.textContent = ' [TIMESTAMP] Gogo: '
+    msgLabel.classList.add('timestamp')
+    msgLabel.textContent = ` [${time}] ${user}: `
     msgText.appendChild(msgLabel)
     
-    msgText.classList.add(self ? "text-self" : "text-other")
+    msgText.classList.add(self ? 'text-self' : 'text-other')
     msgText.appendChild(textNode)
     msgWrapper.appendChild(msgText)
 
-    msgWrapper.classList.add("message")
+    msgWrapper.classList.add('message')
 
     html.msgPool.appendChild(msgWrapper)
     html.msgPool.scrollTop = html.msgPool.scrollHeight;
