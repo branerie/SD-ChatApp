@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+  <title>SmartChat</title>
+</head>
+
+<body>
+  <div class="chat-container">
+    <header class="chat-header">
+      <h1>SmartChat</h1>
+      <a href="index.html" class="btn">X</a>
+    </header>
+    <main class="chat-main">
+      <aside class="chat-sidebar">
+        <h2>GROUPS</h2>
+        <ul id="groups">
+          <li>Games</li>
+          <li>Football</li>
+          <li>Movies</li>
+          <li>ChitChat</li>
+        </ul>
+        <h2>CONFERENCE</h2>
+        <ul id="conf">
+          <li>cid1</li>
+          <li>cid2</li>
+        </ul>
+        <h2>CHATS</h2>
+        <ul id="chat">
+          <li>Unufri</li>
+          <li>Цеца</li>
+        </ul>
+      </aside>
+      <div class="chat-messages">
+        <div class="message">
+          <p class="text-self"><span class="timestamp"> [TIMESTAMP] Gogo: </span>Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+            Deleniti iusto a reprehenderit doloremque, hic sunt! Cum eos tenetur quidem dolor unde quod et, culpa
+            architecto itaque magni ut deserunt praesentium id corporis quas maxime quam ab obcaecati dolore aliquam
+            incidunt consequatur nisi voluptas ipsa? Aut voluptatum consequuntur nemo dolores doloremque!
+          </p>
+        </div>
+        <div class="message">
+          <p class="text-other"><span class="timestamp"> [TIMESTAMP] Гичка: </span>Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+            Deleniti iusto a reprehenderit doloremque, hic sunt! Cum eos tenetur quidem dolor unde quod et, culpa
+            architecto itaque magni ut deserunt praesentium id corporis quas maxime quam ab obcaecati dolore aliquam
+            incidunt consequatur nisi voluptas ipsa? Aut voluptatum consequuntur nemo dolores doloremque!
+          </p>
+        </div>
+        <div class="message">
+          <p class="text-other"><span class="timestamp"> [TIMESTAMP] Цеца: </span>Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+            Deleniti iusto a reprehenderit doloremque, hic sunt! Cum eos tenetur quidem dolor unde quod et, culpa
+            architecto itaque magni ut deserunt praesentium id corporis quas maxime quam ab obcaecati dolore aliquam
+            incidunt consequatur nisi voluptas ipsa? Aut voluptatum consequuntur nemo dolores doloremque!
+          </p>
+        </div>
+      </div>
+      <aside class="chat-sidebar">
+        <h2>ONLINE</h2>
+        <ul id="members">
+          <li>Gogo</li>
+          <li>RandomGuy</li>
+          <li>Asan</li>
+          <li>Unufri</li>
+          <li>Кръстю</li>
+          <li>Гичка</li>
+          <li>Цеца</li>
+        </ul>
+      </aside>
+    </main>
+    <div class="chat-form-container">
+      <form id="chat-form">
+        <input id="msg" type="text" required autocomplete="off" />
+        <button class="btn">Send</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="vanilla.js"></script>
+</body>
+
+</html>
