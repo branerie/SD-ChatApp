@@ -27,7 +27,7 @@ io.on("connect", socket => {
     // Get message from client and send to all
     socket.on("chat-message", msg => {
         console.log(msg)
-        io.emit("chat-message", msg)
+        socket.broadcast.emit("chat-message", msg)
     })
 })
 
