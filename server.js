@@ -18,6 +18,7 @@ const io = socketio(server)
 
 io.on("connect", socket => {
     console.log("New connection")
+    console.log("server",socket.id);
     // Welcome message from server to client connected
     socket.emit("welcome-message", {
         time: getTime(),
@@ -32,6 +33,10 @@ io.on("connect", socket => {
 
     socket.on("disconnect", () => {
         io.emit("goodbye-message", "User left the building")
+    })
+
+    socket.on("login", (data) => {
+        socket.user = data
     })
 
     // Get message from client and send to rest clients
