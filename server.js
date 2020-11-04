@@ -1,17 +1,11 @@
-const config = require("./config")
+const routes = require("./config/routes")
+const config = require("./config/config")
 const express = require("express")
 const app = express()
-const static = express.static("./static")
-app.use(static)
 
-app.use(express.json())
-// app.use(express.urlencoded({ extended: false }));
+routes(app)
 
-const routes = require("./routes")
-app.use("/", routes)
-
-const http = require("http")
-const server = http.createServer(app)
+const server = app.listen(config.port, console.log(`Listening on port ${config.port}!`))
 
 const socketio = require("socket.io")
 const io = socketio(server)
@@ -58,4 +52,3 @@ function getTime() {
     return time.toLocaleTimeString()
 }
 
-server.listen(config.PORT, console.log(`Server up on http://localhost:${config.PORT}`))
