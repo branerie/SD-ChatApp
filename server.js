@@ -10,7 +10,6 @@ routes(app)
 
 const server = app.listen(config.port, console.log(`Listening on port ${config.port}!`))
 
-
 const socketio = require("socket.io")
 const io = socketio(server)
 
@@ -18,10 +17,14 @@ io.on("connect", socket => {
     console.log("New connection")
     console.log("server",socket.id);
     // Welcome message from server to client connected
-    socket.emit("welcome-message", {
-        time: getTime(),
-        user: "SERVER",
-        msg: "Welcome User"
+
+    socket.on("login", username => {
+        socket.username = username
+        socket.emit("welcome-message", {
+            time: getTime(),
+            user: "SERVER",
+            msg: `Welcome ${username}`
+        })
     })
 
     // Notify rest of the users
@@ -33,9 +36,7 @@ io.on("connect", socket => {
         io.emit("goodbye-message", "User left the building")
     })
 
-    socket.on("login", (data) => {
-        socket.user = data
-    })
+
 
     // Get message from client and send to rest clients
     socket.on("chat-message", msg => {
@@ -45,7 +46,7 @@ io.on("connect", socket => {
         //time when server recieved the message
         socket.broadcast.emit("chat-message", {
             time: getTime(),
-            user: "Random",
+            user: socket.username,
             msg
         })
     })
