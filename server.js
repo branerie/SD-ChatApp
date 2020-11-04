@@ -1,12 +1,20 @@
+const dotEnv = require('dotenv')
+dotEnv.config()
+
 const routes = require("./config/routes")
 const config = require("./config/config")
 const expressConfig = require('./config/express')
+const connectDB = require ('./config/database')
 const express = require("express")
 const app = express()
 const staticFiles = express.static('./static')
 
+
+connectDB()
 expressConfig(app,staticFiles)
 routes(app)
+
+
 
 const server = app.listen(config.port, console.log(`Listening on port ${config.port}!`))
 

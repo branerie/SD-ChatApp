@@ -1,5 +1,4 @@
 const express = require('express')
-// const staticFiles = express.static('../static')
 
 module.exports = (app, staticFiles) => {
     app.use(staticFiles)
