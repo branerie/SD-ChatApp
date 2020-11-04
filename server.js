@@ -1,11 +1,15 @@
 const routes = require("./config/routes")
 const config = require("./config/config")
+const expressConfig = require('./config/express')
 const express = require("express")
 const app = express()
+const staticFiles = express.static('./static')
 
+expressConfig(app,staticFiles)
 routes(app)
 
 const server = app.listen(config.port, console.log(`Listening on port ${config.port}!`))
+
 
 const socketio = require("socket.io")
 const io = socketio(server)
@@ -51,4 +55,3 @@ function getTime() {
     let time = new Date()
     return time.toLocaleTimeString()
 }
-
