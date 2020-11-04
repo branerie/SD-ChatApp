@@ -4,6 +4,12 @@ const app = express()
 const static = express.static("./static")
 app.use(static)
 
+app.use(express.json())
+// app.use(express.urlencoded({ extended: false }));
+
+const routes = require("./routes")
+app.use("/", routes)
+
 const http = require("http")
 const server = http.createServer(app)
 
