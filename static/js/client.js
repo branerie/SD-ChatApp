@@ -4,7 +4,13 @@ const html = {
     msgInput: document.getElementById('msg-input'),
     msgPool: document.querySelector('.chat-messages')
 }
+let username = ""
 
+// Server detected you but doesn't know your name. Tell him who you are
+socket.on('connect', () => {
+    username = getUserName()
+    socket.emit("login" , username)
+})
 
 socket.on('welcome-message', data => {
     console.log(data.msg)
@@ -38,7 +44,7 @@ html.sendMsg.addEventListener('submit', e => {
     let time = new Date()
     let data = {
         time: time.toLocaleTimeString(),
-        user: "Me",
+        user: username,
         msg
     }
 
@@ -69,3 +75,6 @@ function attachMsg({time, user, msg}, self) {
     html.msgPool.scrollTop = html.msgPool.scrollHeight;
 }
 
+function getUserName() {
+    return window.location.search.split("&")[0].split("=")[1] || "gerr0r"
+}

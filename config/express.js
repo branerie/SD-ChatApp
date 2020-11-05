@@ -1,7 +1,7 @@
 const express = require('express')
 
-module.exports = (app, staticFiles) => {
-    app.use(staticFiles)
+module.exports = app => {
     app.use(express.json())
-    // app.use(express.urlencoded({ extended: false }))
+    app.use(express.urlencoded({ extended: true }))
+    app.use(express.static('static'))
 }
