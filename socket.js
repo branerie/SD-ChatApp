@@ -7,12 +7,23 @@ module.exports = io => {
         // Welcome message from server to client connected
         socket.on("login", username => {
             socket.username = username
-            let check = mock.find(x => x.name === username);
-            console.log(check ? `Rooms list: ${check.rooms.toString()}` : "User has no rooms")
+            let user = mock.find(x => x.name === username);
+            // console.log(check ? `Groups list: ${check.groups.toString()}` : "User has no groups")
+            console.log(socket.rooms) // will return socket id as a room for private chat
+            if (user) {
+                socket.join(user.groups, () => {
+                    console.log(socket.rooms) // will return socket id and all of rooms
+                    user.groups.forEach(group => {
+                        // send join message to group online members  
+                        socket.to(group).emit("join-message", username)
+                    })
+                })
+            }
             socket.emit("welcome-message", {
                 time: getTime(),
                 user: "SERVER",
-                msg: `Welcome ${username}`
+                msg: `Welcome ${username}`,
+                groups: user ? user.groups : null
             })
         })
 
@@ -22,7 +33,8 @@ module.exports = io => {
         // Notify users on disconnect
 
         socket.on("disconnect", () => {
-            io.emit("goodbye-message", "User left the building")
+            console.log(`SERVER: User ${socket.username} has quit server`)
+            io.emit("quit-message", socket.username)
         })
 
 
