@@ -6,11 +6,9 @@ const html = {
 }
 let username = ""
 
+// Server detected you but doesn't know your name. Tell him who you are
 socket.on('connect', () => {
     username = getUserName()
-    console.log("Client", socket.id)
-    console.log(username)
-
     socket.emit("login" , username)
 })
 
