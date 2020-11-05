@@ -76,8 +76,18 @@ a {
 	text-align: center;
 }
 
+
 .chat-sidebar ul li {
 	padding: 10px 0;
+}
+
+.chat-sidebar ul li.selected {
+	background-color: gray;
+	color: darkgreen;
+}
+
+.chat-sidebar ul li:hover {
+	color: darkgreen;
 }
 
 .chat-messages {
@@ -95,6 +105,10 @@ a {
 
 .chat-messages .message .text-self {
 	color: green;
+}
+
+.chat-messages .message .text-system {
+	color: purple;
 }
 
 .chat-messages .message .timestamp {
