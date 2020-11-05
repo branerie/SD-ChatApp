@@ -1,11 +1,14 @@
+const mock = require("./mock")
+
 module.exports = io => {
     io.on("connect", socket => {
-        console.log("New connection")
-        console.log("server", socket.id);
-        // Welcome message from server to client connected
+        console.log(`SERVER: New connection detected. Socket ID: ${socket.id}`)
 
+        // Welcome message from server to client connected
         socket.on("login", username => {
             socket.username = username
+            let check = mock.find(x => x.name === username);
+            console.log(check ? `Rooms list: ${check.rooms.toString()}` : "User has no rooms")
             socket.emit("welcome-message", {
                 time: getTime(),
                 user: "SERVER",
