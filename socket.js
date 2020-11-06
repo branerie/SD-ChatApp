@@ -2,15 +2,15 @@ const mock = require("./mock")
 
 module.exports = io => {
     io.on("connect", socket => {
-        console.log(`SERVER: New connection detected. Socket ID: ${socket.id}`)
+        console.log(`[${getTime()}] SERVER: New connection detected. Socket ID: ${socket.id}`)
 
         // Welcome message from server to client connected
         socket.on("login", username => {
             socket.username = username
-            let user = mock.find(x => x.name === username);
-            // console.log(check ? `Groups list: ${check.groups.toString()}` : "User has no groups")
-            console.log(socket.rooms) // will return socket id as a room for private chat
+            socket.groups = []
+            let user = mock.find(x => x.name === username)
             if (user) {
+                socket.groups = user.groups
                 socket.join(user.groups, () => {
                     console.log(socket.rooms) // will return socket id and all of rooms
                     user.groups.forEach(group => {
@@ -33,8 +33,11 @@ module.exports = io => {
         // Notify users on disconnect
 
         socket.on("disconnect", () => {
-            console.log(`SERVER: User ${socket.username} has quit server`)
-            io.emit("quit-message", socket.username)
+            console.log(`[${getTime()}] SERVER: User ${socket.username} has quit server`)
+            // send message to user groups that he quit
+            socket.groups.forEach(group => {
+                socket.to(group).emit("quit-message", socket.username)
+            })
         })
 
 
