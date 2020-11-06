@@ -1,52 +1,59 @@
 const mock = require("./mock")
 
 module.exports = io => {
-    io.on("connect", socket => {
-        console.log(`SERVER: New connection detected. Socket ID: ${socket.id}`)
+    io.of("/chat.html").on("connect", socket => {
+        console.log(`[${getTime()}] SERVER: New connection detected. Socket ID: ${socket.id}`)
+
+        socket.username = socket.handshake.query.username;
+        socket.groups = []
+        console.log(`[${getTime()}] SERVER: Associating socket ID ${socket.id} with user ${socket.username}`)
+
+        let user = mock.find(x => x.name === socket.username)
+        if (user) {
+            socket.groups = user.groups
+            socket.join(socket.groups, () => {
+                socket.groups.forEach(group => {
+                    // send join message to group online members so they could update their userlists
+                    socket.to(group).emit("join-message", { user: socket.username, group })
+                })
+            })
+        }
 
         // Welcome message from server to client connected
-        socket.on("login", username => {
-            socket.username = username
-            let user = mock.find(x => x.name === username);
-            // console.log(check ? `Groups list: ${check.groups.toString()}` : "User has no groups")
-            console.log(socket.rooms) // will return socket id as a room for private chat
-            if (user) {
-                socket.join(user.groups, () => {
-                    console.log(socket.rooms) // will return socket id and all of rooms
-                    user.groups.forEach(group => {
-                        // send join message to group online members  
-                        socket.to(group).emit("join-message", username)
-                    })
-                })
-            }
-            socket.emit("welcome-message", {
-                time: getTime(),
-                user: "SERVER",
-                msg: `Welcome ${username}`,
-                groups: user ? user.groups : null
+        socket.emit("welcome-message", {
+            time: getTime(),
+            user: "SERVER",
+            msg: `Welcome ${socket.username}`,
+            groups: socket.groups
+        })
+
+        // socket.broadcast.emit("notice-message", "User connected to chat", "Say hello to user")
+
+        socket.on("get-userlist", (group, callback) => {
+            let clients = []
+            io.of('/chat.html').in(group).clients((error, ids) => {
+                clients = ids.map(id => io.of('/chat.html').connected[id].username);
+                console.log(clients);
+                callback(clients)
+            })
+        })
+        
+        // Notify users on disconnect
+        socket.on("disconnect", () => {
+            console.log(`[${getTime()}] SERVER: User ${socket.username} has quit server`)
+            // send message to user groups that he quit
+            socket.groups.forEach(group => {
+                socket.to(group).emit("quit-message", {user: socket.username , group})
             })
         })
 
-        // Notify rest of the users
-        socket.broadcast.emit("notice-message", "User connected to chat", "Say hello to user")
-
-        // Notify users on disconnect
-
-        socket.on("disconnect", () => {
-            console.log(`SERVER: User ${socket.username} has quit server`)
-            io.emit("quit-message", socket.username)
-        })
-
-
-
         // Get message from client and send to rest clients
         socket.on("chat-message", msg => {
-            // console.log(socket);
             console.log(msg)
 
             //time when server recieved the message
             socket.broadcast.emit("chat-message", {
-                time: getTime(),
+                time: new Date().toLocaleTimeString(),
                 user: socket.username,
                 msg
             })
@@ -54,7 +61,6 @@ module.exports = io => {
     })
 
     function getTime() {
-        let time = new Date()
-        return time.toLocaleTimeString()
+        return new Date().toLocaleTimeString()
     }
 }

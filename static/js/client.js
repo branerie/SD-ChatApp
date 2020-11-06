@@ -1,36 +1,34 @@
-const socket = io()
+const socket = io(window.location.href)
 const html = {
     sendMsg: document.getElementById('chat-form'),
     msgInput: document.getElementById('msg-input'),
-    msgPool: document.querySelector('.chat-messages'),
-    groupList: document.getElementById("groups")
+    msgPool: document.querySelector('.chat-messages-container'),
+    groupList: document.getElementById("groups"),
+    userList: document.getElementById("members")
 }
-let username = ""
+const username = window.location.search.split("&")[0].split("=")[1] || "gerr0r"
+document.title = `SC | ${username}`
 
-// Server detected you but doesn't know your name. Tell him who you are
-socket.on('connect', () => {
-    username = getUserName()
-    document.title = 'SC | '+  username
-    socket.emit("login" , username)
-})
-
-socket.on("join")
+// Server detected you . Ask for your data
+// socket.on('connect', () => {
+//     socket.emit("get-groups" , username)
+// })
 
 socket.on('welcome-message', data => {
     console.log(data.msg)
     console.log(data.groups);
-    attachMsg(data, true)
+    attachMsg(data, 'text-system', "status")
     attachGroups(data.groups)
 })
 
-socket.on('quit-message', user => {
+socket.on('quit-message', info => {
     let time = new Date().toLocaleTimeString()
     let data = {
         time,
         user: "SERVER",
-        msg: `${user} has quit`
+        msg: `${info.user} has quit`
     }
-    attachMsg(data, 'text-system')
+    attachMsg(data, 'text-system', info.group)
 })
 
 socket.on('notice-message', (msg1, msg2) => {
@@ -38,14 +36,14 @@ socket.on('notice-message', (msg1, msg2) => {
     console.log(msg2)
 })
 
-socket.on('join-message', user => {
+socket.on('join-message', info => {
     let time = new Date().toLocaleTimeString()
     let data = {
         time,
         user: "SERVER",
-        msg: `${user} has joined the group`
+        msg: `${info.user} has joined the group`
     }
-    attachMsg(data, 'text-system')
+    attachMsg(data, 'text-system', info.group)
 })
 
 socket.on('chat-message', data => {
@@ -77,13 +75,22 @@ html.sendMsg.addEventListener('submit', e => {
 
 html.groupList.addEventListener("click", function (e) {
     if (e.target === html.groupList) return
+    let group = e.target.textContent;
     // change messages container
+    [...html.msgPool.children].forEach(el => el.classList.add("hidden"));
+    document.getElementById(`group-${group}`).classList.remove("hidden");
+
+    // change user list
     [...e.currentTarget.children].forEach(el => el.classList.remove("selected"))
     e.target.classList.add("selected")
-    // change user list
-},)
+    console.log(group); // validate
+    socket.emit('get-userlist', group, userlist => attachUsers(userlist))
+})
 
-function attachMsg({time, user, msg}, textSrc) {
+function attachMsg({time, user, msg}, textSrc, winID = "status") {
+    if (winID !== "status") winID = "group-" + winID
+    let msgWindow = document.getElementById(winID)
+
     let msgWrapper = document.createElement('div')
     let msgText = document.createElement('p')
     let msgLabel = document.createElement('span')
@@ -100,8 +107,11 @@ function attachMsg({time, user, msg}, textSrc) {
 
     msgWrapper.classList.add('message')
 
-    html.msgPool.appendChild(msgWrapper)
-    html.msgPool.scrollTop = html.msgPool.scrollHeight;
+    msgWindow.appendChild(msgWrapper)
+    msgWindow.scrollTop = html.msgPool.scrollHeight;
+
+    html.msgPool.appendChild(msgWindow)
+
 }
 
 
@@ -113,14 +123,26 @@ function attachGroups(groups) {
         let element = document.createElement("li")
         element.textContent = group;
         html.groupList.appendChild(element);
+
+        let chatDiv = document.createElement("div")
+        chatDiv.id = `group-${group}`
+        chatDiv.classList.add("chat-messages","hidden")
+        html.msgPool.appendChild(chatDiv)
     });
 }
 
-function attachUsers()  {
-
+function attachUsers(userlist)  {
+    console.log(userlist);
+    html.userList.innerHTML = ""
+    if (!userlist) return
+    userlist.forEach(user => {
+        let element = document.createElement("li")
+        element.textContent = user;
+        html.userList.appendChild(element);
+    });
 }
 
 
-function getUserName() {
-    return window.location.search.split("&")[0].split("=")[1] || "gerr0r"
-}
+// function getUserName() {
+//     return window.location.search.split("&")[0].split("=")[1] || "gerr0r"
+// }

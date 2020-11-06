@@ -8,7 +8,7 @@ require('./config/express')(app)
 require("./config/routes")(app)
 
 const connectDB = require ('./config/database')
-connectDB()
+// connectDB()
 
 const server = app.listen(config.port, console.log(`Listening on port ${config.port}!`))
 
