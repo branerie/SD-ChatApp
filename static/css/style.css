@@ -90,10 +90,19 @@ a {
 	color: darkgreen;
 }
 
+
+.chat-messages-container {
+	max-height: 500px;
+}
+
 .chat-messages {
 	padding: 30px;
 	max-height: 500px;
 	overflow-y: scroll;
+}
+
+.chat-messages-container .hidden {
+	display: none;
 }
 
 .chat-messages .message {
