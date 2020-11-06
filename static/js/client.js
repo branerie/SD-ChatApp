@@ -1,18 +1,17 @@
-const socket = io()
+const socket = io(window.location.href)
 const html = {
     sendMsg: document.getElementById('chat-form'),
     msgInput: document.getElementById('msg-input'),
     msgPool: document.querySelector('.chat-messages'),
     groupList: document.getElementById("groups")
 }
-let username = ""
+const username = window.location.search.split("&")[0].split("=")[1] || "gerr0r"
+document.title = `SC | ${username}`
 
-// Server detected you but doesn't know your name. Tell him who you are
-socket.on('connect', () => {
-    username = getUserName()
-    document.title = 'SC | '+  username
-    socket.emit("login" , username)
-})
+// Server detected you . Ask for your data
+// socket.on('connect', () => {
+//     socket.emit("get-groups" , username)
+// })
 
 socket.on("join")
 
@@ -121,6 +120,6 @@ function attachUsers()  {
 }
 
 
-function getUserName() {
-    return window.location.search.split("&")[0].split("=")[1] || "gerr0r"
-}
+// function getUserName() {
+//     return window.location.search.split("&")[0].split("=")[1] || "gerr0r"
+// }
