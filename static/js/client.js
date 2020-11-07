@@ -1,4 +1,6 @@
-const socket = io(window.location.href)
+const username = window.location.search.split("&")[0].split("=")[1] || "gerr0r"
+console.log(username);
+const socket = io({ query: { username }})
 const html = {
     sendMsg: document.getElementById('chat-form'),
     msgInput: document.getElementById('msg-input'),
@@ -6,7 +8,6 @@ const html = {
     groupList: document.getElementById("groups"),
     userList: document.getElementById("members")
 }
-const username = window.location.search.split("&")[0].split("=")[1] || "gerr0r"
 document.title = `SC | ${username}`
 
 // Server detected you . Ask for your data
@@ -29,6 +30,7 @@ socket.on('quit-message', info => {
         msg: `${info.user} has quit`
     }
     attachMsg(data, 'text-system', info.group)
+    socket.emit('get-userlist', info.group, userlist => attachUsers(userlist)) // optimize ?
 })
 
 socket.on('notice-message', (msg1, msg2) => {
@@ -44,6 +46,7 @@ socket.on('join-message', info => {
         msg: `${info.user} has joined the group`
     }
     attachMsg(data, 'text-system', info.group)
+    socket.emit('get-userlist', info.group, userlist => attachUsers(userlist)) // optimize ?
 })
 
 socket.on('chat-message', data => {

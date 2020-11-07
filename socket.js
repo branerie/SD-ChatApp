@@ -1,7 +1,7 @@
 const mock = require("./mock")
 
 module.exports = io => {
-    io.of("/chat.html").on("connect", socket => {
+    io.on("connect", socket => {
         console.log(`[${getTime()}] SERVER: New connection detected. Socket ID: ${socket.id}`)
 
         socket.username = socket.handshake.query.username;
@@ -31,8 +31,8 @@ module.exports = io => {
 
         socket.on("get-userlist", (group, callback) => {
             let clients = []
-            io.of('/chat.html').in(group).clients((error, ids) => {
-                clients = ids.map(id => io.of('/chat.html').connected[id].username);
+            io.in(group).clients((error, ids) => {
+                clients = ids.map(id => io.of("/").connected[id].username);
                 console.log(clients);
                 callback(clients)
             })
