@@ -48,15 +48,16 @@ module.exports = io => {
         })
 
         // Get message from client and send to rest clients
-        socket.on("chat-message", msg => {
-            console.log(msg)
+        socket.on("chat-message", data => {
+            console.log(socket.username, data.group , data.msg)
 
             //time when server recieved the message
-            socket.broadcast.emit("chat-message", {
-                time: new Date().toLocaleTimeString(),
-                user: socket.username,
-                msg
-            })
+            socket.to(data.group).emit("chat-message", {user: socket.username , group: data.group, msg: data.msg })
+            // socket.broadcast.emit("chat-message", {
+            //     time: new Date().toLocaleTimeString(),
+            //     user: socket.username,
+            //     msg
+            // })
         })
     })
 

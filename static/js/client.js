@@ -49,29 +49,35 @@ socket.on('join-message', info => {
     socket.emit('get-userlist', info.group, userlist => attachUsers(userlist)) // optimize ?
 })
 
-socket.on('chat-message', data => {
-    console.log(data)
-    attachMsg(data, 'text-other')
+socket.on('chat-message', info => {
+    console.log(info)
+    let data = {
+        time: new Date().toLocaleTimeString(),
+        user: info.user,
+        msg: info.msg
+    }
+    attachMsg(data, 'text-other', info.group)
 })
 
 
 html.sendMsg.addEventListener('submit', e => {
     e.preventDefault()
     let msg = html.msgInput.value
+    let msgWindow = document.querySelector("#groups .selected")
+    let group = msgWindow.textContent
 
     // Send message to server
-    socket.emit('chat-message', msg)
+    socket.emit('chat-message', { msg , group })
 
     // get current time
-    let time = new Date()
     let data = {
-        time: time.toLocaleTimeString(),
+        time: new Date().toLocaleTimeString(),
         user: username,
         msg
     }
 
     // should be in gray color until confirmed !!!
-    attachMsg(data, 'text-self')
+    attachMsg(data, 'text-self', group)
     html.msgInput.value = ''
     html.msgInput.focus()
 })
@@ -144,8 +150,3 @@ function attachUsers(userlist)  {
         html.userList.appendChild(element);
     });
 }
-
-
-// function getUserName() {
-//     return window.location.search.split("&")[0].split("=")[1] || "gerr0r"
-// }
