@@ -21,11 +21,11 @@ module.exports = io => {
 
         // Welcome message from server to client connected
         socket.emit("welcome-message", {
-            time: getTime(),
             user: "SERVER",
             msg: `Welcome ${socket.username}`,
             groups: socket.groups
         })
+        
 
         // socket.broadcast.emit("notice-message", "User connected to chat", "Say hello to user")
 
@@ -46,6 +46,11 @@ module.exports = io => {
                 socket.to(group).emit("quit-message", {user: socket.username , group})
             })
         })
+
+        socket.on("reconnect" , () => {
+            console.log(`[${getTime()}] SERVER: User ${socket.username} has reconnect server`)
+        })
+
 
         // Get message from client and send to rest clients
         socket.on("chat-message", data => {

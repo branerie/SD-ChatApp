@@ -1,6 +1,6 @@
 const username = window.location.search.split("&")[0].split("=")[1] || "gerr0r"
 console.log(username);
-const socket = io({ query: { username }})
+const socket = io({ query: { username } })
 const html = {
     sendMsg: document.getElementById('chat-form'),
     msgInput: document.getElementById('msg-input'),
@@ -10,16 +10,14 @@ const html = {
 }
 document.title = `SC | ${username}`
 
-// Server detected you . Ask for your data
-// socket.on('connect', () => {
-//     socket.emit("get-groups" , username)
-// })
-
-socket.on('welcome-message', data => {
-    console.log(data.msg)
-    console.log(data.groups);
+socket.on('welcome-message', ({ user, msg, groups }) => {
+    let data = {
+        time: new Date().toLocaleTimeString(),
+        user,
+        msg
+    }
     attachMsg(data, 'text-system', "status")
-    attachGroups(data.groups)
+    attachGroups(groups)
 })
 
 socket.on('quit-message', info => {
@@ -67,7 +65,7 @@ html.sendMsg.addEventListener('submit', e => {
     let group = msgWindow.textContent
 
     // Send message to server
-    socket.emit('chat-message', { msg , group })
+    socket.emit('chat-message', { msg, group })
 
     // get current time
     let data = {
@@ -96,7 +94,7 @@ html.groupList.addEventListener("click", function (e) {
     socket.emit('get-userlist', group, userlist => attachUsers(userlist))
 })
 
-function attachMsg({time, user, msg}, textSrc, winID = "status") {
+function attachMsg({ time, user, msg }, textSrc, winID = "status") {
     if (winID !== "status") winID = "group-" + winID
     let msgWindow = document.getElementById(winID)
 
@@ -104,12 +102,12 @@ function attachMsg({time, user, msg}, textSrc, winID = "status") {
     let msgText = document.createElement('p')
     let msgLabel = document.createElement('span')
     let textNode = document.createTextNode(msg)
-    
-    
+
+
     msgLabel.classList.add('timestamp')
     msgLabel.textContent = ` [${time}] ${user}: `
     msgText.appendChild(msgLabel)
-    
+
     msgText.classList.add(textSrc)
     msgText.appendChild(textNode)
     msgWrapper.appendChild(msgText)
@@ -117,9 +115,7 @@ function attachMsg({time, user, msg}, textSrc, winID = "status") {
     msgWrapper.classList.add('message')
 
     msgWindow.appendChild(msgWrapper)
-    msgWindow.scrollTop = html.msgPool.scrollHeight;
-
-    html.msgPool.appendChild(msgWindow)
+    msgWindow.scrollTop = msgWindow.scrollHeight;
 
 }
 
@@ -127,20 +123,27 @@ function attachMsg({time, user, msg}, textSrc, winID = "status") {
 
 function attachGroups(groups) {
     html.groupList.innerHTML = ""
+    html.msgPool.innerHTML = ""
+
+    let statusDiv = document.createElement("div")
+    statusDiv.id = `status`
+    statusDiv.classList.add("chat-messages")
+    html.msgPool.appendChild(statusDiv)
     if (!groups) return
     groups.forEach(group => {
         let element = document.createElement("li")
         element.textContent = group;
         html.groupList.appendChild(element);
 
+
         let chatDiv = document.createElement("div")
         chatDiv.id = `group-${group}`
-        chatDiv.classList.add("chat-messages","hidden")
+        chatDiv.classList.add("chat-messages", "hidden")
         html.msgPool.appendChild(chatDiv)
     });
 }
 
-function attachUsers(userlist)  {
+function attachUsers(userlist) {
     console.log(userlist);
     html.userList.innerHTML = ""
     if (!userlist) return
