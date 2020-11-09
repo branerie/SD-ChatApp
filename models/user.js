@@ -12,7 +12,7 @@ const UserSchema = new mongoose.Schema({
         required: true
     },
     
-    chatRooms: {
+    chatRoom: {
         type: 'ObjectId',
         ref: 'ChatRoom'
     }
