@@ -1,6 +1,6 @@
 const username = window.location.search.split("&")[0].split("=")[1] || "gerr0r"
 console.log(username);
-const socket = io({ query: { username } })
+const socket = io({ reconnectionAttempts: 3, query: { username } })
 const html = {
     sendMsg: document.getElementById('chat-form'),
     msgInput: document.getElementById('msg-input'),
@@ -9,6 +9,24 @@ const html = {
     userList: document.getElementById("members")
 }
 document.title = `SC | ${username}`
+
+socket.on('reconnecting', (attemptNumber) => {
+    console.log(`Attempt to connect to server (${attemptNumber}):`)
+});
+
+socket.on('reconnect_error', (error) => {
+    console.log("Failed to connect to server.")
+});
+
+// Fires if number of retries is reached (unless Infinity)
+socket.on('reconnect_failed', () => {
+    console.log("Maximum number of retries reached.")
+});
+
+socket.on('reconnect', (attemptNumber) => {
+    console.log(`Reconnected to server after ${attemptNumber} retries!`);
+});
+
 
 socket.on('welcome-message', ({ user, msg, groups }) => {
     let data = {
