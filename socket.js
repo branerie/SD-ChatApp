@@ -27,8 +27,6 @@ module.exports = io => {
         })
         
 
-        // socket.broadcast.emit("notice-message", "User connected to chat", "Say hello to user")
-
         socket.on("get-userlist", (group, callback) => {
             let clients = []
             io.in(group).clients((error, ids) => {
@@ -53,16 +51,11 @@ module.exports = io => {
 
 
         // Get message from client and send to rest clients
-        socket.on("chat-message", data => {
-            console.log(socket.username, data.group , data.msg)
+        socket.on("chat-message", ({group, msg} , callback) => {
+            console.log(`[${getTime()}] SERVER: User ${socket.username} sent message to ${group}`)
 
-            //time when server recieved the message
-            socket.to(data.group).emit("chat-message", {user: socket.username , group: data.group, msg: data.msg })
-            // socket.broadcast.emit("chat-message", {
-            //     time: new Date().toLocaleTimeString(),
-            //     user: socket.username,
-            //     msg
-            // })
+            socket.to(group).emit("chat-message", {user: socket.username , group, msg })
+            callback()
         })
     })
 
