@@ -1,5 +1,4 @@
 const username = window.location.search.split("&")[0].split("=")[1] || "gerr0r"
-console.log(username);
 const socket = io({ reconnectionAttempts: 10, query: { username } })
 const html = {
     sendMsg: document.getElementById('chat-form'),
@@ -7,9 +6,22 @@ const html = {
     msgPool: document.querySelector('.chat-messages-container'),
     groupList: document.getElementById("groups"),
     userList: document.getElementById("members"),
-    status: document.getElementById("status")
+    status: document.getElementById("status"),
+    titleBar: document.querySelector("header h1")
 }
 document.title = `SC | ${username}`
+
+
+socket.on('disconnect', (reason) => {
+    let data = {
+        time: new Date().toLocaleTimeString(),
+        user: "SYSTEM",
+        msg: `You have been disconnected from server (${reason}):`,
+        textType: 'text-system',
+        windowID: "status-window"
+    }
+    attachMsg(data)
+})
 
 socket.on('reconnecting', (attemptNumber) => {
     // console.log(`Attempt to connect to server (${attemptNumber}):`)
@@ -21,7 +33,7 @@ socket.on('reconnecting', (attemptNumber) => {
         windowID: "status-window"
     }
     attachMsg(data)
-});
+})
 
 socket.on('reconnect_error', (error) => {
     // console.log("Failed to connect to server.")
@@ -115,16 +127,13 @@ socket.on('chat-message', info => {
 })
 
 
+
 html.sendMsg.addEventListener('submit', e => {
     e.preventDefault()
     let msg = html.msgInput.value
     let msgWindow = document.querySelector("#groups .selected")
     let group = msgWindow.textContent
 
-    // Send message to server
-    socket.emit('chat-message', { msg, group })
-
-    // get current time
     let data = {
         time: new Date().toLocaleTimeString(),
         user: username,
@@ -133,24 +142,35 @@ html.sendMsg.addEventListener('submit', e => {
         windowID: group
     }
 
+    // Send message to server
     // should be in gray color until confirmed !!!
-    attachMsg(data)
+    socket.emit('chat-message', { msg, group }, () => attachMsg(data))
+
     html.msgInput.value = ''
     html.msgInput.focus()
+})
+
+html.status.addEventListener("click", function (e) {
+    html.titleBar.textContent = `SmartChat / STATUS`
+    Array.from(html.msgPool.children).forEach(el => el.classList.add("hidden"))
+    document.getElementById(`status-window`).classList.remove("hidden")
+    Array.from(html.groupList.children).forEach(el => el.classList.remove("selected"))
+    e.target.classList.add("selected")
 })
 
 html.groupList.addEventListener("click", function (e) {
     if (e.target === html.groupList) return
     let group = e.target.textContent;
     // change messages container
-    [...html.msgPool.children].forEach(el => el.classList.add("hidden"));
-    document.getElementById(`group-${group}`).classList.remove("hidden");
+    html.titleBar.textContent = `SmartChat / ${group}`
+    Array.from(html.msgPool.children).forEach(el => el.classList.add("hidden"))
+    document.getElementById(`group-${group}`).classList.remove("hidden")
 
     // change user list
-    [...e.currentTarget.children].forEach(el => el.classList.remove("selected"))
+    html.status.classList.remove("selected")
+    Array.from(e.currentTarget.children).forEach(el => el.classList.remove("selected"))
     e.target.classList.add("selected")
-    console.log(group); // validate
-    socket.emit('get-userlist', group, userlist => attachUsers(userlist))
+    socket.emit('get-userlist', group, userlist => attachUsers(userlist))  // optimize ?
 })
 
 function attachMsg({ time, user, msg, textType, windowID }) {
@@ -175,7 +195,6 @@ function attachMsg({ time, user, msg, textType, windowID }) {
 
     msgWindow.appendChild(msgWrapper)
     msgWindow.scrollTop = msgWindow.scrollHeight;
-
 }
 
 
