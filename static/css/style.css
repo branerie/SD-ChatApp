@@ -68,6 +68,10 @@ a {
 	scrollbar-width: none;
 }
 
+/* .chat-members {
+	display: none;
+} */
+
 .chat-sidebar h2 {
 	font-size: 20px;
 	background: rgba(10, 10, 10, 0.1);
@@ -118,6 +122,10 @@ a {
 
 .chat-messages .message .text-system {
 	color: purple;
+}
+
+.chat-messages .message .text-server {
+	color: mediumblue;
 }
 
 .chat-messages .message .timestamp {

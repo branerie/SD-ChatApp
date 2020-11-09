@@ -1,30 +1,63 @@
 const username = window.location.search.split("&")[0].split("=")[1] || "gerr0r"
 console.log(username);
-const socket = io({ reconnectionAttempts: 3, query: { username } })
+const socket = io({ reconnectionAttempts: 10, query: { username } })
 const html = {
     sendMsg: document.getElementById('chat-form'),
     msgInput: document.getElementById('msg-input'),
     msgPool: document.querySelector('.chat-messages-container'),
     groupList: document.getElementById("groups"),
-    userList: document.getElementById("members")
+    userList: document.getElementById("members"),
+    status: document.getElementById("status")
 }
 document.title = `SC | ${username}`
 
 socket.on('reconnecting', (attemptNumber) => {
-    console.log(`Attempt to connect to server (${attemptNumber}):`)
+    // console.log(`Attempt to connect to server (${attemptNumber}):`)
+    let data = {
+        time: new Date().toLocaleTimeString(),
+        user: "SYSTEM",
+        msg: `Attempt to connect to server (${attemptNumber}):`,
+        textType: 'text-system',
+        windowID: "status-window"
+    }
+    attachMsg(data)
 });
 
 socket.on('reconnect_error', (error) => {
-    console.log("Failed to connect to server.")
+    // console.log("Failed to connect to server.")
+    let data = {
+        time: new Date().toLocaleTimeString(),
+        user: "SYSTEM",
+        msg: "Failed to connect to server.",
+        textType: 'text-system',
+        windowID: "status-window"
+    }
+    attachMsg(data)
 });
 
 // Fires if number of retries is reached (unless Infinity)
 socket.on('reconnect_failed', () => {
-    console.log("Maximum number of retries reached.")
+    // console.log("Maximum number of retries reached.")
+    let data = {
+        time: new Date().toLocaleTimeString(),
+        user: "SYSTEM",
+        msg: "Maximum number of retries reached.",
+        textType: 'text-system',
+        windowID: "status-window"
+    }
+    attachMsg(data)
 });
 
 socket.on('reconnect', (attemptNumber) => {
-    console.log(`Reconnected to server after ${attemptNumber} retries!`);
+    // console.log(`Reconnected to server after ${attemptNumber} retries!`);
+    let data = {
+        time: new Date().toLocaleTimeString(),
+        user: "SYSTEM",
+        msg: `Reconnected to server after ${attemptNumber} retries!`,
+        textType: 'text-system',
+        windowID: "status-window"
+    }
+    attachMsg(data)
 });
 
 
@@ -32,20 +65,23 @@ socket.on('welcome-message', ({ user, msg, groups }) => {
     let data = {
         time: new Date().toLocaleTimeString(),
         user,
-        msg
+        msg,
+        textType: 'text-server',
+        windowID: "status-window"
     }
-    attachMsg(data, 'text-system', "status")
+    attachMsg(data)
     attachGroups(groups)
 })
 
 socket.on('quit-message', info => {
-    let time = new Date().toLocaleTimeString()
     let data = {
-        time,
+        time: new Date().toLocaleTimeString(),
         user: "SERVER",
-        msg: `${info.user} has quit`
+        msg: `${info.user} has quit`,
+        textType: 'text-server',
+        windowID: info.group
     }
-    attachMsg(data, 'text-system', info.group)
+    attachMsg(data)
     socket.emit('get-userlist', info.group, userlist => attachUsers(userlist)) // optimize ?
 })
 
@@ -55,13 +91,14 @@ socket.on('notice-message', (msg1, msg2) => {
 })
 
 socket.on('join-message', info => {
-    let time = new Date().toLocaleTimeString()
     let data = {
-        time,
+        time: new Date().toLocaleTimeString(),
         user: "SERVER",
-        msg: `${info.user} has joined the group`
+        msg: `${info.user} has joined the group`,
+        textType: 'text-server',
+        windowID: info.group
     }
-    attachMsg(data, 'text-system', info.group)
+    attachMsg(data)
     socket.emit('get-userlist', info.group, userlist => attachUsers(userlist)) // optimize ?
 })
 
@@ -70,9 +107,11 @@ socket.on('chat-message', info => {
     let data = {
         time: new Date().toLocaleTimeString(),
         user: info.user,
-        msg: info.msg
+        msg: info.msg,
+        textType: 'text-other',
+        windowID: info.group
     }
-    attachMsg(data, 'text-other', info.group)
+    attachMsg(data)
 })
 
 
@@ -89,11 +128,13 @@ html.sendMsg.addEventListener('submit', e => {
     let data = {
         time: new Date().toLocaleTimeString(),
         user: username,
-        msg
+        msg,
+        textType: 'text-self',
+        windowID: group
     }
 
     // should be in gray color until confirmed !!!
-    attachMsg(data, 'text-self', group)
+    attachMsg(data)
     html.msgInput.value = ''
     html.msgInput.focus()
 })
@@ -112,9 +153,9 @@ html.groupList.addEventListener("click", function (e) {
     socket.emit('get-userlist', group, userlist => attachUsers(userlist))
 })
 
-function attachMsg({ time, user, msg }, textSrc, winID = "status") {
-    if (winID !== "status") winID = "group-" + winID
-    let msgWindow = document.getElementById(winID)
+function attachMsg({ time, user, msg, textType, windowID }) {
+    if (windowID !== "status-window") windowID = "group-" + windowID
+    let msgWindow = document.getElementById(windowID)
 
     let msgWrapper = document.createElement('div')
     let msgText = document.createElement('p')
@@ -126,7 +167,7 @@ function attachMsg({ time, user, msg }, textSrc, winID = "status") {
     msgLabel.textContent = ` [${time}] ${user}: `
     msgText.appendChild(msgLabel)
 
-    msgText.classList.add(textSrc)
+    msgText.classList.add(textType)
     msgText.appendChild(textNode)
     msgWrapper.appendChild(msgText)
 
@@ -141,12 +182,12 @@ function attachMsg({ time, user, msg }, textSrc, winID = "status") {
 
 function attachGroups(groups) {
     html.groupList.innerHTML = ""
-    html.msgPool.innerHTML = ""
+    // html.msgPool.innerHTML = ""
 
-    let statusDiv = document.createElement("div")
-    statusDiv.id = `status`
-    statusDiv.classList.add("chat-messages")
-    html.msgPool.appendChild(statusDiv)
+    // let statusDiv = document.createElement("div")
+    // statusDiv.id = "status-window"
+    // statusDiv.classList.add("chat-messages")
+    // html.msgPool.appendChild(statusDiv)
     if (!groups) return
     groups.forEach(group => {
         let element = document.createElement("li")
