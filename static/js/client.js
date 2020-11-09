@@ -1,5 +1,4 @@
 const username = window.location.search.split("&")[0].split("=")[1] || "gerr0r"
-console.log(username);
 const socket = io({ reconnectionAttempts: 10, query: { username } })
 const html = {
     sendMsg: document.getElementById('chat-form'),
@@ -7,7 +6,8 @@ const html = {
     msgPool: document.querySelector('.chat-messages-container'),
     groupList: document.getElementById("groups"),
     userList: document.getElementById("members"),
-    status: document.getElementById("status")
+    status: document.getElementById("status"),
+    titleBar: document.querySelector("header h1")
 }
 document.title = `SC | ${username}`
 
@@ -127,6 +127,7 @@ socket.on('chat-message', info => {
 })
 
 
+
 html.sendMsg.addEventListener('submit', e => {
     e.preventDefault()
     let msg = html.msgInput.value
@@ -150,6 +151,7 @@ html.sendMsg.addEventListener('submit', e => {
 })
 
 html.status.addEventListener("click", function (e) {
+    html.titleBar.textContent = `SmartChat / STATUS`
     Array.from(html.msgPool.children).forEach(el => el.classList.add("hidden"))
     document.getElementById(`status-window`).classList.remove("hidden")
     Array.from(html.groupList.children).forEach(el => el.classList.remove("selected"))
@@ -160,6 +162,7 @@ html.groupList.addEventListener("click", function (e) {
     if (e.target === html.groupList) return
     let group = e.target.textContent;
     // change messages container
+    html.titleBar.textContent = `SmartChat / ${group}`
     Array.from(html.msgPool.children).forEach(el => el.classList.add("hidden"))
     document.getElementById(`group-${group}`).classList.remove("hidden")
 
@@ -167,7 +170,6 @@ html.groupList.addEventListener("click", function (e) {
     html.status.classList.remove("selected")
     Array.from(e.currentTarget.children).forEach(el => el.classList.remove("selected"))
     e.target.classList.add("selected")
-    console.log(group); // validate
     socket.emit('get-userlist', group, userlist => attachUsers(userlist))  // optimize ?
 })
 
