@@ -1,7 +1,7 @@
 const mock = require("./mock")
 
 module.exports = io => {
-    io.of("/chat.html").on("connect", socket => {
+    io.on("connect", socket => {
         console.log(`[${getTime()}] SERVER: New connection detected. Socket ID: ${socket.id}`)
 
         socket.username = socket.handshake.query.username;
@@ -21,18 +21,18 @@ module.exports = io => {
 
         // Welcome message from server to client connected
         socket.emit("welcome-message", {
-            time: getTime(),
             user: "SERVER",
             msg: `Welcome ${socket.username}`,
             groups: socket.groups
         })
+        
 
         // socket.broadcast.emit("notice-message", "User connected to chat", "Say hello to user")
 
         socket.on("get-userlist", (group, callback) => {
             let clients = []
-            io.of('/chat.html').in(group).clients((error, ids) => {
-                clients = ids.map(id => io.of('/chat.html').connected[id].username);
+            io.in(group).clients((error, ids) => {
+                clients = ids.map(id => io.of("/").connected[id].username);
                 console.log(clients);
                 callback(clients)
             })
@@ -47,16 +47,22 @@ module.exports = io => {
             })
         })
 
+        socket.on("reconnect" , () => {
+            console.log(`[${getTime()}] SERVER: User ${socket.username} has reconnect server`)
+        })
+
+
         // Get message from client and send to rest clients
-        socket.on("chat-message", msg => {
-            console.log(msg)
+        socket.on("chat-message", data => {
+            console.log(socket.username, data.group , data.msg)
 
             //time when server recieved the message
-            socket.broadcast.emit("chat-message", {
-                time: new Date().toLocaleTimeString(),
-                user: socket.username,
-                msg
-            })
+            socket.to(data.group).emit("chat-message", {user: socket.username , group: data.group, msg: data.msg })
+            // socket.broadcast.emit("chat-message", {
+            //     time: new Date().toLocaleTimeString(),
+            //     user: socket.username,
+            //     msg
+            // })
         })
     })
 
