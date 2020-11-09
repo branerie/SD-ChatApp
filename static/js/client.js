@@ -5,6 +5,7 @@ const html = {
     msgInput: document.getElementById('msg-input'),
     msgPool: document.querySelector('.chat-messages-container'),
     groupList: document.getElementById("groups"),
+    userListDiv: document.querySelector(".chat-members"),
     userList: document.getElementById("members"),
     status: document.getElementById("status"),
     titleBar: document.querySelector("header h1")
@@ -151,6 +152,7 @@ html.sendMsg.addEventListener('submit', e => {
 })
 
 html.status.addEventListener("click", function (e) {
+    html.userListDiv.style.display = "none"
     html.titleBar.textContent = `SmartChat / STATUS`
     Array.from(html.msgPool.children).forEach(el => el.classList.add("hidden"))
     document.getElementById(`status-window`).classList.remove("hidden")
@@ -171,6 +173,7 @@ html.groupList.addEventListener("click", function (e) {
     Array.from(e.currentTarget.children).forEach(el => el.classList.remove("selected"))
     e.target.classList.add("selected")
     socket.emit('get-userlist', group, userlist => attachUsers(userlist))  // optimize ?
+    html.userListDiv.style.display = "block"
 })
 
 function attachMsg({ time, user, msg, textType, windowID }) {

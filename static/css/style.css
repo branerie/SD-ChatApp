@@ -56,7 +56,7 @@ a {
 
 .chat-main {
 	display: grid;
-	grid-template-columns: 1fr 3fr 1fr;
+	grid-template-columns: auto 3fr auto;
 }
 
 .chat-sidebar {
@@ -65,12 +65,13 @@ a {
 	padding: 20px 10px 60px;
 	overflow-y: scroll;
 	max-height: 500px;
+	min-width: 200px;
 	scrollbar-width: none;
 }
 
-/* .chat-members {
+.chat-members {
 	display: none;
-} */
+}
 
 .chat-sidebar h2 {
 	font-size: 20px;
@@ -105,7 +106,7 @@ a {
 	overflow-y: auto;
 }
 
-.chat-messages-container .hidden {
+.hidden {
 	display: none;
 }
 
