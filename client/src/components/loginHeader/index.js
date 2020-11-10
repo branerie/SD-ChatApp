@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './index.module.css'
 
-const Header = () => {
+const LoginHeader = () => {
     return (
         <header className={styles['login-header']}>
             <h1>SmartChat Login</h1>
@@ -9,4 +9,4 @@ const Header = () => {
     )
 }
 
-export default Header
+export default LoginHeader

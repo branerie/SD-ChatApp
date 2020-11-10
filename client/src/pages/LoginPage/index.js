@@ -1,7 +1,7 @@
 import React from 'react'
 import styles from './index.module.css'
-import LoginHeader from '../../components/loginHeader'
-import LoginMain from '../../components/loginMain'
+import LoginHeader from '../../components/LoginHeader'
+import LoginMain from '../../components/LoginMain'
 
 
 const LoginPage = () => {
