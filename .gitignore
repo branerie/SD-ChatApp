@@ -24,6 +24,6 @@ yarn-debug.log*
 yarn-error.log*
 
 #user defined
-.env
-mock.js
+/server/.env
+/server/mock.js
 .vscode/

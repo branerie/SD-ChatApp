@@ -4,7 +4,7 @@ import LoginHeader from '../../components/loginHeader'
 import LoginMain from '../../components/loginMain'
 
 
-const Login = () => {
+const LoginPage = () => {
     return (
         <div className={styles['login-container']}>
             <LoginHeader />
@@ -13,4 +13,4 @@ const Login = () => {
     )
 }
 
-export default Login
+export default LoginPage
