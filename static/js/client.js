@@ -5,9 +5,11 @@ const html = {
     msgInput: document.getElementById('msg-input'),
     msgPool: document.querySelector('.chat-messages-container'),
     groupList: document.getElementById("groups"),
+    userListDiv: document.querySelector(".chat-members"),
     userList: document.getElementById("members"),
     status: document.getElementById("status"),
-    titleBar: document.querySelector("header h1")
+    titleBar: document.querySelector("header h1"),
+    chatList: document.getElementById("chat")
 }
 document.title = `SC | ${username}`
 
@@ -18,6 +20,7 @@ socket.on('disconnect', (reason) => {
         user: "SYSTEM",
         msg: `You have been disconnected from server (${reason}):`,
         textType: 'text-system',
+        windowType: null,
         windowID: "status-window"
     }
     attachMsg(data)
@@ -30,6 +33,7 @@ socket.on('reconnecting', (attemptNumber) => {
         user: "SYSTEM",
         msg: `Attempt to connect to server (${attemptNumber}):`,
         textType: 'text-system',
+        windowType: null,
         windowID: "status-window"
     }
     attachMsg(data)
@@ -41,7 +45,8 @@ socket.on('reconnect_error', (error) => {
         time: new Date().toLocaleTimeString(),
         user: "SYSTEM",
         msg: "Failed to connect to server.",
-        textType: 'text-system',
+        textType: 'text-system',        
+        windowType: null,
         windowID: "status-window"
     }
     attachMsg(data)
@@ -55,6 +60,7 @@ socket.on('reconnect_failed', () => {
         user: "SYSTEM",
         msg: "Maximum number of retries reached.",
         textType: 'text-system',
+        windowType: null,
         windowID: "status-window"
     }
     attachMsg(data)
@@ -67,6 +73,7 @@ socket.on('reconnect', (attemptNumber) => {
         user: "SYSTEM",
         msg: `Reconnected to server after ${attemptNumber} retries!`,
         textType: 'text-system',
+        windowType: null,
         windowID: "status-window"
     }
     attachMsg(data)
@@ -79,6 +86,7 @@ socket.on('welcome-message', ({ user, msg, groups }) => {
         user,
         msg,
         textType: 'text-server',
+        windowType: null,
         windowID: "status-window"
     }
     attachMsg(data)
@@ -91,6 +99,7 @@ socket.on('quit-message', info => {
         user: "SERVER",
         msg: `${info.user} has quit`,
         textType: 'text-server',
+        windowType: "group",
         windowID: info.group
     }
     attachMsg(data)
@@ -108,6 +117,7 @@ socket.on('join-message', info => {
         user: "SERVER",
         msg: `${info.user} has joined the group`,
         textType: 'text-server',
+        windowType: "group",
         windowID: info.group
     }
     attachMsg(data)
@@ -121,6 +131,7 @@ socket.on('chat-message', info => {
         user: info.user,
         msg: info.msg,
         textType: 'text-other',
+        windowType: "group",
         windowID: info.group
     }
     attachMsg(data)
@@ -138,7 +149,8 @@ html.sendMsg.addEventListener('submit', e => {
         time: new Date().toLocaleTimeString(),
         user: username,
         msg,
-        textType: 'text-self',
+        textType: 'text-self',        
+        windowType: "group",
         windowID: group
     }
 
@@ -151,6 +163,7 @@ html.sendMsg.addEventListener('submit', e => {
 })
 
 html.status.addEventListener("click", function (e) {
+    html.userListDiv.style.display = "none"
     html.titleBar.textContent = `SmartChat / STATUS`
     Array.from(html.msgPool.children).forEach(el => el.classList.add("hidden"))
     document.getElementById(`status-window`).classList.remove("hidden")
@@ -171,10 +184,26 @@ html.groupList.addEventListener("click", function (e) {
     Array.from(e.currentTarget.children).forEach(el => el.classList.remove("selected"))
     e.target.classList.add("selected")
     socket.emit('get-userlist', group, userlist => attachUsers(userlist))  // optimize ?
+    html.userListDiv.style.display = "block"
 })
 
-function attachMsg({ time, user, msg, textType, windowID }) {
-    if (windowID !== "status-window") windowID = "group-" + windowID
+html.chatList.addEventListener("click", function (e) {
+    if (e.target === html.chatList) return
+    let chat = e.target.textContent;
+    // change messages container
+    html.titleBar.textContent = `SmartChat / ${chat}`
+    Array.from(html.msgPool.children).forEach(el => el.classList.add("hidden"))
+    // document.getElementById(`chat-${chat}`).classList.remove("hidden")
+
+    // change user list
+    html.status.classList.remove("selected")
+    Array.from(e.currentTarget.children).forEach(el => el.classList.remove("selected"))
+    e.target.classList.add("selected")
+    html.userListDiv.style.display = "none"
+})
+
+function attachMsg({ time, user, msg, textType, windowType, windowID }) {
+    if (windowID !== "status-window") windowID = windowType + "-"+ windowID
     let msgWindow = document.getElementById(windowID)
 
     let msgWrapper = document.createElement('div')
@@ -221,6 +250,12 @@ function attachGroups(groups) {
     });
 }
 
+function attachChat(name) {
+    let li = document.createElement("li")
+    li.textContent = name;
+    html.chatList.appendChild(li)
+}
+
 function attachUsers(userlist) {
     console.log(userlist);
     html.userList.innerHTML = ""
@@ -231,3 +266,32 @@ function attachUsers(userlist) {
         html.userList.appendChild(element);
     });
 }
+
+
+html.userList.addEventListener("dblclick", function (e) {
+    if (e.target === html.userList) return
+    
+    let chat = e.target.textContent
+    if (Array.from(html.chatList.children, child => child.textContent).includes(chat)) return // focus on existing window
+
+    attachChat(chat)
+
+    let chatDiv = document.createElement("div")
+    chatDiv.id = `chat-${chat}`
+    chatDiv.classList.add("chat-messages")
+    html.msgPool.appendChild(chatDiv)
+
+    Array.from(html.msgPool.children).forEach(el => el.classList.add("hidden"))
+    chatDiv.classList.remove("hidden")
+
+    let data = {
+        time: new Date().toLocaleTimeString(),
+        user: "SYSTEM",
+        msg: `Start chat with ${chat}`,
+        textType: 'text-system',
+        windowType: "chat",
+        windowID: chat
+    }
+
+    attachMsg(data)
+})

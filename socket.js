@@ -2,13 +2,12 @@ const mock = require("./mock")
 
 module.exports = io => {
     io.on("connect", socket => {
-        console.log(`[${getTime()}] SERVER: New connection detected. Socket ID: ${socket.id}`)
-
         socket.username = socket.handshake.query.username;
         socket.groups = []
-        console.log(`[${getTime()}] SERVER: Associating socket ID ${socket.id} with user ${socket.username}`)
 
-        let user = mock.find(x => x.name === socket.username)
+        console.log(`[${getTime()}] SERVER: Detected connection with socket ID: ${socket.id}. Username: ${socket.username}`)
+
+        let user = mock.find(x => x.name === socket.username) // fetch DB
         if (user) {
             socket.groups = user.groups
             socket.join(socket.groups, () => {
@@ -31,14 +30,14 @@ module.exports = io => {
             let clients = []
             io.in(group).clients((error, ids) => {
                 clients = ids.map(id => io.of("/").connected[id].username);
-                console.log(clients);
+                // console.log(clients);
                 callback(clients)
             })
         })
         
         // Notify users on disconnect
-        socket.on("disconnect", () => {
-            console.log(`[${getTime()}] SERVER: User ${socket.username} has quit server`)
+        socket.on("disconnect", (reason) => {
+            console.log(`[${getTime()}] SERVER: User ${socket.username} has quit server (${reason})`)
             // send message to user groups that he quit
             socket.groups.forEach(group => {
                 socket.to(group).emit("quit-message", {user: socket.username , group})
