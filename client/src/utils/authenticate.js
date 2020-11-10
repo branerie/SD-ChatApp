@@ -6,7 +6,9 @@ const authenticate = async (url, body, onSuccess, onFailure) => {
             'Content-Type': 'application/json'
         }
     })
-    console.log(await promise.json());
+    const token = await promise.json();
+    
+    console.log();
 }
 
 export default authenticate
