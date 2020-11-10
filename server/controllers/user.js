@@ -12,19 +12,28 @@ router.post('/login', async (request, response, next) => {
     } = request.body
 
     if(!inputValidation(username, password)){
-        response.send('Incorrect input data')
+        console.error("Username and password are required!")
+        response.json('Username and password are required!')
         return
     }
 
     const userObject = await User.findOne({username})
 
     if(!userObject){
-        response.send('Not found')
+        console.error('User not found')
+        return
     }
     const isPasswordCorrect = await bcrypt.compare(password, userObject.password)
+
+    
+    if(!isPasswordCorrect){
+        console.error('Wrong password')
+        return
+    }
+
     const token = jwt.createToken(userObject)
     response.cookie('x-auth-token', token)
-    response.send(userObject)
+    response.json(token)
 })
 
 router.post('/register', async (request, response, next) => {
@@ -40,7 +49,7 @@ router.post('/register', async (request, response, next) => {
     const userObject = await user.save()
     const token = jwt.createToken(userObject)
     response.cookie('x-auth-token', token)
-    response.send(userObject)
+    response.json(token)
 })
 
 module.exports = router

@@ -7,19 +7,25 @@ import authenticate from '../../utils/authenticate'
 
 
 const LoginMain = (props) => {
+    const url = 'http://localhost:5000/login'
     const [username, setUsername] = useState ('')
     const [password, setPassword] = useState ('')
 
-    const handleSubmit = async (event) =>{
+    const handleSubmit = (event) =>{
         event.preventDefault()
-        await authenticate('http://localhost:5000/login', {
-            username,
-            password
-        }, (user) =>{
-    
-        },(error) =>{
-    
-        } )
+        const promise = fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({
+                username,
+                password
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(token => document.cookie = `x-auth-token=${token}`)
+        
     }
 
     return (
