@@ -18,6 +18,7 @@ const authenticate = async (url, body, onSuccess, onFailure) => {
         } else {
             onFailure()
         }
+
     } catch (error) {
         onFailure(error)
     }
