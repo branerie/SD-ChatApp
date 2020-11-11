@@ -1,0 +1,22 @@
+h2 {
+	font-size: 20px;
+	background: rgba(10, 10, 10, 0.1);
+	padding: 10px;
+	margin-bottom: 10px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+
+ul li {
+	padding: 10px 0;
+}
+
+ul li.selected {
+	background-color: gray;
+	color: darkgreen;
+}
+
+ul li:hover {
+	color: darkgreen;
+}
