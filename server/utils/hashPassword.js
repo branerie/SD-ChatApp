@@ -9,7 +9,7 @@ const passwordEncryption = async (password) => {
     } catch (error) {
         console.error(error)
         throw error
-    }
+    } 
 }
 
 module.exports = passwordEncryption
