@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import styles from './index.module.css'
 import Input from '../Input'
 import SubmitButton from '../Buttons/SubmitButton'
@@ -8,10 +9,11 @@ import authenticate from '../../utils/authenticate'
 
 const LoginMain = (props) => {
     const url = 'http://localhost:5000/login'
-    const [username, setUsername] = useState ('')
-    const [password, setPassword] = useState ('')
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
+    const history = useHistory()
 
-    const handleSubmit = (event) =>{
+    const handleSubmit = (event) => {
         event.preventDefault()
         const promise = fetch(url, {
             method: 'POST',
@@ -23,9 +25,16 @@ const LoginMain = (props) => {
                 'Content-Type': 'application/json'
             }
         })
-        .then(response => response.json())
-        .then(token => document.cookie = `x-auth-token=${token}`)
-        
+            .then(response => response.json())
+            .then(token => {
+                document.cookie = `x-auth-token=${token}`
+                history.push({
+                    pathname: "/chat", 
+                    token,
+                    username
+                })
+            })
+
     }
 
     return (
