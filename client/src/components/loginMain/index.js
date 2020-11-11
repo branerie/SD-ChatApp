@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import styles from './index.module.css'
 import Input from '../Input'
-import SubmitButton from '../Buttons/SubmitButton'
+import SubmitButton from '../buttons/SubmitButton'
 import authenticate from '../../utils/authenticate'
 
 
