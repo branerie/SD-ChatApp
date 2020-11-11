@@ -9,6 +9,7 @@ import inputValidation from '../../utils/inputValidation'
 import { useHistory } from "react-router-dom"
 
 const RegisterMain = () => {
+    const url = 'http://localhost:5000/register'
     const [username, setUsername] = useState ('')
     const [password, setPassword] = useState ('')
     const [rePassword, setRePassword] = useState ('')
@@ -26,7 +27,7 @@ const RegisterMain = () => {
             return
         }
       
-        await authenticate('http://localhost:5000/register', {
+        await authenticate(url, {
             username,
             password
         }, (user) =>{

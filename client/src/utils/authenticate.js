@@ -7,9 +7,12 @@ const authenticate = async (url, body, onSuccess, onFailure) => {
                 'Content-Type': 'application/json'
             }
         })
+        console.log('promise', promise);
         const authToken = promise.headers.get("Authorization")
+        console.log('token',authToken);
         document.cookie = `x-auth-token=${authToken}`
         const response = await promise.json()
+        console.log(response.username);
         if (response.username && authToken) {
             onSuccess({
                 username: response.username,
