@@ -48,8 +48,9 @@ router.post('/register', async (request, response, next) => {
     })
     const userObject = await user.save()
     const token = jwt.createToken(userObject)
-    response.cookie('x-auth-token', token)
-    response.json(token)
+    
+    response.header("Authorization", token)
+    response.send(userObject)
 })
 
 module.exports = router

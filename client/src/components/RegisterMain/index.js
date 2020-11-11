@@ -8,12 +8,11 @@ import UserContext from '../../Context'
 import inputValidation from '../../utils/inputValidation'
 import { useHistory } from "react-router-dom"
 
-
-
 const RegisterMain = () => {
     const [username, setUsername] = useState ('')
     const [password, setPassword] = useState ('')
     const [rePassword, setRePassword] = useState ('')
+
     const [alertMessage, setAlertMessage] = useState ('')
     const context = useContext(UserContext)
     const history = useHistory()
@@ -26,7 +25,7 @@ const RegisterMain = () => {
         if (alertMessage) {
             return
         }
-
+      
         await authenticate('http://localhost:5000/register', {
             username,
             password

@@ -8,7 +8,7 @@ const Input = ({ label, value, onChange, type }) => {
             <label>
                 {label}
                 <div>
-                    <input type={type || 'text'} value={value} onChange={onChange} placeholder={`${label}...`}/>
+                    <input type={type || 'text'} className={styles.input} value={value} onChange={onChange} placeholder={`${label}...`}/>
                 </div>
             </label>
         </div>
