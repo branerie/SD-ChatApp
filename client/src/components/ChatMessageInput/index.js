@@ -1,19 +1,25 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
+import { MessagesContext } from '../../context/MessagesContext'
 import './index.css'
 
-const ChatMessageInput = ({ socket }) => {
+const ChatMessageInput = ({ socket, user }) => {
     const [message, setMessage] = useState('')
     const [group, setGroup] = useState("test")
+    const { activeWindow, updateMessages } = useContext(MessagesContext)
 
     function sendMessage(e) {
         e.preventDefault()
         console.log(socket);
 
-        socket.emit('chat-message', { message, group }, () => attachMsg("test"))
+        socket.emit('chat-message', { group: activeWindow, msg: message }, () => attachMsg())
     }
 
-    function attachMsg(data) {
-        console.log(data);
+    function attachMsg() {
+        updateMessages({
+            group: activeWindow,
+            msg: message,
+            user: user
+        })
         setMessage('')
     }
 

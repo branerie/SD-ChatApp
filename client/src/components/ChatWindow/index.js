@@ -1,9 +1,21 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import './index.css'
+import { MessagesContext } from '../../context/MessagesContext'
 
-const ChatWindow = () => {
+const ChatWindow = (props) => {
+    const {messages, activeWindow} = useContext(MessagesContext)
     return (
-        <div>
-            
+        <div className="chat-messages">
+            {messages[activeWindow] && messages[activeWindow].map(({ user, msg, time }) => {
+                return (
+                    <div className="message">
+                        <p className={user === props.user ? 'text-self' : `text-${user}`}>
+                            <span className="timestamp">{`[${time}] ${user}: `}</span>
+                            {msg}
+                        </p>
+                    </div>
+                )
+            })}
         </div>
     )
 }

@@ -40,12 +40,8 @@ module.exports = io => {
             console.log(`[${getTime()}] SERVER: User ${socket.username} has quit server (${reason})`)
             // send message to user groups that he quit
             socket.groups.forEach(group => {
-                socket.to(group).emit("quit-message", {user: socket.username , group})
+                socket.to(group).emit("quit-message", {user: socket.username, reason, group})
             })
-        })
-
-        socket.on("reconnect" , () => {
-            console.log(`[${getTime()}] SERVER: User ${socket.username} has reconnect server`)
         })
 
 

@@ -1,0 +1,29 @@
+.chat-messages {
+	padding: 30px;
+	max-height: 500px;
+	overflow-y: auto;
+}
+.chat-messages .message {
+	padding: 10px;
+	margin-bottom: 15px;
+	background-color: var(--background-color);
+	border-radius: 5px;
+}
+
+.chat-messages .message .text-self {
+	color: green;
+}
+
+.chat-messages .message .text-SYSTEM {
+	color: purple;
+}
+
+.chat-messages .message .text-SERVER {
+	color: mediumblue;
+}
+.chat-messages .message .timestamp {
+	font-size: 15px;
+	font-weight: bold;
+	opacity: 0.7;
+	margin-bottom: 7px;
+}
