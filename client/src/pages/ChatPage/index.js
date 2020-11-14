@@ -14,11 +14,10 @@ const ChatPage = () => {
     const context = useContext(MessagesContext)
     console.log(context);
     const location = useLocation()
-    const [username, setUsername] = useState(location.username)
+    const username = location.username
     const [socketID, setSocketID] = useState(null)
-    const [groups, setGroups] = useState([])
-    const [confs, setConfs] = useState(['conf', 'conf2', 'conf3']) //dummy 
-    const [chats, setChats] = useState(['user1', 'user2', 'user3']) //dummy
+    const confs = ['conf', 'conf2', 'conf3'] //dummy 
+    const chats = ['user1', 'user2', 'user3'] //dummy
 
     const socket = useRef()
 
@@ -30,13 +29,14 @@ const ChatPage = () => {
         })
 
         socket.current.on("connect", () => {
-            setSocketID(socket.id)
-            console.log([socketID, username]);
+            // setSocketID(socket.id)
+            // console.log([socketID, username]);
             document.title = username
         })
-
+        
         socket.current.on('welcome-message', ({ user, msg, groups }) => {
-            welcomeMessage(groups) 
+            context.updateMessages({ user, msg, group: "STATUS" })
+            context.updateGroups(groups)
         })
 
         socket.current.on('chat-message', ({ user, msg, group }) => {
@@ -44,8 +44,11 @@ const ChatPage = () => {
         })
         
         socket.current.on('join-message', ({ user, group }) => {
-            console.log(user, group);
-            context.updateMessages({ user: "SERVER", msg: `${user} has joined ${group}`, group })
+            context.updateMessages({
+                user: "SERVER",
+                msg: user === username ? `You are now talking in ${group}` : `${user} has joined ${group}`,
+                group 
+            })     
         })
 
         socket.current.on('quit-message', ({ user, reason, group }) => {
@@ -53,18 +56,14 @@ const ChatPage = () => {
         })
     }, [])
 
-    function welcomeMessage(groups) {
-        setGroups(groups)
-    }
-
     return (
         // <MessagesContextProvider>
             <div className="chat-container">
                 <ChatHeader />
                 <main className="chat-main">
                     <aside className="chat-sidebar">
-                        <ul><li className="selected">STATUS</li></ul>
-                        {groups ? <ChatList label={"groups"} data={groups} /> : null}
+                        {/* <ul><li key="status-window" className="selected">STATUS</li></ul> */}
+                        {context.groups ? <ChatList label={"groups"} data={context.groups} /> : null}
                         {confs ? <ChatList label={"conferences"} data={confs} /> : null}
                         {chats ? <ChatList label={"chats"} data={chats} /> : null}
                     </aside>

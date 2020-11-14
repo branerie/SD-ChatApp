@@ -3,13 +3,12 @@ import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatList = ({ label, data }) => {
-    const [selected, setSelected] = useState("status")
+    const [selected, setSelected] = useState("STATUS")
     const { changeWindow }  = useContext(MessagesContext)
 
     function handleClick(item) {
         changeWindow(item)
         setSelected(item)
-        console.log("|");
     }
     return (
         <div>

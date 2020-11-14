@@ -4,7 +4,6 @@ import './index.css'
 
 const ChatMessageInput = ({ socket, user }) => {
     const [message, setMessage] = useState('')
-    const [group, setGroup] = useState("test")
     const { activeWindow, updateMessages } = useContext(MessagesContext)
 
     function sendMessage(e) {

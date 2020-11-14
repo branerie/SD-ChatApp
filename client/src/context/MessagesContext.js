@@ -47,12 +47,8 @@ import React, { useState } from 'react'
 export const MessagesContext = React.createContext()
 
 export default function MessagesContextProvider(props) {
-    const initState = { "status": [] }
+    const initState = { "STATUS": [] }
     const dummyState = {
-        "status": [
-            {user: "SERVER", msg: "WELCOME", time: "13:10:36"},
-            {user: "SYSTEM", msg: "Time is ...", time: "13:10:37"},
-        ],
         "Divavu": [
             {user: "SERVER", msg: "Yago joined", time: "13:10:38"},
             {user: "Yago", msg: "Hi there ...", time: "13:11:36"},
@@ -67,8 +63,14 @@ export default function MessagesContextProvider(props) {
             {user: "SERVER", msg: "Shep left ...", time: "13:12:36"}
         ]
     }
+
+    const [groups,setGroups] = useState(["STATUS"])
     const [messages, setMessages] = useState(dummyState)
-    const [activeWindow, setActiveWindow] = useState("status")
+    const [activeWindow, setActiveWindow] = useState("STATUS")
+
+    function updateGroups(groups) {
+        setGroups(prevGroups => ([...prevGroups, ...groups]))
+    }
 
     function updateMessages({ user, msg, group }) {
         setMessages(prevMessages => ({
@@ -81,12 +83,11 @@ export default function MessagesContextProvider(props) {
     }
 
     function changeWindow(selectedWindow) {
-        console.log(activeWindow);
         setActiveWindow(selectedWindow)
     }
 
     return (
-        <MessagesContext.Provider value={{messages, updateMessages, activeWindow, changeWindow}}>
+        <MessagesContext.Provider value={{groups, updateGroups, messages, updateMessages, activeWindow, changeWindow}}>
             {props.children}
         </MessagesContext.Provider>
     )
