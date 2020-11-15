@@ -3,7 +3,7 @@ import './index.css'
 import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatWindow = (props) => {
-    const {messages, activeWindow} = useContext(MessagesContext)
+    const { messages, activeWindow } = useContext(MessagesContext)
     return (
         <div className="chat-messages">
             {messages[activeWindow] && messages[activeWindow].map(({ user, msg, time }, i) => {

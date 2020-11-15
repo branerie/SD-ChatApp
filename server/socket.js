@@ -14,9 +14,14 @@ module.exports = io => {
             // console.log(socket.rooms.size);
             // send join message to group online members so they could update their userlists
             socket.rooms.forEach(group => {
-                io.to(group).emit("join-message", { user: socket.username, group })
+                socket.to(group).emit("join-message", { user: socket.username, group })
             })
         }
+
+        // let online = io.sockets.adapter.rooms.get('Cardguard')
+        // console.log(online);
+        // console.log([...online].map(sid => io.sockets.sockets.get(sid).username))
+
 
         // Welcome message from server to client connected
         socket.emit("welcome-message", {
@@ -36,7 +41,7 @@ module.exports = io => {
         // })
 
         // Notify users on disconnect
-        socket.on("disconnect", (reason) => {
+        socket.on("disconnecting", (reason) => {
             console.log(`[${getTime()}] SERVER: User ${socket.username} has quit server (${reason})`)
             // send message to user groups that he quit
             socket.rooms.forEach(group => {

@@ -7,6 +7,7 @@ import { MessagesContext } from '../../context/MessagesContext'
 import ChatHeader from '../../components/ChatHeader'
 import ChatWindow from '../../components/ChatWindow'
 import ChatMessageInput from '../../components/ChatMessageInput'
+import ChatGroupMembers from '../../components/ChatGroupMembers'
 
 // let socket;
 
@@ -33,51 +34,52 @@ const ChatPage = () => {
             // console.log([socketID, username]);
             document.title = username
         })
-        
+
         socket.current.on('welcome-message', ({ user, msg, groups }) => {
             context.updateMessages({ user, msg, group: "STATUS" })
             context.updateGroups(groups)
+            groups.forEach(group => {
+                context.updateMessages({
+                    user: "SYSTEM",
+                    msg: `You are now talking in ${group}`,
+                    group
+                })
+            });
         })
 
         socket.current.on('chat-message', ({ user, msg, group }) => {
             context.updateMessages({ user, msg, group })
         })
-        
+
         socket.current.on('join-message', ({ user, group }) => {
             context.updateMessages({
                 user: "SERVER",
-                msg: user === username ? `You are now talking in ${group}` : `${user} has joined ${group}`,
-                group 
-            })     
+                msg: `${user} has joined ${group}`,
+                group
+            })
         })
 
         socket.current.on('quit-message', ({ user, reason, group }) => {
             context.updateMessages({ user: "SERVER", msg: `${user} has quit (${reason})`, group })
         })
+
+        return () => socket.current.disconnect()
     }, [])
 
     return (
-        // <MessagesContextProvider>
-            <div className="chat-container">
-                <ChatHeader />
-                <main className="chat-main">
-                    <aside className="chat-sidebar">
-                        {/* <ul><li key="status-window" className="selected">STATUS</li></ul> */}
-                        {context.groups ? <ChatList label={"groups"} data={context.groups} /> : null}
-                        {confs ? <ChatList label={"conferences"} data={confs} /> : null}
-                        {chats ? <ChatList label={"chats"} data={chats} /> : null}
-                    </aside>
-                    <div className="chat-messages-container">
-                        <ChatWindow user={username}/>
-                    </div>
-                    <aside className="chat-sidebar chat-members hidden">
-                        <h2>ONLINE</h2>
-                        <ul id="members"></ul>
-                    </aside>
-                </main>
-                <ChatMessageInput socket={socket.current} user={username}/>
-            </div>
-        // </MessagesContextProvider>
+        <div className="chat-container">
+            <ChatHeader />
+            <main className="chat-main">
+                <aside className="chat-sidebar">
+                    {context.groups ? <ChatList label={"groups"} data={context.groups} /> : null}
+                    {confs ? <ChatList label={"conferences"} data={confs} /> : null}
+                    {chats ? <ChatList label={"chats"} data={chats} /> : null}
+                </aside>
+                <ChatWindow user={username} />
+                {context.windowIsGroup && <ChatGroupMembers />}
+            </main>
+            <ChatMessageInput socket={socket.current} user={username} />
+        </div>
     )
 }
 
