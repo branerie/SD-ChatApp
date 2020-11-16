@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import UserContext from './Context'
 
+import MessagesContextProvider from './context/MessagesContext'
+
 const App = () => {
   const [user, setUser] = useState(null);
   // const [loading, setLoading] = useState(true);
@@ -30,13 +32,15 @@ const App = () => {
       logIn,
       logOut
     }}>
-      <BrowserRouter>
-        <Switch>
-          <Route path="/login" component={LoginPage} />
-          <Route path="/register" component={RegisterPage} />
-          <Route path="/chat" component={ChatPage} />
-        </Switch>
-      </BrowserRouter>
+      <MessagesContextProvider>
+        <BrowserRouter>
+          <Switch>
+            <Route path="/login" component={LoginPage} />
+            <Route path="/register" component={RegisterPage} />
+            <Route path="/chat" component={ChatPage} />
+          </Switch>
+        </BrowserRouter>
+      </MessagesContextProvider>
     </UserContext.Provider>
   )
 }

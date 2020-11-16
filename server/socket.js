@@ -9,51 +9,52 @@ module.exports = io => {
 
         let user = mock.find(x => x.name === socket.username) // fetch DB
         if (user) {
-            socket.groups = user.groups
-            socket.join(socket.groups, () => {
-                socket.groups.forEach(group => {
-                    // send join message to group online members so they could update their userlists
-                    socket.to(group).emit("join-message", { user: socket.username, group })
-                })
+            // socket.groups = user.groups
+            socket.join(user.groups)
+            // console.log(socket.rooms.size);
+            // send join message to group online members so they could update their userlists
+            socket.rooms.forEach(group => {
+                socket.to(group).emit("join-message", { user: socket.username, group })
             })
         }
+
+        // let online = io.sockets.adapter.rooms.get('Cardguard')
+        // console.log(online);
+        // console.log([...online].map(sid => io.sockets.sockets.get(sid).username))
+
 
         // Welcome message from server to client connected
         socket.emit("welcome-message", {
             user: "SERVER",
             msg: `Welcome ${socket.username}`,
-            groups: socket.groups
+            groups: [...socket.rooms].slice(1)
         })
-        
 
-        socket.on("get-userlist", (group, callback) => {
-            let clients = []
-            io.in(group).clients((error, ids) => {
-                clients = ids.map(id => io.of("/").connected[id].username);
-                // console.log(clients);
-                callback(clients)
-            })
-        })
-        
+
+        // socket.on("get-userlist", (group, callback) => {
+        //     let clients = []
+        //     io.in(group).clients((error, ids) => {
+        //         clients = ids.map(id => io.of("/").connected[id].username);
+        //         // console.log(clients);
+        //         callback(clients)
+        //     })
+        // })
+
         // Notify users on disconnect
-        socket.on("disconnect", (reason) => {
+        socket.on("disconnecting", (reason) => {
             console.log(`[${getTime()}] SERVER: User ${socket.username} has quit server (${reason})`)
             // send message to user groups that he quit
-            socket.groups.forEach(group => {
-                socket.to(group).emit("quit-message", {user: socket.username , group})
+            socket.rooms.forEach(group => {
+                socket.to(group).emit("quit-message", { user: socket.username, reason, group })
             })
-        })
-
-        socket.on("reconnect" , () => {
-            console.log(`[${getTime()}] SERVER: User ${socket.username} has reconnect server`)
         })
 
 
         // Get message from client and send to rest clients
-        socket.on("chat-message", ({group, msg} , callback) => {
+        socket.on("chat-message", ({ group, msg }, callback) => {
             console.log(`[${getTime()}] SERVER: User ${socket.username} sent message to ${group}`)
 
-            socket.to(group).emit("chat-message", {user: socket.username , group, msg })
+            socket.to(group).emit("chat-message", { user: socket.username, group, msg })
             callback()
         })
     })
