@@ -47,25 +47,9 @@ import React, { useState } from 'react'
 export const MessagesContext = React.createContext()
 
 export default function MessagesContextProvider(props) {
-    const initState = { "STATUS": [] }
-    const dummyState = {
-        "Divavu": [
-            { user: "SERVER", msg: "Yago joined", time: "13:10:38" },
-            { user: "Yago", msg: "Hi there ...", time: "13:11:36" },
-            { user: "Maia", msg: "Hey Yago! Sup? ...", time: "13:11:44" },
-            { user: "SERVER", msg: "Yago quit ...", time: "13:12:36" }
-        ],
-        "Jamia": [
-            { user: "SERVER", msg: "Yago joined", time: "13:10:38" },
-            { user: "Shep", msg: "Ops ...", time: "13:11:36" },
-            { user: "Maia", msg: "Hey Shep! How you doin? ...", time: "13:11:44" },
-            { user: "Shep", msg: "Fine 10X!", time: "13:11:44" },
-            { user: "SERVER", msg: "Shep left ...", time: "13:12:36" }
-        ]
-    }
 
     const dummyUsersState = {
-        "Latlux": {
+        "Cyperaceae": {
             online: ['user1', 'user2'],
             offline: ['user3']
         },
@@ -78,7 +62,7 @@ export default function MessagesContextProvider(props) {
     const [users, setUsers] = useState(dummyUsersState)
     const [groups, setGroups] = useState(["STATUS"])
     const [chats, setChats] = useState([])
-    const [messages, setMessages] = useState(dummyState)
+    const [messages, setMessages] = useState({ "STATUS": [] })
     const [activeWindow, setActiveWindow] = useState("STATUS")
     const [windowIsGroup, setwindowIsGroup] = useState(false)
 
