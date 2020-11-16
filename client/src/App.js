@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import "./style.css"
 import ChatPage from './pages/ChatPage'
@@ -7,6 +7,7 @@ import RegisterPage from './pages/RegisterPage'
 import UserContext from './Context'
 
 import MessagesContextProvider from './context/MessagesContext'
+import { SocketContextProvider } from './context/SocketContext'
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -32,15 +33,17 @@ const App = () => {
       logIn,
       logOut
     }}>
-      <MessagesContextProvider>
-        <BrowserRouter>
-          <Switch>
-            <Route path="/login" component={LoginPage} />
-            <Route path="/register" component={RegisterPage} />
-            <Route path="/chat" component={ChatPage} />
-          </Switch>
-        </BrowserRouter>
-      </MessagesContextProvider>
+      <BrowserRouter>
+        <Switch>
+          <Route path="/login" component={LoginPage} />
+          <Route path="/register" component={RegisterPage} />
+        </Switch>
+          <MessagesContextProvider>
+            <Switch>
+              <Route path="/chat" component={ChatPage} />
+            </Switch>
+          </MessagesContextProvider>
+      </BrowserRouter>
     </UserContext.Provider>
   )
 }

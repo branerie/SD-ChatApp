@@ -1,10 +1,12 @@
 import React, { useContext, useState } from 'react'
-import { MessagesContext } from '../../context/MessagesContext'
 import './index.css'
+import { MessagesContext } from '../../context/MessagesContext'
+import { SocketContext } from '../../context/SocketContext'
 
-const ChatMessageInput = ({ socket, user }) => {
+const ChatMessageInput = () => {
     const [message, setMessage] = useState('')
     const { activeWindow, updateMessages } = useContext(MessagesContext)
+    const { socket, username } = useContext(SocketContext)
 
     function sendMessage(e) {
         e.preventDefault()
@@ -17,7 +19,7 @@ const ChatMessageInput = ({ socket, user }) => {
         updateMessages({
             group: activeWindow,
             msg: message,
-            user: user
+            user: username
         })
         setMessage('')
     }
