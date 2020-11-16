@@ -1,17 +1,25 @@
-const mock = require("./mock")
+const mockUsers = require("./mock-users")
+const mockGroups = require("./mock-groups")
 
 module.exports = io => {
     io.on("connect", socket => {
         socket.username = socket.handshake.query.username;
         socket.groups = []
+        socket.chats = []
 
         console.log(`[${getTime()}] SERVER: Detected connection with socket ID: ${socket.id}. Username: ${socket.username}`)
 
-        let user = mock.find(x => x.name === socket.username) // fetch DB
+        let user = mockUsers.find(x => x.name === socket.username) // fetch DB
         if (user) {
-            // socket.groups = user.groups
+            socket.groups = [...new Set(user.groups)] // temporary (to remove dubs from mock db)
+            socket.chats = [...new Set(user.chats)] // temporary (to remove dubs from mock db)
+            socket.emit("welcome-message", {
+                user: "SERVER",
+                msg: `Welcome ${socket.username}`,
+                groups: socket.groups,
+                chats: socket.chats
+            })
             socket.join(user.groups)
-            // console.log(socket.rooms.size);
             // send join message to group online members so they could update their userlists
             socket.rooms.forEach(group => {
                 socket.to(group).emit("join-message", { user: socket.username, group })
@@ -23,12 +31,8 @@ module.exports = io => {
         // console.log([...online].map(sid => io.sockets.sockets.get(sid).username))
 
 
-        // Welcome message from server to client connected
-        socket.emit("welcome-message", {
-            user: "SERVER",
-            msg: `Welcome ${socket.username}`,
-            groups: [...socket.rooms].slice(1)
-        })
+        // Welcome message from server to connected client
+        // Send groups and chats to client for UI setup
 
 
         // socket.on("get-userlist", (group, callback) => {
