@@ -18,12 +18,6 @@ const LoginMain = (props) => {
 
     const handleSubmit = async (event) =>{
         event.preventDefault()
-        
-        // setAlertMessage(inputValidation(username, password, rePassword))
-       
-        // if (alertMessage) {
-        //     return
-        // }
       
         await authenticate(url, {
             username,
@@ -37,34 +31,6 @@ const LoginMain = (props) => {
             console.log('Error', error);
         } )
     }
-
-
-
-
-
-    // const handleSubmit = (event) => {
-    //     event.preventDefault()
-    //     const promise = fetch(url, {
-    //         method: 'POST',
-    //         body: JSON.stringify({
-    //             username,
-    //             password
-    //         }),
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     })
-    //         .then(response => response.json())
-    //         .then(token => {
-    //             document.cookie = `x-auth-token=${token}`
-    //             history.push({
-    //                 pathname: "/chat", 
-    //                 token,
-    //                 username
-    //             })
-    //         })
-
-    // }
 
     return (
         <form className={styles['login-main']} onSubmit={handleSubmit}>

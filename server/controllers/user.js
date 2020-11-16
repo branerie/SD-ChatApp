@@ -13,12 +13,10 @@ router.post('/login', async (request, response, next) => {
 
     if(!inputValidation(username, password)){
         console.error("Username and password are required!")
-        response.json('Username and password are required!')
         return
     }
 
     const userObject = await User.findOne({username})
-
     if(!userObject){
         console.error('User not found')
         return
@@ -30,10 +28,9 @@ router.post('/login', async (request, response, next) => {
         console.error('Wrong password')
         return
     }
-
     const token = jwt.createToken(userObject)
-    response.cookie('x-auth-token', token)
-    response.json(token)
+    response.header("Authorization", token)
+    response.send(userObject)
 })
 
 router.post('/register', async (request, response, next) => {
