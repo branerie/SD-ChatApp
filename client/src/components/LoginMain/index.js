@@ -13,10 +13,15 @@ const LoginMain = (props) => {
     const context = useContext(UserContext)
     const history = useHistory()
 
-
     const handleSubmit = async (event) =>{
-        event.preventDefault()
-      
+        event.preventDefault()        
+
+        // dev hack
+        if (!password) {
+            history.push({ pathname: '/chat', username })
+            return;
+        }
+
         await authenticate(url, {
             username,
             password
