@@ -2,10 +2,8 @@ import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styles from './index.module.css'
 import Input from '../Input'
-import SubmitButton from '../buttons/SubmitButton'
+import SubmitButton from '../Buttons/SubmitButton'
 import authenticate from '../../utils/authenticate'
-
-
 
 const LoginMain = (props) => {
     const url = 'http://localhost:5000/login'
