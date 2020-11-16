@@ -17,31 +17,3 @@
 	display: grid;
 	grid-template-columns: auto 3fr auto;
 }
-
-.chat-sidebar {
-	background: var(--color-b);
-	color: #fff;
-	padding: 20px 10px 60px;
-	overflow-y: scroll;
-	max-height: 500px;
-	min-width: 200px;
-	scrollbar-width: none;
-}
-
-.chat-sidebar h2 {
-	font-size: 20px;
-	background: rgba(10, 10, 10, 0.1);
-	padding: 10px;
-	margin-bottom: 10px;
-	text-align: center;
-}
-
-
-.chat-sidebar ul li {
-	padding: 10px 0;
-}
-
-
-.chat-sidebar ul li:hover {
-	color: darkgreen;
-}

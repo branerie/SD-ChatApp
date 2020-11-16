@@ -1,3 +1,13 @@
+.chat-sidebar {
+	background: var(--color-b);
+	color: #fff;
+	padding: 20px 10px 60px;
+	overflow-y: scroll;
+	max-height: 500px;
+	min-width: 200px;
+	scrollbar-width: none;
+}
+
 h2 {
 	font-size: 20px;
 	background: rgba(10, 10, 10, 0.1);
