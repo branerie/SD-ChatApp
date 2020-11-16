@@ -77,6 +77,7 @@ export default function MessagesContextProvider(props) {
 
     const [users, setUsers] = useState(dummyUsersState)
     const [groups, setGroups] = useState(["STATUS"])
+    const [chats, setChats] = useState([])
     const [messages, setMessages] = useState(dummyState)
     const [activeWindow, setActiveWindow] = useState("STATUS")
     const [windowIsGroup, setwindowIsGroup] = useState(false)
@@ -102,8 +103,9 @@ export default function MessagesContextProvider(props) {
 
     return (
         <MessagesContext.Provider value={{
-            groups, updateGroups,
+            groups, setGroups, updateGroups,
             users, setUsers,
+            chats, setChats,
             messages, updateMessages,
             activeWindow, changeWindow,
             windowIsGroup

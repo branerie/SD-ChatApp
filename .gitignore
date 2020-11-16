@@ -25,5 +25,5 @@ yarn-error.log*
 
 #user defined
 /server/.env
-/server/mock.js
+/server/mock*.js
 .vscode/

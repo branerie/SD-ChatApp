@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState, useRef } from 'react'
+import React, { useEffect, useContext, useState, useRef, useCallback } from 'react'
 import { useLocation } from "react-router-dom"
 import ChatList from "../../components/ChatList"
 import io from "socket.io-client"
@@ -16,9 +16,6 @@ const ChatPage = () => {
     console.log(context);
     const location = useLocation()
     const username = location.username
-    const [socketID, setSocketID] = useState(null)
-    const confs = ['conf', 'conf2', 'conf3'] //dummy 
-    const chats = ['user1', 'user2', 'user3'] //dummy
 
     const socket = useRef()
 
@@ -30,21 +27,20 @@ const ChatPage = () => {
         })
 
         socket.current.on("connect", () => {
-            // setSocketID(socket.id)
-            // console.log([socketID, username]);
             document.title = username
         })
 
-        socket.current.on('welcome-message', ({ user, msg, groups }) => {
+        socket.current.on('welcome-message', ({ user, msg, groups, chats }) => {
             context.updateMessages({ user, msg, group: "STATUS" })
-            context.updateGroups(groups)
+            context.setGroups(["STATUS", ...groups])
+            context.setChats(chats)
             groups.forEach(group => {
                 context.updateMessages({
                     user: "SYSTEM",
                     msg: `You are now talking in ${group}`,
                     group
                 })
-            });
+            })
         })
 
         socket.current.on('chat-message', ({ user, msg, group }) => {
@@ -70,11 +66,7 @@ const ChatPage = () => {
         <div className="chat-container">
             <ChatHeader />
             <main className="chat-main">
-                <aside className="chat-sidebar">
-                    {context.groups ? <ChatList label={"groups"} data={context.groups} /> : null}
-                    {confs ? <ChatList label={"conferences"} data={confs} /> : null}
-                    {chats ? <ChatList label={"chats"} data={chats} /> : null}
-                </aside>
+                <ChatList />
                 <ChatWindow user={username} />
                 {context.windowIsGroup && <ChatGroupMembers />}
             </main>
