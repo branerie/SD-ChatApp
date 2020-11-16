@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react'
 import { useHistory } from 'react-router-dom'
 import styles from './index.module.css'
-import Input from '../Input2'
+import Input from '../Input'
 import SubmitButton from '../Buttons/SubmitButton'
 import authenticate from '../../utils/authenticate'
 import UserContext from '../../Context'

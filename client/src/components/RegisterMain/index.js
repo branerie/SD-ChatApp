@@ -1,6 +1,6 @@
 import React, {useState, useContext} from 'react'
 import styles from './index.module.css'
-import Input from '../Input2'
+import Input from '../Input'
 import Alert from '../Alert'
 import SubmitButton from '../Buttons/SubmitButton'
 import authenticate from '../../utils/authenticate'
