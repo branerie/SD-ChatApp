@@ -1,3 +1,13 @@
 .form-control {
 	margin-bottom: 20px;
+	width: 100%;
+}
+
+.input {
+	
+	font-size: 16px;
+	padding: 5px;
+	height: 40px;
+	width: 100%;
+	
 }
