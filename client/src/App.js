@@ -7,7 +7,6 @@ import RegisterPage from './pages/RegisterPage'
 import UserContext from './Context'
 
 import MessagesContextProvider from './context/MessagesContext'
-import { SocketContextProvider } from './context/SocketContext'
 
 const App = () => {
   const [user, setUser] = useState(null);

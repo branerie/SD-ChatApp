@@ -42,24 +42,32 @@
         ],
     }
 */
-import React, { useState } from 'react'
+import React, { useState, useReducer } from 'react'
 
 export const MessagesContext = React.createContext()
 
+function reducer(groupMembers, action) {
+    const { group, user } = action.payload 
+    switch (action.type) {
+        case "loadUsers":
+            return action.payload.groups            
+        case "addUser":
+            groupMembers[group].online.push(user)
+            groupMembers[group].offline = groupMembers[group].offline.filter(member => member !== user)
+            return groupMembers
+        case "remUser":
+            groupMembers[group].offline.push(user)
+            groupMembers[group].online = groupMembers[group].online.filter(member => member !== user)
+            return groupMembers
+        default:
+            return groupMembers
+    }
+}
+
 export default function MessagesContextProvider(props) {
 
-    const dummyUsersState = {
-        "Cyperaceae": {
-            online: ['user1', 'user2'],
-            offline: ['user3']
-        },
-        "Jamia": {
-            online: ['user4'],
-            offline: ['user6']
-        }
-    }
-
-    const [users, setUsers] = useState(dummyUsersState)
+    const [groupMembers, dispatch] = useReducer(reducer, {})
+    // const [users, setUsers] = useState()
     const [groups, setGroups] = useState(["STATUS"])
     const [chats, setChats] = useState([])
     const [messages, setMessages] = useState({ "STATUS": [] })
@@ -80,6 +88,10 @@ export default function MessagesContextProvider(props) {
         }))
     }
 
+    function updateUsers(user) {
+        
+    }
+
     function changeWindow(selectedWindow, isGroup) {
         setActiveWindow(selectedWindow)
         setwindowIsGroup(isGroup)
@@ -88,7 +100,7 @@ export default function MessagesContextProvider(props) {
     return (
         <MessagesContext.Provider value={{
             groups, setGroups, updateGroups,
-            users, setUsers,
+            groupMembers, dispatch,
             chats, setChats,
             messages, updateMessages,
             activeWindow, changeWindow,

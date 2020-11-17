@@ -3,15 +3,25 @@ const mockGroups = require("./mock-groups")
 
 module.exports = io => {
     io.on("connect", socket => {
-        socket.username = socket.handshake.query.username;
-        socket.groups = []
+        socket.username = socket.handshake.query.username
+        socket.groups = {}
         socket.chats = []
 
         console.log(`[${getTime()}] SERVER: Detected connection with socket ID: ${socket.id}. Username: ${socket.username}`)
 
         let user = mockUsers.find(x => x.name === socket.username) // fetch DB
         if (user) {
-            socket.groups = [...new Set(user.groups)] // temporary (to remove dubs from mock db)
+            user.groups = [...new Set(user.groups)] // temporary (to remove dubs from mock db)
+            user.groups.forEach(group => {
+                let { members } = mockGroups.find(x => x.name === group) || []
+                let onlineSIDs = io.sockets.adapter.rooms.get(group) || []
+                let online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
+                socket.groups[group] = {
+                    online,
+                    offline: members ? members.filter(member => !online.includes(member)) : []
+                }
+            })
+            console.log(socket.groups);
             socket.chats = [...new Set(user.chats)] // temporary (to remove dubs from mock db)
             socket.emit("welcome-message", {
                 user: "SERVER",

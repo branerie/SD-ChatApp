@@ -6,7 +6,7 @@ let socket;
 
 export const SocketContext = React.createContext()
 
-export const SocketContextProvider = (props) => {
+export function SocketContextProvider(props) {
     // const [socket, setSocket] = useState()
     // const socket = useRef()
     const context = useContext(MessagesContext)
@@ -26,14 +26,16 @@ export const SocketContextProvider = (props) => {
     
         socket.on('welcome-message', ({ user, msg, groups, chats }) => {
             context.updateMessages({ user, msg, group: "STATUS" })
-            context.setGroups(["STATUS", ...groups])
+            context.setGroups(["STATUS", ...Object.keys(groups)])
             context.setChats(chats)
-            groups.forEach(group => {
+            context.dispatch({type: 'loadUsers', payload: { groups }})
+            Object.keys(groups).forEach(group => {
                 context.updateMessages({
                     user: "SYSTEM",
                     msg: `You are now talking in ${group}`,
                     group
                 })
+                // context.setUsers
             })
         })
     
@@ -47,10 +49,12 @@ export const SocketContextProvider = (props) => {
                 msg: `${user} has joined ${group}`,
                 group
             })
+            context.dispatch({type: 'addUser', payload: { user, group }})
         })
     
         socket.on('quit-message', ({ user, reason, group }) => {
             context.updateMessages({ user: "SERVER", msg: `${user} has quit (${reason})`, group })
+            context.dispatch({type: 'remUser', payload: { user, group }})
         })
 
         return () => socket.disconnect()
