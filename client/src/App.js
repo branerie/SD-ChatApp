@@ -6,9 +6,6 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import UserContext from './Context'
 
-import MessagesContextProvider from './context/MessagesContext'
-import { SocketContextProvider } from './context/SocketContext'
-
 const App = () => {
   const [user, setUser] = useState(null);
   // const [loading, setLoading] = useState(true);
@@ -37,12 +34,8 @@ const App = () => {
         <Switch>
           <Route path="/login" component={LoginPage} />
           <Route path="/register" component={RegisterPage} />
+          <Route path="/chat" component={ChatPage} />
         </Switch>
-          <MessagesContextProvider>
-            <Switch>
-              <Route path="/chat" component={ChatPage} />
-            </Switch>
-          </MessagesContextProvider>
       </BrowserRouter>
     </UserContext.Provider>
   )
