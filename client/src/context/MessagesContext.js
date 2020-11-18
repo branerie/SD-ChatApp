@@ -68,6 +68,8 @@ export default function MessagesContextProvider(props) {
         setwindowIsGroup(isGroup)
     }
 
+
+    // EVENTS SECTION
     useEffect(() => {
         if (!socket) return
         socket.on('welcome-message', ({ user, msg, groups, chats }) => {
@@ -114,6 +116,76 @@ export default function MessagesContextProvider(props) {
             dispatch({ type: 'remUser', payload: { user, group } })
         })
         return () => socket.off('quit-message')
+    }, [socket, updateMessages])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('disconnect', (reason) => {
+            updateMessages({
+                user: "SYSTEM",
+                msg: `You have been disconnected from server (${reason}):`,
+                group: "STATUS"
+            })
+            // dispatch({ type: 'remUser', payload: { user, group } })
+        })
+        return () => socket.off('disconnect')
+    }, [socket, updateMessages])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.io.on('reconnect_attempt', (attemptNumber) => {
+            updateMessages({
+                user: "SYSTEM",
+                msg: `Attempt to connect to server (${attemptNumber}):`,
+                group: "STATUS"
+            })
+            // dispatch({ type: 'remUser', payload: { user, group } })
+        })
+        return () => socket.off('reconnect_attempt')
+    }, [socket, updateMessages])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.io.on('reconnect_error', (error) => {
+            updateMessages({
+                user: "SYSTEM",
+                msg: `Failed to connect to server (${error}):`,
+                group: "STATUS"
+            })
+            // dispatch({ type: 'remUser', payload: { user, group } })
+        })
+        return () => socket.off('reconnect_error')
+    }, [socket, updateMessages])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.io.on('reconnect_failed', () => {
+            updateMessages({
+                user: "SYSTEM",
+                msg: "Maximum number of retries reached." ,
+                group: "STATUS"
+            })
+            // dispatch({ type: 'remUser', payload: { user, group } })
+        })
+        return () => socket.off('reconnect_failed')
+    }, [socket, updateMessages])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.io.on('reconnect', (attemptNumber) => {
+            updateMessages({
+                user: "SYSTEM",
+                msg: `Reconnected to server after ${attemptNumber} retries!`,
+                group: "STATUS"
+            })
+            // dispatch({ type: 'remUser', payload: { user, group } })
+        })
+        return () => socket.off('reconnect')
     }, [socket, updateMessages])
 
     return (
