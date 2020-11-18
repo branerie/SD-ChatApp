@@ -1,27 +1,28 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import "./index.css"
 import ChatList from "../../components/ChatList"
 import ChatHeader from '../../components/ChatHeader'
 import ChatWindow from '../../components/ChatWindow'
 import ChatMessageInput from '../../components/ChatMessageInput'
 import ChatGroupMembers from '../../components/ChatGroupMembers'
-import { MessagesContext } from '../../context/MessagesContext'
-import { SocketContextProvider } from '../../context/SocketContext'
+import SocketContextProvider from '../../context/SocketContext'
+import MessagesContextProvider from '../../context/MessagesContext'
 
 const ChatPage = () => {
-    const { windowIsGroup } = useContext(MessagesContext)
 
     return (
         <SocketContextProvider>
+            <MessagesContextProvider>
             <div className="chat-container">
                 <ChatHeader />
                 <main className="chat-main">
                     <ChatList />
                     <ChatWindow />
-                    {windowIsGroup && <ChatGroupMembers />}
+                    <ChatGroupMembers />
                 </main>
                 <ChatMessageInput />
             </div>
+            </MessagesContextProvider>
         </SocketContextProvider>
     )
 }

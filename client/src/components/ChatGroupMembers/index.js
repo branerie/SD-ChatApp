@@ -3,12 +3,13 @@ import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatGroupMembers = () => {
-    const { groupMembers , activeWindow }  = useContext(MessagesContext)
+    const { windowIsGroup, groupMembers, activeWindow }  = useContext(MessagesContext)
 
     // function handleClick() {
     //     
     // }
 
+    if (!windowIsGroup) return null
     return (
         <aside className="chat-sidebar">
             <h2>ONLINE</h2>
