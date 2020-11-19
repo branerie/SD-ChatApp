@@ -19,10 +19,12 @@ import { SocketContext } from "./SocketContext"
 export const MessagesContext = React.createContext()
 
 function reducer(groupMembers, action) {
-    const { group, user } = action.payload
+    const { group, user } = action.payload 
     switch (action.type) {
         case "loadUsers":
             return action.payload.groups
+        case "unloadUsers":
+            return {}
         case "addUser":
             groupMembers[group].online.push(user)
             groupMembers[group].offline = groupMembers[group].offline.filter(member => member !== user)
@@ -127,7 +129,12 @@ export default function MessagesContextProvider(props) {
                 msg: `You have been disconnected from server (${reason}):`,
                 group: "STATUS"
             })
-            // dispatch({ type: 'remUser', payload: { user, group } })
+            updateMessages({
+                user: "SYSTEM",
+                msg: `You have been disconnected from server (${reason}):`,
+                group: activeWindow
+            })
+            dispatch({ type: 'unloadUsers', payload: {} })
         })
         return () => socket.off('disconnect')
     }, [socket, updateMessages])

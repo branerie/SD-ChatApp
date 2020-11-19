@@ -12,7 +12,7 @@ export default function SocketContextProvider(props) {
     useEffect(() => {
 
         const request = io("http://localhost:5000", {
-            reconnectionAttempts: 3,
+            reconnectionAttempts: 10,
             query: { username },
             transports: ['websocket']
         })
