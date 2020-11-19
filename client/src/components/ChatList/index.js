@@ -1,14 +1,12 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 
-const ChatList = ({ label, data }) => {
-    const [selected, setSelected] = useState("STATUS")
+const ChatList = () => {
     const context = useContext(MessagesContext)
 
     function handleClick(item, isGroup) {
-        context.changeWindow(item, isGroup)
-        setSelected(item)
+        context.changeWindow(item, isGroup)        
         // if group fetch userlist and messages from server and set state for first request complete
         // if chat fetch chat messages from server and set state for first request complete
     }
@@ -20,7 +18,7 @@ const ChatList = ({ label, data }) => {
                     {context.groups.map((item, i) => {
                         return <li
                             key={`group${i}`}
-                            className={selected === item ? "selected" : null}
+                            className={item === context.activeWindow ? "selected" : null}
                             onClick={() => handleClick(item, item !== "STATUS")}
                         >{item}</li>
                     })}
@@ -30,7 +28,7 @@ const ChatList = ({ label, data }) => {
                     {context.chats.map((item, i) => {
                         return <li
                             key={`chat${i}`}
-                            className={selected === item ? "selected" : null}
+                            className={item === context.activeWindow ? "selected" : null}
                             onClick={() => handleClick(item, false)}
                         >{item}</li>
                     })}

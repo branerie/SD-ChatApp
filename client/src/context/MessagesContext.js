@@ -15,36 +15,16 @@
 */
 import React, { useState, useReducer, useContext, useEffect, useCallback } from 'react'
 import { SocketContext } from "./SocketContext"
+import GroupMembersReducer from "../reducers/GroupMembersReducer"
 
 export const MessagesContext = React.createContext()
-
-function reducer(groupMembers, action) {
-    const { group, user } = action.payload 
-    switch (action.type) {
-        case "loadUsers":
-            return action.payload.groups
-        case "unloadUsers":
-            return {}
-        case "addUser":
-            groupMembers[group].online.push(user)
-            groupMembers[group].offline = groupMembers[group].offline.filter(member => member !== user)
-            return groupMembers
-        case "remUser":
-            groupMembers[group].offline.push(user)
-            groupMembers[group].online = groupMembers[group].online.filter(member => member !== user)
-            return groupMembers
-        default:
-            return groupMembers
-    }
-}
 
 export default function MessagesContextProvider(props) {
 
     const { socket } = useContext(SocketContext)
-    console.log(socket);
+    // console.log(socket);
 
-    const [groupMembers, dispatch] = useReducer(reducer, {})
-    // const [users, setUsers] = useState()
+    const [groupMembers, dispatchGroupMembers] = useReducer(GroupMembersReducer, {})
     const [groups, setGroups] = useState(["STATUS"])
     const [chats, setChats] = useState([])
     const [messages, setMessages] = useState({ "STATUS": [] })
@@ -78,7 +58,7 @@ export default function MessagesContextProvider(props) {
             updateMessages({ user, msg, group: "STATUS" })
             setGroups(["STATUS", ...Object.keys(groups)])
             setChats(chats)
-            dispatch({ type: 'loadUsers', payload: { groups } })
+            dispatchGroupMembers({ type: 'loadUsers', payload: { groups } })
             Object.keys(groups).forEach(group => {
                 updateMessages({
                     user: "SYSTEM",
@@ -88,7 +68,7 @@ export default function MessagesContextProvider(props) {
             })
         })
         return () => socket.off('welcome-message')
-    }, [socket, updateMessages])
+    }, [socket, updateMessages, setGroups, setChats, dispatchGroupMembers])
 
     useEffect(() => {
         if (!socket) return
@@ -106,19 +86,19 @@ export default function MessagesContextProvider(props) {
                 msg: `${user} has joined ${group}`,
                 group
             })
-            dispatch({ type: 'addUser', payload: { user, group } })
+            dispatchGroupMembers({ type: 'addUser', payload: { user, group } })
         })
         return () => socket.off('join-message')
-    }, [socket, updateMessages])
+    }, [socket, updateMessages, dispatchGroupMembers])
 
     useEffect(() => {
         if (!socket) return
         socket.on('quit-message', ({ user, reason, group }) => {
             updateMessages({ user: "SERVER", msg: `${user} has quit (${reason})`, group })
-            dispatch({ type: 'remUser', payload: { user, group } })
+            dispatchGroupMembers({ type: 'remUser', payload: { user, group } })
         })
         return () => socket.off('quit-message')
-    }, [socket, updateMessages])
+    }, [socket, updateMessages, dispatchGroupMembers])
 
 
     useEffect(() => {
@@ -134,10 +114,10 @@ export default function MessagesContextProvider(props) {
                 msg: `You have been disconnected from server (${reason}):`,
                 group: activeWindow
             })
-            dispatch({ type: 'unloadUsers', payload: {} })
+            dispatchGroupMembers({ type: 'unloadUsers', payload: {} })
         })
         return () => socket.off('disconnect')
-    }, [socket, updateMessages])
+    }, [socket, updateMessages, activeWindow, dispatchGroupMembers])
 
 
     useEffect(() => {
@@ -148,7 +128,7 @@ export default function MessagesContextProvider(props) {
                 msg: `Attempt to connect to server (${attemptNumber}):`,
                 group: "STATUS"
             })
-            // dispatch({ type: 'remUser', payload: { user, group } })
+            // dispatchGroupMembers({ type: 'remUser', payload: { user, group } })
         })
         return () => socket.off('reconnect_attempt')
     }, [socket, updateMessages])
@@ -162,7 +142,7 @@ export default function MessagesContextProvider(props) {
                 msg: `Failed to connect to server (${error}):`,
                 group: "STATUS"
             })
-            // dispatch({ type: 'remUser', payload: { user, group } })
+            // dispatchGroupMembers({ type: 'remUser', payload: { user, group } })
         })
         return () => socket.off('reconnect_error')
     }, [socket, updateMessages])
@@ -176,7 +156,7 @@ export default function MessagesContextProvider(props) {
                 msg: "Maximum number of retries reached." ,
                 group: "STATUS"
             })
-            // dispatch({ type: 'remUser', payload: { user, group } })
+            // dispatchGroupMembers({ type: 'remUser', payload: { user, group } })
         })
         return () => socket.off('reconnect_failed')
     }, [socket, updateMessages])
@@ -190,7 +170,7 @@ export default function MessagesContextProvider(props) {
                 msg: `Reconnected to server after ${attemptNumber} retries!`,
                 group: "STATUS"
             })
-            // dispatch({ type: 'remUser', payload: { user, group } })
+            // dispatchGroupMembers({ type: 'remUser', payload: { user, group } })
         })
         return () => socket.off('reconnect')
     }, [socket, updateMessages])
@@ -198,7 +178,7 @@ export default function MessagesContextProvider(props) {
     return (
         <MessagesContext.Provider value={{
             groups, setGroups, updateGroups,
-            groupMembers, dispatch,
+            groupMembers, dispatchGroupMembers,
             chats, setChats,
             messages, updateMessages,
             activeWindow, changeWindow,
