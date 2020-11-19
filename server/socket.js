@@ -28,7 +28,7 @@ module.exports = io => {
                 }
             })
             user.groups = [...user.groups]
-            console.log(socket.groups);
+            // console.log(socket.groups);
             socket.chats = [...new Set(user.chats)] // temporary (to remove dubs from mock db)
             socket.emit("welcome-message", {
                 user: "SERVER",
