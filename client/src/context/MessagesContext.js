@@ -13,7 +13,7 @@
         group2: [ {msg}, {msg}, ... ],
       }
 */
-import React, { useState, useReducer, useContext, useEffect } from 'react'
+import React, { useState, useReducer, useContext, useEffect, useCallback } from 'react'
 import { SocketContext } from "./SocketContext"
 import GroupMembersReducer from "../reducers/GroupMembersReducer"
 import MessagesReducer from "../reducers/MessagesReducer"
@@ -36,6 +36,15 @@ export default function MessagesContextProvider(props) {
         setActiveWindow(selectedWindow)
         setwindowIsGroup(isGroup)
     }
+
+    const updateChats = useCallback((user) => {
+        if (!chats.includes(user)) {
+            setChats(prevChats => ([
+                ...prevChats,
+                user
+            ]))
+        }
+    },[chats])
 
     // EVENTS SECTION
     useEffect(() => {
@@ -63,10 +72,11 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('chat-message', ({ user, msg, group }) => {
+            updateChats(user)
             dispatchMessages({ type: "chat-message", payload: { user, msg, group } })
         })
         return () => socket.off('chat-message')
-    }, [socket, dispatchMessages])
+    }, [socket, updateChats, dispatchMessages])
 
 
     useEffect(() => {
@@ -141,7 +151,7 @@ export default function MessagesContextProvider(props) {
             groups, setGroups,
             groupMembers, dispatchGroupMembers,
             messages, dispatchMessages,
-            chats, setChats,
+            chats, setChats, updateChats,
             activeWindow, changeWindow,
             windowIsGroup
         }}>

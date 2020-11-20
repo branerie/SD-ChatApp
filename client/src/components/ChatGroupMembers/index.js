@@ -3,15 +3,10 @@ import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatGroupMembers = () => {
-    const { windowIsGroup, groupMembers, activeWindow, chats, setChats, changeWindow }  = useContext(MessagesContext)
+    const { windowIsGroup, groupMembers, activeWindow, chats, setChats, changeWindow, updateChats }  = useContext(MessagesContext)
 
     function handleClick(user) {
-        if (!chats.includes(user)) {
-            setChats(prevChats => ([
-                ...prevChats,
-                user
-            ]))
-        }
+        updateChats(user)
         changeWindow(user, false)
     }
 
