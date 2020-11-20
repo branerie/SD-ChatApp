@@ -42,6 +42,11 @@ module.exports = io => {
             socket.rooms.forEach(group => {
                 socket.to(group).emit("join-message", { user: socket.username, group })
             })
+
+            // console.log(io.sockets.adapter.rooms);
+            // console.log(io.sockets.sockets);
+            io.sockets.sockets.forEach((object, socketID) => console.log(socketID, object.username))
+            // console.log(io.eio.clients);
         }
 
 
@@ -65,11 +70,21 @@ module.exports = io => {
 
 
         // Get message from client and send to rest clients
-        // SEC: Check if user can manipulate group (and message)
-        socket.on("chat-message", ({ msg, group }, callback) => {
-            console.log(`[${getTime()}] SERVER: User ${socket.username} sent message to ${group}`)
-
-            socket.to(group).emit("chat-message", { user: socket.username, msg, group })
+        socket.on("chat-message", ({ msg, recipient, public }, callback) => {
+            console.log(`[${getTime()}] SERVER: User ${socket.username} sent message to ${recipient}`)
+            
+            if (public) {
+                // SEC: Check if user can manipulate group (and message)
+                socket.to(group).emit("chat-message", { user: socket.username, msg, group: recipient })
+            } else {
+                
+                let connectedSockets = {}
+                io.sockets.sockets.forEach((object, socketID) => {
+                    connectedSockets[object.username] = socketID
+                })
+                console.log(connectedSockets[recipient]);
+                io.to(connectedSockets[recipient]).emit("chat-message", { user: socket.username, msg, group: socket.username })
+            }
             callback()
         })
     })

@@ -5,14 +5,15 @@ import { SocketContext } from '../../context/SocketContext'
 
 const ChatMessageInput = () => {
     const [message, setMessage] = useState('')
-    const { activeWindow, dispatchMessages } = useContext(MessagesContext)
+    const { windowIsGroup, activeWindow, dispatchMessages } = useContext(MessagesContext)
     const { socket, ME } = useContext(SocketContext)
 
     function sendMessage(e) {
         e.preventDefault()
         console.log(socket);
 
-        socket.emit('chat-message', { group: activeWindow, msg: message }, () => attachMsg())
+        socket.emit('chat-message', { recipient: activeWindow, msg: message , public: windowIsGroup }, () => attachMsg())
+        return
     }
 
     function attachMsg() {

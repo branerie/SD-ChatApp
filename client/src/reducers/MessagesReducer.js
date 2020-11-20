@@ -31,7 +31,7 @@ export default function MessagesReducer(messages, action) {
 
         case "chat-message":
             newMessages[action.payload.group] = [
-                ...messages[action.payload.group], {
+                ...messages[action.payload.group] || [], {
                     user: action.payload.user,
                     msg: action.payload.msg,
                     timestamp
