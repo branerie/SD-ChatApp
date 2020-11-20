@@ -77,7 +77,7 @@ module.exports = io => {
                 // SEC: Check if user can manipulate group (and message)
                 socket.to(group).emit("chat-message", { user: socket.username, msg, group: recipient })
             } else {
-                
+                // maybe keep track globally with next object to avoid this loop on every message
                 let connectedSockets = {}
                 io.sockets.sockets.forEach((object, socketID) => {
                     connectedSockets[object.username] = socketID

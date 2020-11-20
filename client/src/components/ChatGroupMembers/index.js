@@ -3,11 +3,17 @@ import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatGroupMembers = () => {
-    const { windowIsGroup, groupMembers, activeWindow }  = useContext(MessagesContext)
+    const { windowIsGroup, groupMembers, activeWindow, chats, setChats, changeWindow }  = useContext(MessagesContext)
 
-    // function handleClick() {
-    //     
-    // }
+    function handleClick(user) {
+        if (!chats.includes(user)) {
+            setChats(prevChats => ([
+                ...prevChats,
+                user
+            ]))
+        }
+        changeWindow(user, false)
+    }
 
     if (!windowIsGroup) return null
     return (
@@ -17,7 +23,7 @@ const ChatGroupMembers = () => {
                 {groupMembers[activeWindow] && groupMembers[activeWindow].online.map((user, i) => {
                     return <li 
                     key={`onUser${i}`} 
-                    // onClick={() => handleClick(user)}
+                    onDoubleClick={() => handleClick(user)}
                     >{user}</li>
                 })}
             </ul>
@@ -26,7 +32,7 @@ const ChatGroupMembers = () => {
                 {groupMembers[activeWindow] && groupMembers[activeWindow].offline.map((user, i) => {
                     return <li 
                     key={`offUser${i}`} 
-                    // onClick={() => handleClick()}
+                    onDoubleClick={() => handleClick(user)}
                     >{user}</li>
                 })}
             </ul>
