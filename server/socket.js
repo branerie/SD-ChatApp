@@ -28,11 +28,12 @@ module.exports = io => {
                 }
             })
             user.groups = [...user.groups]
-            // console.log(socket.groups);
             socket.chats = [...new Set(user.chats)] // temporary (to remove dubs from mock db)
+
+            // Welcome message from server to connected client
+            // Send groups and chats to client for UI setup
             socket.emit("welcome-message", {
-                user: "SERVER",
-                msg: `Welcome ${socket.username}`,
+                user: socket.username,
                 groups: socket.groups,
                 chats: socket.chats
             })
@@ -42,14 +43,6 @@ module.exports = io => {
                 socket.to(group).emit("join-message", { user: socket.username, group })
             })
         }
-
-        // let online = io.sockets.adapter.rooms.get('Cardguard')
-        // console.log(online);
-        // console.log([...online].map(sid => io.sockets.sockets.get(sid).username))
-
-
-        // Welcome message from server to connected client
-        // Send groups and chats to client for UI setup
 
 
         // socket.on("get-userlist", (group, callback) => {
@@ -72,10 +65,11 @@ module.exports = io => {
 
 
         // Get message from client and send to rest clients
-        socket.on("chat-message", ({ group, msg }, callback) => {
+        // SEC: Check if user can manipulate group (and message)
+        socket.on("chat-message", ({ msg, group }, callback) => {
             console.log(`[${getTime()}] SERVER: User ${socket.username} sent message to ${group}`)
 
-            socket.to(group).emit("chat-message", { user: socket.username, group, msg })
+            socket.to(group).emit("chat-message", { user: socket.username, msg, group })
             callback()
         })
     })

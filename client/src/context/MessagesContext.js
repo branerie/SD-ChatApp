@@ -13,194 +13,135 @@
         group2: [ {msg}, {msg}, ... ],
       }
 */
-import React, { useState, useReducer, useContext, useEffect, useCallback } from 'react'
+import React, { useState, useReducer, useContext, useEffect } from 'react'
 import { SocketContext } from "./SocketContext"
+import GroupMembersReducer from "../reducers/GroupMembersReducer"
+import MessagesReducer from "../reducers/MessagesReducer"
 
 export const MessagesContext = React.createContext()
 
-function reducer(groupMembers, action) {
-    const { group, user } = action.payload 
-    switch (action.type) {
-        case "loadUsers":
-            return action.payload.groups
-        case "unloadUsers":
-            return {}
-        case "addUser":
-            groupMembers[group].online.push(user)
-            groupMembers[group].offline = groupMembers[group].offline.filter(member => member !== user)
-            return groupMembers
-        case "remUser":
-            groupMembers[group].offline.push(user)
-            groupMembers[group].online = groupMembers[group].online.filter(member => member !== user)
-            return groupMembers
-        default:
-            return groupMembers
-    }
-}
-
 export default function MessagesContextProvider(props) {
 
-    const { socket } = useContext(SocketContext)
-    console.log(socket);
+    const { socket, ME } = useContext(SocketContext)
+    console.log("Rerender counter")
 
-    const [groupMembers, dispatch] = useReducer(reducer, {})
-    // const [users, setUsers] = useState()
+    const [groupMembers, dispatchGroupMembers] = useReducer(GroupMembersReducer, {})
+    const [messages, dispatchMessages] = useReducer(MessagesReducer, { "STATUS": [] })
     const [groups, setGroups] = useState(["STATUS"])
     const [chats, setChats] = useState([])
-    const [messages, setMessages] = useState({ "STATUS": [] })
     const [activeWindow, setActiveWindow] = useState("STATUS")
     const [windowIsGroup, setwindowIsGroup] = useState(false)
-
-    function updateGroups(groups) {
-        setGroups(prevGroups => ([...prevGroups, ...groups]))
-    }
-
-    const updateMessages = useCallback(({ user, msg, group }) => {
-        setMessages(prevMessages => ({
-            ...prevMessages,
-            [group]: [
-                ...prevMessages[group] || [],
-                { user, msg, time: new Date().toLocaleTimeString() }
-            ]
-        }))
-    }, [setMessages])
 
     function changeWindow(selectedWindow, isGroup) {
         setActiveWindow(selectedWindow)
         setwindowIsGroup(isGroup)
     }
 
-
     // EVENTS SECTION
     useEffect(() => {
         if (!socket) return
-        socket.on('welcome-message', ({ user, msg, groups, chats }) => {
-            updateMessages({ user, msg, group: "STATUS" })
+        socket.on('connect', () => {
+            document.title = ME
+            dispatchMessages({ type: "connect-message" })
+        })
+        return () => socket.off('connect')
+    }, [socket, ME, dispatchMessages])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('welcome-message', ({  user, groups, chats }) => {
             setGroups(["STATUS", ...Object.keys(groups)])
             setChats(chats)
-            dispatch({ type: 'loadUsers', payload: { groups } })
-            Object.keys(groups).forEach(group => {
-                updateMessages({
-                    user: "SYSTEM",
-                    msg: `You are now talking in ${group}`,
-                    group
-                })
-            })
+            dispatchGroupMembers({ type: 'loadUsers', payload: { groups } })
+            dispatchMessages({ type: "welcome-message", payload: { groups: Object.keys(groups), user } })
         })
         return () => socket.off('welcome-message')
-    }, [socket, updateMessages])
+    }, [socket, setGroups, setChats, dispatchGroupMembers, dispatchMessages])
+
 
     useEffect(() => {
         if (!socket) return
         socket.on('chat-message', ({ user, msg, group }) => {
-            updateMessages({ user, msg, group })
+            dispatchMessages({ type: "chat-message", payload: { user, msg, group } })
         })
         return () => socket.off('chat-message')
-    }, [socket, updateMessages])
+    }, [socket, dispatchMessages])
+
 
     useEffect(() => {
         if (!socket) return
         socket.on('join-message', ({ user, group }) => {
-            updateMessages({
-                user: "SERVER",
-                msg: `${user} has joined ${group}`,
-                group
-            })
-            dispatch({ type: 'addUser', payload: { user, group } })
+            dispatchMessages({ type: "join-message", payload: { user, group } })
+            dispatchGroupMembers({ type: 'addUser', payload: { user, group } })
         })
         return () => socket.off('join-message')
-    }, [socket, updateMessages])
+    }, [socket, dispatchMessages, dispatchGroupMembers])
+
 
     useEffect(() => {
         if (!socket) return
         socket.on('quit-message', ({ user, reason, group }) => {
-            updateMessages({ user: "SERVER", msg: `${user} has quit (${reason})`, group })
-            dispatch({ type: 'remUser', payload: { user, group } })
+            dispatchMessages({ type: "quit-message", payload: { user, reason, group } })
+            dispatchGroupMembers({ type: 'remUser', payload: { user, group } })
         })
         return () => socket.off('quit-message')
-    }, [socket, updateMessages])
+    }, [socket, dispatchMessages, dispatchGroupMembers])
 
 
     useEffect(() => {
         if (!socket) return
         socket.on('disconnect', (reason) => {
-            updateMessages({
-                user: "SYSTEM",
-                msg: `You have been disconnected from server (${reason}):`,
-                group: "STATUS"
-            })
-            updateMessages({
-                user: "SYSTEM",
-                msg: `You have been disconnected from server (${reason}):`,
-                group: activeWindow
-            })
-            dispatch({ type: 'unloadUsers', payload: {} })
+            dispatchMessages({ type: "disconnect-message", payload: { reason, groups: [...new Set(["STATUS", activeWindow])] } })
+            dispatchGroupMembers({ type: 'unloadUsers', payload: {} })
         })
         return () => socket.off('disconnect')
-    }, [socket, updateMessages])
+    }, [socket, activeWindow, dispatchMessages, dispatchGroupMembers])
 
 
     useEffect(() => {
         if (!socket) return
         socket.io.on('reconnect_attempt', (attemptNumber) => {
-            updateMessages({
-                user: "SYSTEM",
-                msg: `Attempt to connect to server (${attemptNumber}):`,
-                group: "STATUS"
-            })
-            // dispatch({ type: 'remUser', payload: { user, group } })
+            dispatchMessages({ type: "reconnect-attempt-message", payload: { attemptNumber } })
         })
         return () => socket.off('reconnect_attempt')
-    }, [socket, updateMessages])
+    }, [socket, dispatchMessages])
 
 
     useEffect(() => {
         if (!socket) return
         socket.io.on('reconnect_error', (error) => {
-            updateMessages({
-                user: "SYSTEM",
-                msg: `Failed to connect to server (${error}):`,
-                group: "STATUS"
-            })
-            // dispatch({ type: 'remUser', payload: { user, group } })
+            dispatchMessages({ type: "reconnect-error-message", payload: { error } })
         })
         return () => socket.off('reconnect_error')
-    }, [socket, updateMessages])
+    }, [socket, dispatchMessages])
 
 
     useEffect(() => {
         if (!socket) return
         socket.io.on('reconnect_failed', () => {
-            updateMessages({
-                user: "SYSTEM",
-                msg: "Maximum number of retries reached." ,
-                group: "STATUS"
-            })
-            // dispatch({ type: 'remUser', payload: { user, group } })
+            dispatchMessages({ type: "reconnect-failed-message" })
         })
         return () => socket.off('reconnect_failed')
-    }, [socket, updateMessages])
+    }, [socket, dispatchMessages])
 
 
     useEffect(() => {
         if (!socket) return
         socket.io.on('reconnect', (attemptNumber) => {
-            updateMessages({
-                user: "SYSTEM",
-                msg: `Reconnected to server after ${attemptNumber} retries!`,
-                group: "STATUS"
-            })
-            // dispatch({ type: 'remUser', payload: { user, group } })
+            dispatchMessages({ type: "reconnect-message", payload: { attemptNumber } })
+            socket.off('connect')
         })
         return () => socket.off('reconnect')
-    }, [socket, updateMessages])
+    }, [socket, dispatchMessages])
+
 
     return (
         <MessagesContext.Provider value={{
-            groups, setGroups, updateGroups,
-            groupMembers, dispatch,
+            groups, setGroups,
+            groupMembers, dispatchGroupMembers,
+            messages, dispatchMessages,
             chats, setChats,
-            messages, updateMessages,
             activeWindow, changeWindow,
             windowIsGroup
         }}>
