@@ -11,6 +11,7 @@ module.exports = io => {
 
         let user = mockUsers.find(x => x.name === socket.username) // fetch DB
         let registeredGroups = [...new Set(mockGroups.map(x => x.name))] // get registered groups form mock
+        let registeredUsers = [...new Set(mockUsers.map(x => x.name))] // get registered groups form mock
         if (user) {
             user.groups = new Set(user.groups) // temporary (to remove dubs from mock db)
             user.groups.forEach(group => {
@@ -28,7 +29,15 @@ module.exports = io => {
                 }
             })
             user.groups = [...user.groups]
-            socket.chats = [...new Set(user.chats)] // temporary (to remove dubs from mock db)
+
+            user.chats = new Set(user.chats) // temporary (to remove dubs from mock db)
+            user.chats.forEach(chat => {
+                if (!registeredUsers.includes(chat) || chat === user.name) {
+                    user.chats.delete(chat)
+                }
+            })
+            socket.chats = [...user.chats]
+
 
             // Welcome message from server to connected client
             // Send groups and chats to client for UI setup
@@ -77,7 +86,7 @@ module.exports = io => {
                 // SEC: Check if user can manipulate group (and message)
                 socket.to(group).emit("chat-message", { user: socket.username, msg, group: recipient })
             } else {
-                // maybe keep track globally with next object to avoid this loop on every message
+                // maybe keep track globally in next object to avoid this loop on every message
                 let connectedSockets = {}
                 io.sockets.sockets.forEach((object, socketID) => {
                     connectedSockets[object.username] = socketID
