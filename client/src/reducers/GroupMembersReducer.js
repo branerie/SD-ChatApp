@@ -2,7 +2,6 @@ export default function GroupMembersReducer(groupMembers, action) {
     const { group, user } = action.payload
     switch (action.type) {
         case "loadUsers":
-            console.log(action.payload.groups);
             return action.payload.groups
         case "unloadUsers":
             return {}

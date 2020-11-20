@@ -5,15 +5,15 @@ import { SocketContext } from '../../context/SocketContext'
 
 const ChatWindow = () => {
     const { messages, activeWindow } = useContext(MessagesContext)
-    const { username } = useContext(SocketContext)
+    const { ME } = useContext(SocketContext)
 
     return (
         <div className="chat-messages">
-            {messages[activeWindow] && messages[activeWindow].map(({ user, msg, time }, i) => {
+            {messages[activeWindow] && messages[activeWindow].map(({ user, msg, timestamp }, i) => {
                 return (
                     <div className="message" key={i}>
-                        <p className={user === username ? 'text-self' : `text-${user}`}>
-                            <span className="timestamp">{`[${time}] ${user}: `}</span>
+                        <p className={user === ME ? 'text-self' : `text-${user}`}>
+                            <span className="timestamp">{`[${timestamp}] ${user}: `}</span>
                             {msg}
                         </p>
                     </div>

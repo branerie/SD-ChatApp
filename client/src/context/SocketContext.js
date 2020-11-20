@@ -7,27 +7,23 @@ export const SocketContext = React.createContext()
 export default function SocketContextProvider(props) {
     const [socket, setSocket] = useState()
     const location = useLocation()
-    const username = location.username
+    const ME = location.username
 
     useEffect(() => {
 
         const request = io("http://localhost:5000", {
             reconnectionAttempts: 10,
-            query: { username },
+            query: { username: ME },
             transports: ['websocket']
         })
 
         setSocket(request)
 
-        request.on("connect", () => {
-            document.title = username
-        })
-
         return () => request.disconnect()
-    }, [username])
+    }, [ME])
 
     return (
-        <SocketContext.Provider value={{ socket, username }}>
+        <SocketContext.Provider value={{ socket, ME }}>
             {props.children}
         </SocketContext.Provider>
     )

@@ -5,8 +5,8 @@ import { SocketContext } from '../../context/SocketContext'
 
 const ChatMessageInput = () => {
     const [message, setMessage] = useState('')
-    const { activeWindow, updateMessages } = useContext(MessagesContext)
-    const { socket, username } = useContext(SocketContext)
+    const { activeWindow, dispatchMessages } = useContext(MessagesContext)
+    const { socket, ME } = useContext(SocketContext)
 
     function sendMessage(e) {
         e.preventDefault()
@@ -16,10 +16,13 @@ const ChatMessageInput = () => {
     }
 
     function attachMsg() {
-        updateMessages({
-            group: activeWindow,
-            msg: message,
-            user: username
+        dispatchMessages({ 
+            type: "chat-message",
+            payload: {
+                user: ME,
+                msg: message,
+                group: activeWindow
+            }
         })
         setMessage('')
     }
