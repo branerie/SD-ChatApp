@@ -21,6 +21,7 @@ module.exports = io => {
                     return
                 }
                 let { members } = mockGroups.find(x => x.name === group) || []
+                members = [...new Set(members)]
                 let onlineSIDs = io.sockets.adapter.rooms.get(group) || []
                 let online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
                 socket.groups[group] = {
@@ -84,7 +85,7 @@ module.exports = io => {
             
             if (public) {
                 // SEC: Check if user can manipulate group (and message)
-                socket.to(group).emit("chat-message", { user: socket.username, msg, group: recipient })
+                socket.to(recipient).emit("chat-message", { user: socket.username, msg, group: recipient })
             } else {
                 // maybe keep track globally in next object to avoid this loop on every message
                 let connectedSockets = {}

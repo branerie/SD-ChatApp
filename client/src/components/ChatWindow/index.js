@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useRef, useEffect } from 'react'
 import './index.css'
 import { MessagesContext } from '../../context/MessagesContext'
 import { SocketContext } from '../../context/SocketContext'
@@ -6,9 +6,12 @@ import { SocketContext } from '../../context/SocketContext'
 const ChatWindow = () => {
     const { messages, activeWindow } = useContext(MessagesContext)
     const { ME } = useContext(SocketContext)
+    const messagesRef = useRef()
+
+    useEffect(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight)
 
     return (
-        <div className="chat-messages">
+        <div className="chat-messages" ref={messagesRef}>
             {messages[activeWindow] && messages[activeWindow].map(({ user, msg, timestamp }, i) => {
                 return (
                     <div className="message" key={i}>
