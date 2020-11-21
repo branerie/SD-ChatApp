@@ -13,7 +13,7 @@ const ChatMessageInput = () => {
         e.preventDefault()
         console.log(socket);
 
-        socket.emit('chat-message', { recipient: activeWindow, msg: message , public: windowIsGroup }, () => attachMsg())
+        socket.emit('chat-message', { recipient: activeWindow, msg: message , isGroup: windowIsGroup }, () => attachMsg())
         return
     }
 

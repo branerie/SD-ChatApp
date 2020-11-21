@@ -80,12 +80,12 @@ module.exports = io => {
 
 
         // Get message from client and send to rest clients
-        socket.on("chat-message", ({ msg, recipient, public }, callback) => {
+        socket.on("chat-message", ({ msg, recipient, isGroup }, callback) => {
             console.log(`[${getTime()}] SERVER: User ${socket.username} sent message to ${recipient}`)
             
-            if (public) {
+            if (isGroup) {
                 // SEC: Check if user can manipulate group (and message)
-                socket.to(recipient).emit("chat-message", { user: socket.username, msg, group: recipient })
+                socket.to(recipient).emit("chat-message", { user: socket.username, msg, group: recipient, isGroup })
             } else {
                 // maybe keep track globally in next object to avoid this loop on every message
                 let connectedSockets = {}
@@ -93,7 +93,7 @@ module.exports = io => {
                     connectedSockets[object.username] = socketID
                 })
                 console.log(connectedSockets[recipient]);
-                io.to(connectedSockets[recipient]).emit("chat-message", { user: socket.username, msg, group: socket.username })
+                io.to(connectedSockets[recipient]).emit("chat-message", { user: socket.username, msg, group: socket.username, isGroup })
             }
             callback()
         })

@@ -3,7 +3,7 @@ import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatGroupMembers = () => {
-    const { windowIsGroup, groupMembers, activeWindow, chats, setChats, changeWindow, updateChats }  = useContext(MessagesContext)
+    const { windowIsGroup, groupMembers, activeWindow, changeWindow, updateChats }  = useContext(MessagesContext)
 
     function handleClick(user) {
         updateChats(user)

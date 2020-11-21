@@ -6,7 +6,7 @@ const ChatList = () => {
     const context = useContext(MessagesContext)
 
     function handleClick(item, isGroup) {
-        context.changeWindow(item, isGroup)        
+        context.changeWindow(item, isGroup)
         // if group fetch userlist and messages from server and set state for first request complete
         // if chat fetch chat messages from server and set state for first request complete
     }
@@ -18,7 +18,10 @@ const ChatList = () => {
                     {context.groups.map((item, i) => {
                         return <li
                             key={`group${i}`}
-                            className={item === context.activeWindow ? "selected" : null}
+                            className={`
+                                        ${item === context.activeWindow ? "selected" : ""} 
+                                        ${(context.newMessages[item] && item !== context.activeWindow) ? 'new-messages' : ''}
+                                        `}
                             onClick={() => handleClick(item, item !== "STATUS")}
                         >{item}</li>
                     })}
@@ -28,7 +31,10 @@ const ChatList = () => {
                     {context.chats.map((item, i) => {
                         return <li
                             key={`chat${i}`}
-                            className={item === context.activeWindow ? "selected" : null}
+                            className={`
+                                        ${item === context.activeWindow ? "selected" : ""}
+                                        ${context.newMessages[item] && item !== context.activeWindow ? 'new-messages' : ''}
+                                        `}
                             onClick={() => handleClick(item, false)}
                         >{item}</li>
                     })}
