@@ -39,12 +39,11 @@ export default function MessagesContextProvider(props) {
         updateNewMessages(selectedWindow, false)
     }
 
-    const updateChats = useCallback((user) => {
-        if (!chats.includes(user)) {
-            setChats(prevChats => ([
-                ...prevChats,
-                user
-            ]))
+    const updateChats = useCallback((user, action) => {
+        if (action === "open") {
+            !chats.includes(user) && setChats(prevChats => [...prevChats, user])
+        } else { // action == 'close'
+            setChats(prevChats => prevChats.filter(chat => chat !== user))
         }
     }, [chats])
 
@@ -81,7 +80,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('chat-message', ({ user, msg, group, isGroup }) => {
-            if (!isGroup) updateChats(user)
+            if (!isGroup) updateChats(user, "open")
             updateNewMessages(group, group !== activeWindow)
             dispatchMessages({ type: "chat-message", payload: { user, msg, group } })
         })

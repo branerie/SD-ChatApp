@@ -6,7 +6,7 @@ const ChatGroupMembers = () => {
     const { windowIsGroup, groupMembers, activeWindow, changeWindow, updateChats }  = useContext(MessagesContext)
 
     function handleClick(user) {
-        updateChats(user)
+        updateChats(user, "open")
         changeWindow(user, false)
     }
 
