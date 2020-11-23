@@ -11,6 +11,7 @@ module.exports = io => {
 
         let user = mockUsers.find(x => x.name === socket.username) // fetch DB
         let registeredGroups = [...new Set(mockGroups.map(x => x.name))] // get registered groups form mock
+        let registeredUsers = [...new Set(mockUsers.map(x => x.name))] // get registered groups form mock
         if (user) {
             user.groups = new Set(user.groups) // temporary (to remove dubs from mock db)
             user.groups.forEach(group => {
@@ -20,6 +21,7 @@ module.exports = io => {
                     return
                 }
                 let { members } = mockGroups.find(x => x.name === group) || []
+                members = [...new Set(members)]
                 let onlineSIDs = io.sockets.adapter.rooms.get(group) || []
                 let online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
                 socket.groups[group] = {
@@ -28,7 +30,15 @@ module.exports = io => {
                 }
             })
             user.groups = [...user.groups]
-            socket.chats = [...new Set(user.chats)] // temporary (to remove dubs from mock db)
+
+            user.chats = new Set(user.chats) // temporary (to remove dubs from mock db)
+            user.chats.forEach(chat => {
+                if (!registeredUsers.includes(chat) || chat === user.name) {
+                    user.chats.delete(chat)
+                }
+            })
+            socket.chats = [...user.chats]
+
 
             // Welcome message from server to connected client
             // Send groups and chats to client for UI setup
@@ -42,6 +52,11 @@ module.exports = io => {
             socket.rooms.forEach(group => {
                 socket.to(group).emit("join-message", { user: socket.username, group })
             })
+
+            // console.log(io.sockets.adapter.rooms);
+            // console.log(io.sockets.sockets);
+            io.sockets.sockets.forEach((object, socketID) => console.log(socketID, object.username))
+            // console.log(io.eio.clients);
         }
 
 
@@ -65,11 +80,21 @@ module.exports = io => {
 
 
         // Get message from client and send to rest clients
-        // SEC: Check if user can manipulate group (and message)
-        socket.on("chat-message", ({ msg, group }, callback) => {
-            console.log(`[${getTime()}] SERVER: User ${socket.username} sent message to ${group}`)
-
-            socket.to(group).emit("chat-message", { user: socket.username, msg, group })
+        socket.on("chat-message", ({ msg, recipient, isGroup }, callback) => {
+            console.log(`[${getTime()}] SERVER: User ${socket.username} sent message to ${recipient}`)
+            
+            if (isGroup) {
+                // SEC: Check if user can manipulate group (and message)
+                socket.to(recipient).emit("chat-message", { user: socket.username, msg, group: recipient, isGroup })
+            } else {
+                // maybe keep track globally in next object to avoid this loop on every message
+                let connectedSockets = {}
+                io.sockets.sockets.forEach((object, socketID) => {
+                    connectedSockets[object.username] = socketID
+                })
+                console.log(connectedSockets[recipient]);
+                io.to(connectedSockets[recipient]).emit("chat-message", { user: socket.username, msg, group: socket.username, isGroup })
+            }
             callback()
         })
     })

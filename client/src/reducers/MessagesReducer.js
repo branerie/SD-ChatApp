@@ -31,7 +31,7 @@ export default function MessagesReducer(messages, action) {
 
         case "chat-message":
             newMessages[action.payload.group] = [
-                ...messages[action.payload.group], {
+                ...messages[action.payload.group] || [], {
                     user: action.payload.user,
                     msg: action.payload.msg,
                     timestamp
@@ -62,7 +62,7 @@ export default function MessagesReducer(messages, action) {
         case "disconnect-message":
             action.payload.groups.forEach(group => {
                 newMessages[group] = [
-                    ...messages[group], {
+                    ...messages[group] || [], {
                         user: "SYSTEM",
                         msg: `You have been disconnected from server (${action.payload.reason}):`,
                         timestamp

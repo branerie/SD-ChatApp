@@ -1,18 +1,20 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import './index.css'
 import { MessagesContext } from '../../context/MessagesContext'
 import { SocketContext } from '../../context/SocketContext'
 
 const ChatMessageInput = () => {
     const [message, setMessage] = useState('')
-    const { activeWindow, dispatchMessages } = useContext(MessagesContext)
+    const { windowIsGroup, activeWindow, dispatchMessages } = useContext(MessagesContext)
     const { socket, ME } = useContext(SocketContext)
+    const messageRef = useRef()
 
     function sendMessage(e) {
         e.preventDefault()
         console.log(socket);
 
-        socket.emit('chat-message', { group: activeWindow, msg: message }, () => attachMsg())
+        socket.emit('chat-message', { recipient: activeWindow, msg: message , isGroup: windowIsGroup }, () => attachMsg())
+        return
     }
 
     function attachMsg() {
@@ -27,10 +29,12 @@ const ChatMessageInput = () => {
         setMessage('')
     }
 
+    useEffect(() => messageRef.current.focus())
+
     return (
         <div className="chat-form-container">
             <form onSubmit={e => sendMessage(e)}>
-                <input type="text" value={message} required autoComplete="off" onChange={e => setMessage(e.target.value)} />
+                <input ref={messageRef} type="text" autoFocus value={message} required autoComplete="off" onChange={e => setMessage(e.target.value)} />
                 <button className="btn">Send</button>
             </form>
         </div>

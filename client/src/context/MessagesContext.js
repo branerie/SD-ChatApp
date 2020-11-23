@@ -13,7 +13,7 @@
         group2: [ {msg}, {msg}, ... ],
       }
 */
-import React, { useState, useReducer, useContext, useEffect } from 'react'
+import React, { useState, useReducer, useContext, useEffect, useCallback } from 'react'
 import { SocketContext } from "./SocketContext"
 import GroupMembersReducer from "../reducers/GroupMembersReducer"
 import MessagesReducer from "../reducers/MessagesReducer"
@@ -27,6 +27,7 @@ export default function MessagesContextProvider(props) {
 
     const [groupMembers, dispatchGroupMembers] = useReducer(GroupMembersReducer, {})
     const [messages, dispatchMessages] = useReducer(MessagesReducer, { "STATUS": [] })
+    const [newMessages, setNewMessages] = useState({ "STATUS": false })
     const [groups, setGroups] = useState(["STATUS"])
     const [chats, setChats] = useState([])
     const [activeWindow, setActiveWindow] = useState("STATUS")
@@ -35,7 +36,23 @@ export default function MessagesContextProvider(props) {
     function changeWindow(selectedWindow, isGroup) {
         setActiveWindow(selectedWindow)
         setwindowIsGroup(isGroup)
+        updateNewMessages(selectedWindow, false)
     }
+
+    const updateChats = useCallback((user, action) => {
+        if (action === "open") {
+            !chats.includes(user) && setChats(prevChats => [...prevChats, user])
+        } else { // action == 'close'
+            setChats(prevChats => prevChats.filter(chat => chat !== user))
+        }
+    }, [chats])
+
+    const updateNewMessages = useCallback((chat, state) => {
+        setNewMessages(prevMessages => ({
+            ...prevMessages,
+            [chat]: state
+        }))
+    }, [setNewMessages])
 
     // EVENTS SECTION
     useEffect(() => {
@@ -50,7 +67,7 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('welcome-message', ({  user, groups, chats }) => {
+        socket.on('welcome-message', ({ user, groups, chats }) => {
             setGroups(["STATUS", ...Object.keys(groups)])
             setChats(chats)
             dispatchGroupMembers({ type: 'loadUsers', payload: { groups } })
@@ -62,11 +79,13 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('chat-message', ({ user, msg, group }) => {
+        socket.on('chat-message', ({ user, msg, group, isGroup }) => {
+            if (!isGroup) updateChats(user, "open")
+            updateNewMessages(group, group !== activeWindow)
             dispatchMessages({ type: "chat-message", payload: { user, msg, group } })
         })
         return () => socket.off('chat-message')
-    }, [socket, dispatchMessages])
+    }, [socket, activeWindow, updateNewMessages, updateChats, dispatchMessages])
 
 
     useEffect(() => {
@@ -141,7 +160,8 @@ export default function MessagesContextProvider(props) {
             groups, setGroups,
             groupMembers, dispatchGroupMembers,
             messages, dispatchMessages,
-            chats, setChats,
+            newMessages, updateNewMessages,
+            chats, setChats, updateChats,
             activeWindow, changeWindow,
             windowIsGroup
         }}>
