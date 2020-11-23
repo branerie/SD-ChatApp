@@ -1,9 +1,8 @@
-const User = require('../models/user')
 const { hashPassword, jwt, inputValidation} = require('../utils')
 const express = require('express');
-const { models } = require('mongoose');
 const router = express.Router()
-const bcrypt = require ('bcrypt')
+const bcrypt = require ('bcrypt');
+const models = require('../models');
 
 router.post('/login', async (request, response, next) => {
     const {
@@ -12,11 +11,11 @@ router.post('/login', async (request, response, next) => {
     } = request.body
 
     if(!inputValidation(username, password)){
-        console.error("Username and password are required!")
+        console.error('Username and password are required!')
         return
     }
 
-    const userObject = await User.findOne({username})
+    const userObject = await models.User.findOne({username})
     if(!userObject){
         console.error('User not found')
         return
@@ -29,7 +28,7 @@ router.post('/login', async (request, response, next) => {
         return
     }
     const token = jwt.createToken(userObject)
-    response.header("Authorization", token)
+    response.header('Authorization', token)
     response.send(userObject)
 })
 
@@ -46,8 +45,25 @@ router.post('/register', async (request, response, next) => {
     const userObject = await user.save()
     const token = jwt.createToken(userObject)
     
-    response.header("Authorization", token)
+    response.header('Authorization', token)
     response.send(userObject)
+})
+
+router.post('/verify', async (req, res, next) =>{
+    const token = req.headers.authorization || ''
+    const data = await jwt.verifyToken(token)
+    const user = await models.User.findById(data.userID)
+    console.log(user);
+    if(!user){
+        res.send({
+            status: false        
+        }) 
+    }
+    res.send({
+        status: true,
+        user: data.username,
+        userID: data.userID
+    })
 })
 
 module.exports = router
