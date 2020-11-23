@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
 import "./style.css"
-import ChatPage from './pages/ChatPage'
-import LoginPage from './pages/LoginPage'
+import HomePage from './pages/HomePage'
 import RegisterPage from './pages/RegisterPage'
+import LoginPage from './pages/LoginPage'
+import ChatPage from './pages/ChatPage'
 import UserContext from './Context'
 
 const App = () => {
@@ -32,6 +33,7 @@ const App = () => {
     }}>
       <BrowserRouter>
         <Switch>
+          <Route exact path="/" component={HomePage} />
           <Route path="/login" component={LoginPage} />
           <Route path="/register" component={RegisterPage} />
           <Route path="/chat" component={ChatPage} />
