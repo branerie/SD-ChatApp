@@ -1,17 +1,13 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-
-import './index.css'
+import styles from './index.module.css'
+import PageHeader from  '../../components/PageHeader'
+import HomeMain from  '../../components/HomeMain'
 
 const HomePage = () => {
     return (
-        <div className='header'>
-            <Link to="/">Logo</Link>
-            <div>
-                <Link className='navlink' to="/login">Login</Link>
-                <Link className='navlink' to="/register">Register</Link>
-                <Link className='navlink' to="/">About</Link>
-            </div>
+        <div className={styles['home-container']}>   
+            <PageHeader text='Welcome to ChatApp'/>
+            <HomeMain />
         </div>
     )
 }
