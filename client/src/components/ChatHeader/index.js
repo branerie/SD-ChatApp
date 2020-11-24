@@ -7,7 +7,7 @@ const ChatHeader = () => {
     return (
         <header className="chat-header">
             <h1>SmartChat / {activeWindow}</h1>
-            <a href="/login" className="btn">Exit</a>
+            <a href="/login" className="btn">Logout</a>
         </header>
     )
 }

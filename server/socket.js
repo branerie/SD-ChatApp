@@ -97,6 +97,34 @@ module.exports = io => {
             }
             callback()
         })
+
+        socket.on("join-request", ({ group }, callback) => {
+            console.log(`[${getTime()}] SERVER: Request from user ${socket.username} to join group ${group}`)
+            let success = false
+            let msg = ''
+            let requestedGroup = mockGroups.find(x => x.name === group) // fetch
+            if (!requestedGroup) {        
+                msg = `${group} doesn't exist`
+                console.log(msg)
+                callback(success, msg)
+            } else if (!requestedGroup.open) {
+                msg = `${group} is closed`
+                console.log(msg)
+                callback(success, msg)
+            } else {                
+                let members = [...new Set(requestedGroup.members)] || []
+                let onlineSIDs = io.sockets.adapter.rooms.get(group) || []
+                let online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
+                socket.groups[group] = {
+                    online,
+                    offline: members ? members.filter(member => !online.includes(member)) : []
+                }
+                socket.join(group)
+                success = true
+                socket.to(group).emit("join-message", { user: socket.username, group })
+                callback(success, socket.groups)
+            }
+        })
     })
 
     function getTime() {
