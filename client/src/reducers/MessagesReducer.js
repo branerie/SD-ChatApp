@@ -49,6 +49,16 @@ export default function MessagesReducer(messages, action) {
             ]
             break
 
+        case "join-request-message":
+            newMessages[action.payload.group] = [
+                ...messages[action.payload.group] || [], {
+                    user: "SYSTEM",
+                    msg: `You are now talking in ${action.payload.group}`,
+                    timestamp
+                }
+            ]
+            break
+
         case "quit-message":
             newMessages[action.payload.group] = [
                 ...messages[action.payload.group], {
