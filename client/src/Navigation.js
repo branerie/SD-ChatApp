@@ -7,13 +7,12 @@ import RegisterPage from './pages/RegisterPage'
 import { AuthenticateUser }  from './context/authenticationContext'
 
 const Navigation = () => {
-    const user = AuthenticateUser()
-    // console.log(user)
+    const authContextObj = AuthenticateUser()
 
     return (
         <BrowserRouter>
             <Switch>
-                <Route exact path='/' component={user.user.loggedIn ? ChatPage : HomePage} />
+                <Route exact path='/' component={authContextObj.user.loggedIn ? ChatPage : HomePage} />
                 <Route exact path='/login' component={LoginPage} />
                 <Route exact path='/register' component={RegisterPage} />
                 <Route path='/chat' component={ChatPage} />

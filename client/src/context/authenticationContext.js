@@ -11,14 +11,14 @@ export function AuthenticateUser () {
 export default function AuthenticationProvider (props){
     const [user, setUser] = useState({})
 
-    const logIn = (useraaa) => {
+    const logIn = (user) => {
         setUser({
-            ...useraaa,
+            ...user,
             loggedIn: true
         })
     }
 
-    const logOut = (user) => {
+    const logOut = () => {
         document.cookie = "x-auth-token= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
         setUser({
             loggedIn: false
