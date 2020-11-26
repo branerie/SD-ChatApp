@@ -11,9 +11,11 @@ const ChatMessageInput = () => {
 
     function sendMessage(e) {
         e.preventDefault()
-        console.log(socket);
 
-        socket.emit('chat-message', { recipient: activeWindow, msg: message , isGroup: windowIsGroup }, () => attachMsg())
+        socket.emit(windowIsGroup ? 'group-chat-message' : 'single-chat-message', { 
+            recipient: activeWindow, 
+            msg: message 
+        }, () => attachMsg())
         return
     }
 

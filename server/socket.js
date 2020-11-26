@@ -1,133 +1,145 @@
 const mockUsers = require("./mock-users")
 const mockGroups = require("./mock-groups")
+const registeredUsers = [...new Set(mockUsers.map(x => x.name))] // get registered users form mock
+const registeredGroups = [...new Set(mockGroups.map(x => x.name))] // get registered groups form mock
 
 module.exports = io => {
+    // names cache keeps track of connected users and their assigned socket id
+    // It's an object with username as property key and socket id as property value 
+    // it is updated on every connect and disconnect 
+    const nameToSocketIdCache = {}
+    let clientsCount = 0
+
     io.on("connect", socket => {
-        socket.username = socket.handshake.query.username
-        socket.groups = {}
-        socket.chats = []
-
-        console.log(`[${getTime()}] SERVER: Detected connection with socket ID: ${socket.id}. Username: ${socket.username}`)
-
-        let user = mockUsers.find(x => x.name === socket.username) // fetch DB
-        let registeredGroups = [...new Set(mockGroups.map(x => x.name))] // get registered groups form mock
-        let registeredUsers = [...new Set(mockUsers.map(x => x.name))] // get registered groups form mock
-        if (user) {
-            user.groups = new Set(user.groups) // temporary (to remove dubs from mock db)
-            user.groups.forEach(group => {
-                // avoid joining non-existing groups generated in mock data
-                if (!registeredGroups.includes(group)) {
-                    user.groups.delete(group)
-                    return
-                }
-                let { members } = mockGroups.find(x => x.name === group) || []
-                members = [...new Set(members)]
-                let onlineSIDs = io.sockets.adapter.rooms.get(group) || []
-                let online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
-                socket.groups[group] = {
-                    online,
-                    offline: members ? members.filter(member => !online.includes(member)) : []
-                }
-            })
-            user.groups = [...user.groups]
-
-            user.chats = new Set(user.chats) // temporary (to remove dubs from mock db)
-            user.chats.forEach(chat => {
-                if (!registeredUsers.includes(chat) || chat === user.name) {
-                    user.chats.delete(chat)
-                }
-            })
-            socket.chats = [...user.chats]
-
-
-            // Welcome message from server to connected client
-            // Send groups and chats to client for UI setup
-            socket.emit("welcome-message", {
-                user: socket.username,
-                groups: socket.groups,
-                chats: socket.chats
-            })
-            socket.join(user.groups)
-            // send join message to group online members so they could update their userlists
-            socket.rooms.forEach(group => {
-                socket.to(group).emit("join-message", { user: socket.username, group })
-            })
-
-            // console.log(io.sockets.adapter.rooms);
-            // console.log(io.sockets.sockets);
-            io.sockets.sockets.forEach((object, socketID) => console.log(socketID, object.username))
-            // console.log(io.eio.clients);
+        // this first check should be done at rest api to avoid unnecessary connections but may be left in case of leaks
+        queryName = socket.handshake.query.username
+        if (!registeredUsers.includes(queryName)) {
+            console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (Unknown username: ${queryName})`)
+            socket.disconnect()
+            return
         }
+        nameToSocketIdCache[queryName] = socket.id
+        clientsCount++
+        console.log(`[${getTime()}] Connect @ ${socket.id} (${queryName}). Total connections in pool: ${clientsCount}.`)
+        socket.userData = {} // initialize empty object for user data from DB
+        let {groups, chats} = mockUsers.find(x => x.name === queryName) // fetch DB
+        socket.userData.name = queryName
+        socket.userData.groups = {}
+        socket.userData.chats = cleanFalseChats(chats, queryName)
 
+        groups = cleanFalseGroups(groups, queryName) // temporary (to remove dubs from mock db)
+        socket.join(groups)
+        groups.forEach(group => {
+            let { members } = mockGroups.find(x => x.name === group) || []
+            members = cleanFalseMembers(members, group)
+            let online = io.sockets.adapter.rooms.get(group) || new Set()
+            online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name) // Array must be send to React
+            socket.userData.groups[group] = {
+                online,
+                offline: members ? members.filter(member => !online.includes(member)) : []
+            }
+        })
 
-        // socket.on("get-userlist", (group, callback) => {
-        //     let clients = []
-        //     io.in(group).clients((error, ids) => {
-        //         clients = ids.map(id => io.of("/").connected[id].username);
-        //         // console.log(clients);
-        //         callback(clients)
-        //     })
-        // })
+        // Welcome message from server to connected client
+        // Send groups and chats to client for UI setup
+        socket.emit("welcome-message", {
+            groups: socket.userData.groups,
+            chats: socket.userData.chats
+        })
+        
+        // send join message to group online members so they could update their userlists
+        groups.forEach(group => {
+            socket.to(group).emit("join-message", { user: socket.userData.name, group })
+        })
 
         // Notify users on disconnect
         socket.on("disconnecting", (reason) => {
-            console.log(`[${getTime()}] SERVER: User ${socket.username} has quit server (${reason})`)
+            // console.log(`[${getTime()}] User ${socket.userData.name} has quit server (${reason})`)
+            delete nameToSocketIdCache[socket.userData.name]
+            clientsCount--
+            console.log(`[${getTime()}] Disconnect @ ${socket.id} (${socket.userData.name}). Reason: ${reason}. Total connections in pool: ${clientsCount}.`)
             // send message to user groups that he quit
-            socket.rooms.forEach(group => {
-                socket.to(group).emit("quit-message", { user: socket.username, reason, group })
+            groups.forEach(group => {
+                socket.to(group).emit("quit-message", { user: socket.userData.name, reason, group })
             })
         })
 
 
         // Get message from client and send to rest clients
-        socket.on("chat-message", ({ msg, recipient, isGroup }, callback) => {
-            console.log(`[${getTime()}] SERVER: User ${socket.username} sent message to ${recipient}`)
-            
-            if (isGroup) {
-                // SEC: Check if user can manipulate group (and message)
-                socket.to(recipient).emit("chat-message", { user: socket.username, msg, group: recipient, isGroup })
+        socket.on("group-chat-message", ({ msg, recipient }, callback) => {
+            console.log(`[${getTime()}] Message (group): ${socket.userData.name} >> ${recipient}`)
+            socket.to(recipient).emit("group-chat-message", { user: socket.userData.name, msg, group: recipient })
+            callback()
+        })
+
+        socket.on("single-chat-message", ({ msg, recipient }, callback) => {            
+            if (nameToSocketIdCache[recipient]) {
+                console.log(`[${getTime()}] Message (private): ${socket.userData.name} >> ${recipient}`)
+                io.to(nameToSocketIdCache[recipient]).emit("single-chat-message", { user: socket.userData.name, msg })
             } else {
-                // maybe keep track globally in next object to avoid this loop on every message
-                let connectedSockets = {}
-                io.sockets.sockets.forEach((object, socketID) => {
-                    connectedSockets[object.username] = socketID
-                })
-                console.log(connectedSockets[recipient]);
-                io.to(connectedSockets[recipient]).emit("chat-message", { user: socket.username, msg, group: socket.username, isGroup })
+                // send offline msg to DB if not in blacklist
+                console.log(`[${getTime()}] Message (offline): ${socket.userData.name} >> ${recipient}`)
             }
             callback()
         })
 
-        socket.on("join-request", ({ group }, callback) => {
-            console.log(`[${getTime()}] SERVER: Request from user ${socket.username} to join group ${group}`)
-            let success = false
+        socket.on("join-request", ({ group }, callback) => {            
             let msg = ''
             let requestedGroup = mockGroups.find(x => x.name === group) // fetch
-            if (!requestedGroup) {        
+            if (!requestedGroup) {
                 msg = `${group} doesn't exist`
-                console.log(msg)
-                callback(success, msg)
-            } else if (!requestedGroup.open) {
+                console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
+                callback(false, msg)
+            } else if (!requestedGroup.open && !requestedGroup.members.includes(socket.userData.name)) {
                 msg = `${group} is closed`
-                console.log(msg)
-                callback(success, msg)
-            } else {                
-                let members = [...new Set(requestedGroup.members)] || []
-                let onlineSIDs = io.sockets.adapter.rooms.get(group) || []
-                let online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
-                socket.groups[group] = {
+                console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
+                callback(false, msg)
+            } else if (Object.keys(socket.userData.groups).includes(requestedGroup.name)) {
+                msg = `Already there`
+                console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
+                callback(false, msg)                
+            } else {
+                console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Success.`)
+                socket.join(group)
+                let members = cleanFalseMembers(requestedGroup.members, group)
+                let online = io.sockets.adapter.rooms.get(group) || new Set()
+                online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name)
+                socket.userData.groups[group] = {
                     online,
                     offline: members ? members.filter(member => !online.includes(member)) : []
                 }
-                socket.join(group)
-                success = true
-                socket.to(group).emit("join-message", { user: socket.username, group })
-                callback(success, socket.groups)
+                socket.to(group).emit("join-message", { user: socket.userData.name, group })
+                callback(true, socket.userData.groups)
             }
         })
     })
+}
 
-    function getTime() {
-        return new Date().toLocaleTimeString()
-    }
+
+function getTime() {
+    return new Date().toLocaleTimeString()
+}
+
+
+// next three function has to do with mock data
+
+//remove dublicate, non-existent or missing-me-from-group-members groups
+function cleanFalseGroups(groups, me) {
+    groups = new Set(groups)
+    groups.forEach(group => (!registeredGroups.includes(group) || !mockGroups.find(x => x.name === group).members.includes(me)) && groups.delete(group))
+    return [...groups]
+}
+
+//remove dublicate, non-existent or missing-group-from-group-list member
+function cleanFalseMembers(members, group) {
+    members = new Set(members)
+    members.forEach(member => (!registeredUsers.includes(member) || !mockUsers.find(x => x.name === member).groups.includes(group)) && members.delete(member))
+    return [...members]
+}
+
+//remove dublicate, self or non-existent-user chats
+function cleanFalseChats(chats, me) {
+    chats = new Set(chats)
+    chats.forEach(chat => (!registeredUsers.includes(chat) || chat === me) && chats.delete(chat))
+    return [...chats]
 }
