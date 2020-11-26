@@ -38,6 +38,7 @@ export default function MessagesContextProvider(props) {
         setwindowIsGroup(isGroup)
         updateNewMessages(selectedWindow, false)
     }
+    
 
     const updateChats = useCallback((user, action) => {
         if (action === "open") {
@@ -67,24 +68,34 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('welcome-message', ({ user, groups, chats }) => {
+        socket.on('welcome-message', ({ groups, chats }) => {
             setGroups(["STATUS", ...Object.keys(groups)])
             setChats(chats)
             dispatchGroupMembers({ type: 'loadUsers', payload: { groups } })
-            dispatchMessages({ type: "welcome-message", payload: { groups: Object.keys(groups), user } })
+            dispatchMessages({ type: "welcome-message", payload: { groups: Object.keys(groups), user: ME } })
         })
         return () => socket.off('welcome-message')
-    }, [socket, setGroups, setChats, dispatchGroupMembers, dispatchMessages])
+    }, [socket, ME, setGroups, setChats, dispatchGroupMembers, dispatchMessages])
 
 
     useEffect(() => {
         if (!socket) return
-        socket.on('chat-message', ({ user, msg, group, isGroup }) => {
-            if (!isGroup) updateChats(user, "open")
+        socket.on('group-chat-message', ({ user, msg, group }) => {
             updateNewMessages(group, group !== activeWindow)
             dispatchMessages({ type: "chat-message", payload: { user, msg, group } })
         })
-        return () => socket.off('chat-message')
+        return () => socket.off('group-chat-message')
+    }, [socket, activeWindow, updateNewMessages, dispatchMessages])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('single-chat-message', ({ user, msg }) => {
+            updateChats(user, "open")
+            updateNewMessages(user, user !== activeWindow)
+            dispatchMessages({ type: "chat-message", payload: { user, msg, group: user } })
+        })
+        return () => socket.off('single-chat-message')
     }, [socket, activeWindow, updateNewMessages, updateChats, dispatchMessages])
 
 

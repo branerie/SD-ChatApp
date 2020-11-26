@@ -21,9 +21,11 @@ const ChatList = () => {
             if (success) {
                 context.setGroups(oldGroups => [...oldGroups, groupName])
                 context.changeWindow(groupName, true)
-                console.log(data);
                 context.dispatchGroupMembers({ type: 'loadUsers', payload: { groups: data } })
                 context.dispatchMessages({ type: "join-request-message", payload: { group: groupName } })
+            } else {
+                if (data === "Already there") context.changeWindow(groupName, true)
+                else console.log(data)
             }
         })
     }
