@@ -11,13 +11,14 @@ router.post('/login', async (request, response, next) => {
     } = request.body
 
     if(!inputValidation(username, password)){
-        console.error('Username and password are required!')
+        response.status(401).send({error: 'Username and password are required!'})
         return
     }
 
     const userObject = await models.User.findOne({username})
     if(!userObject){
         console.error('User not found')
+        response.status(403).send({error: 'Username or password invalid!'})
         return
     }
     const isPasswordCorrect = await bcrypt.compare(password, userObject.password)
@@ -25,6 +26,7 @@ router.post('/login', async (request, response, next) => {
     
     if(!isPasswordCorrect){
         console.error('Wrong password')
+        response.status(403).send({error: 'Username or password invalid!'})
         return
     }
     const token = jwt.createToken(userObject)
@@ -38,7 +40,7 @@ router.post('/register', async (request, response, next) => {
         password
     } = request.body
     const encryptedPassword = await hashPassword(password)
-    const user = new User({
+    const user = new models.User({
         username, 
         password: encryptedPassword
     })

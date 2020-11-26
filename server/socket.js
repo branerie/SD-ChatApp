@@ -1,6 +1,6 @@
 const mockUsers = require("./mock-users")
 const mockGroups = require("./mock-groups")
-const registeredUsers = [...new Set(mockUsers.map(x => x.name))] // get registered users form mock
+const registeredUsers = [...new Set(mockUsers.map(x => x.name)), "test"] // get registered users form mock
 const registeredGroups = [...new Set(mockGroups.map(x => x.name))] // get registered groups form mock
 
 module.exports = io => {
@@ -12,6 +12,7 @@ module.exports = io => {
 
     io.on("connect", socket => {
         // this first check should be done at rest api to avoid unnecessary connections but may be left in case of leaks
+        console.log(socket.handshake);
         queryName = socket.handshake.query.username
         if (!registeredUsers.includes(queryName)) {
             console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (Unknown username: ${queryName})`)
@@ -22,10 +23,14 @@ module.exports = io => {
         clientsCount++
         console.log(`[${getTime()}] Connect @ ${socket.id} (${queryName}). Total connections in pool: ${clientsCount}.`)
         socket.userData = {} // initialize empty object for user data from DB
-        let {groups, chats} = mockUsers.find(x => x.name === queryName) // fetch DB
+        // let {groups, chats} = mockUsers.find(x => x.name === queryName) // fetch DB
+        let groups = socket.handshake.query.groups.split(",") //hack
+        let chats = socket.handshake.query.chats.split(",") // hack
+        console.log(chats);
         socket.userData.name = queryName
         socket.userData.groups = {}
-        socket.userData.chats = cleanFalseChats(chats, queryName)
+        // socket.userData.chats = cleanFalseChats(chats, queryName)
+        socket.userData.chats = chats
 
         groups = cleanFalseGroups(groups, queryName) // temporary (to remove dubs from mock db)
         socket.join(groups)

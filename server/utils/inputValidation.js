@@ -1,14 +1,15 @@
 
-const inputValidation = (username, password) =>{
-    if(!username){
-        console.log('Please fill your username');
+const inputValidation = (username, password) => {
+    if(!username && !password){
+        console.error('Login attempt without username and password');
         return false
-    }
-    if(!password){
-        console.log('Please fill your password');
+    } else if (!username) {
+        console.error('Login attempt without username');
         return false
-    }
-    return true
+    } else if (!password) {
+        console.error('Login attempt without password');
+        return false
+    } else return true
 }
 
 module.exports = inputValidation
