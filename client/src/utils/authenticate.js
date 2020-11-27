@@ -7,22 +7,28 @@ const authenticate = async (url, body, onSuccess, onFailure) => {
                 'Content-Type': 'application/json'
             }
         })
-        console.log(promise)
+        console.log("Promise:", promise)
+
         const authToken = promise.headers.get("Authorization")
-        document.cookie = `x-auth-token=${authToken}`
+        console.log("authToken", authToken)
+
+        if (authToken) document.cookie = `x-auth-token=${authToken}`
+
         const response = await promise.json()
-        console.log(response)
+        console.log("Response",response)
+
         if (response.username && authToken) {
             onSuccess({
                 username: response.username,
+                groups: response.groups,
+                chats: response.chats,
                 id: response._id
-            });
+            })
         } else {
-            console.log('here')
-            onFailure()
+            onFailure(response.error)
         }
-
     } catch (error) {
+        // Server or connection down
         onFailure(error)
     }
 }

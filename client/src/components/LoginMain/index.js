@@ -13,26 +13,29 @@ const LoginMain = (props) => {
     const context = useContext(UserContext)
     const history = useHistory()
 
-    const handleSubmit = async (event) =>{
-        event.preventDefault()        
+    const handleSubmit = async (event) => {
+        event.preventDefault()
 
         // dev hack
-        if (!password) {
-            history.push({ pathname: '/chat', username })
-            return;
-        }
+        // if (!password) {
+        //     history.push({ pathname: '/chat', username })
+        //     return;
+        // }
 
-        await authenticate(url, {
-            username,
-            password
-        }, (user) =>{
-            console.log('You are logged in');
-            context.logIn(user)
-            history.push('/chat');
-        },(error) =>{
-            console.log('here');
-            console.log('Error', error);
-        } )
+        await authenticate(url, { username, password },
+            user => {
+                console.log('You are logged in') //UX
+                console.log(user);
+                context.logIn(user)
+                history.push({ pathname: '/chat', 
+                    username: user.username,
+                    groups: user.groups,
+                    chats: user.chats
+                })
+            },
+            error => {
+                console.log(error) //UX
+            })
     }
 
     return (
