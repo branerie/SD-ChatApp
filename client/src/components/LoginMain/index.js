@@ -27,11 +27,7 @@ const LoginMain = (props) => {
                 console.log('You are logged in') //UX
                 console.log(user);
                 context.logIn(user)
-                history.push({ pathname: '/chat', 
-                    username: user.username,
-                    groups: user.groups,
-                    chats: user.chats
-                })
+                history.push({ pathname: '/chat', username })
             },
             error => {
                 console.log(error) //UX

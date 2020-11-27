@@ -33,7 +33,7 @@ const RegisterMain = () => {
         }, (user) =>{
             console.log('Successful registration');
             context.logIn(user)
-            history.push('/chat');
+            history.push({ pathname: '/chat', username })
         },(error) =>{
             console.log('Error', error);
         } )

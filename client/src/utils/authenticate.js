@@ -20,8 +20,6 @@ const authenticate = async (url, body, onSuccess, onFailure) => {
         if (response.username && authToken) {
             onSuccess({
                 username: response.username,
-                groups: response.groups,
-                chats: response.chats,
                 id: response._id
             })
         } else {
