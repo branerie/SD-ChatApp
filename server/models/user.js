@@ -11,11 +11,17 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    
-    chatRoom: {
+
+    groups: [{
         type: 'ObjectId',
-        ref: 'ChatRoom'
-    }
+        ref: 'Group'
+    }],
+
+    chats: [{
+        type: 'ObjectId',
+        ref: 'User'
+    }],
+
 })
 
 module.exports = mongoose.model('User', UserSchema)

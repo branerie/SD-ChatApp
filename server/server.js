@@ -13,6 +13,6 @@ connectDB()
 const server = app.listen(config.port, console.log(`Listening on port ${config.port}!`))
 
 const socketio = require("socket.io")
-// const io = socketio(server)
+const io = socketio(server)
 
-// require("./socket")(io)
+require("./socket")(io)

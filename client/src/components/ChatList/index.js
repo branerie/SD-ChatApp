@@ -29,11 +29,21 @@ const ChatList = () => {
             }
         })
     }
+
+    function addGroup(params) {
+        
+    }
     return (
         <aside className="chat-sidebar">
             <div>
+                <div>
                 <input onChange={e => setGroupName(e.target.value)}/>
                 <button className="join-btn" onClick={joinGroup}>Join</button>
+                </div>
+                <div>
+                <input onChange={e => setGroupName(e.target.value)}/>
+                <button className="join-btn" onClick={addGroup}>Add</button>
+                </div>
                 <h2>GROUPS</h2>
                 <ul>
                     {context.groups.map((item, i) => {
