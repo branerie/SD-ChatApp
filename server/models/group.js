@@ -11,6 +11,10 @@ const GroupSchema = new mongoose.Schema ({
         ref: 'User',
         required: true
     },
+    open: {
+        type: Boolean,
+        default: false
+    },
     members: [{
         type: 'ObjectId',
         ref: 'User'

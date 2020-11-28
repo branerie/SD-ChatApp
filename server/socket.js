@@ -1,9 +1,4 @@
-const mockUsers = require("./mock-users")
-const mockGroups = require("./mock-groups")
-const registeredUsers = [...new Set(mockUsers.map(x => x.name)), "test", "test2", "test3", "test4"] // get registered users form mock
-const registeredGroups = [...new Set(mockGroups.map(x => x.name))] // get registered groups form mock
-
-const models = require('./models')
+const {User, Group} = require('./models')
 
 module.exports = io => {
     // names cache keeps track of connected users and their assigned socket id
@@ -13,66 +8,42 @@ module.exports = io => {
     let clientsCount = 0
 
     io.on("connect", async (socket) => {
-        // this first check should be done at rest api to avoid unnecessary connections but may be left in case of leaks
-        // console.log(socket.handshake);
-        queryName = socket.handshake.query.username
-        if (!registeredUsers.includes(queryName)) {
-            console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (Unknown username: ${queryName})`)
-            socket.disconnect()
-            return
-        }
-        nameToSocketIdCache[queryName] = socket.id
-        clientsCount++
-        console.log(`[${getTime()}] Connect @ ${socket.id} (${queryName}). Total connections in pool: ${clientsCount}.`)
-        socket.userData = {} // initialize empty object for user data from DB
-        // let {groups, chats} = mockUsers.find(x => x.name === queryName) // fetch DB
-        let userData = await models.User.findOne({
+        let queryName = socket.handshake.query.username
+        let userData = await User.findOne({
             username: queryName
         }, 'groups chats').populate({
             path: 'chats',
             select: "username -_id"
-        }).populate({
-            path: 'groups',
-            select: "name -_id"
         })
-        // console.log(user);
 
+        // this check will be done at rest api to avoid unnecessary connections but may be left in case of leaks
+        if (!userData._id) {
+            console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (Unknown username: ${queryName})`)
+            socket.disconnect()
+            return
+        }
+
+        nameToSocketIdCache[queryName] = socket.id
+        clientsCount++
+        console.log(`[${getTime()}] Connect @ ${socket.id} (${queryName}). Total connections in pool: ${clientsCount}.`)
+
+        socket.userData = {} // initialize empty object for user data from DB
         socket.userData.name = queryName
         socket.userData.groups = {}
-        // socket.userData.chats = cleanFalseChats(chats, queryName)
         socket.userData.chats = userData.chats.map(chat => chat.username)
 
-        // groups = cleanFalseGroups(groups, queryName) // temporary (to remove dubs from mock db)
-        let groups = userData.groups.map(group => group.name)
+        let groupData = await Group.find({
+            _id: { $in: userData.groups }
+        }, 'name members -_id').populate({ path: 'members', select: 'username -_id' })
 
-        let groupData = await models.Group.find({
-            name: { $in: groups }
-        }, 'name members').populate({ path: 'members', select: 'username -_id' })
-
-        let groupMembers = {}
-        groupData.map(o => groupMembers[[o.name]] = o.members.map(m => m.username))
-
-        console.log(groupMembers);
-        // console.log(groupData);
-
-        // console.log(groups);
+        let groups = groupData.map(group => group.name)
         socket.join(groups)
-        
-        // await Promise.all(groups.map(async (group) => {
-        //     let members = await getMembers(group)
-        //     let online = io.sockets.adapter.rooms.get(group) || new Set()
-        //     online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name) // React likes Array
-        //     socket.userData.groups[group] = {
-        //         online,
-        //         offline: members ? members.filter(member => !online.includes(member)) : []
-        //     }
-        // }))
 
-        Object.entries(groupMembers).forEach(([group , members]) => {
-            // console.log(group);
-            let online = io.sockets.adapter.rooms.get(group) || new Set()
+        groupData.forEach(({name, members}) => {
+            members = members.map(member => member.username)
+            let online = io.sockets.adapter.rooms.get(name) || new Set()
             online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name) // React likes Array
-            socket.userData.groups[group] = {
+            socket.userData.groups[name] = {
                 online,
                 offline: members ? members.filter(member => !online.includes(member)) : []
             }
@@ -122,14 +93,15 @@ module.exports = io => {
             callback()
         })
 
-        socket.on("join-request", ({ group }, callback) => {
+        socket.on("join-request", async ({ group }, callback) => {
             let msg = ''
-            let requestedGroup = mockGroups.find(x => x.name === group) // fetch
+            let requestedGroup = await Group.findOne({name: group}).populate({path: 'members', select: 'username -_id'}) // fetch
+            let members = requestedGroup ? requestedGroup.members.map(member => member.username) : []
             if (!requestedGroup) {
                 msg = `${group} doesn't exist`
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
                 callback(false, msg)
-            } else if (!requestedGroup.open && !requestedGroup.members.includes(socket.userData.name)) {
+            } else if (!requestedGroup.open && !members.includes(socket.userData.name)) {
                 msg = `${group} is closed`
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
                 callback(false, msg)
@@ -140,7 +112,6 @@ module.exports = io => {
             } else {
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Success.`)
                 socket.join(group)
-                let members = cleanFalseMembers(requestedGroup.members, group)
                 let online = io.sockets.adapter.rooms.get(group) || new Set()
                 online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name)
                 socket.userData.groups[group] = {
@@ -157,35 +128,4 @@ module.exports = io => {
 
 function getTime() {
     return new Date().toLocaleTimeString()
-}
-
-async function getMembers(group) {
-    let groupData = await models.Group.findOne({
-        name: group
-    }, 'members').populate({ path: 'members', select: 'username -_id' })
-    // console.log(groupData)
-    let members = groupData.members.map(member => member.username)
-    return members
-}
-// next three function has to do with mock data
-
-//remove dublicate, non-existent or missing-me-from-group-members groups
-function cleanFalseGroups(groups, me) {
-    groups = new Set(groups)
-    groups.forEach(group => (!registeredGroups.includes(group) || !mockGroups.find(x => x.name === group).members.includes(me)) && groups.delete(group))
-    return [...groups]
-}
-
-//remove dublicate, non-existent or missing-group-from-group-list member
-function cleanFalseMembers(members, group) {
-    members = new Set(members)
-    members.forEach(member => (!registeredUsers.includes(member) || !mockUsers.find(x => x.name === member).groups.includes(group)) && members.delete(member))
-    return [...members]
-}
-
-//remove dublicate, self or non-existent-user chats
-function cleanFalseChats(chats, me) {
-    chats = new Set(chats)
-    chats.forEach(chat => (!registeredUsers.includes(chat) || chat === me) && chats.delete(chat))
-    return [...chats]
 }
