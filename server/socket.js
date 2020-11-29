@@ -17,7 +17,7 @@ module.exports = io => {
         })
 
         // this check will be done at rest api to avoid unnecessary connections but may be left in case of leaks
-        if (!userData._id) {
+        if (!userData) {
             console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (Unknown username: ${queryName})`)
             socket.disconnect()
             return

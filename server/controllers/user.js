@@ -55,7 +55,7 @@ router.post('/verify', async (req, res, next) =>{
     const token = req.headers.authorization || ''
     const data = await jwt.verifyToken(token)
     const user = await models.User.findById(data.userID)
-    console.log(user);
+    console.log("Verify:", user);
     if(!user){
         res.send({
             status: false        

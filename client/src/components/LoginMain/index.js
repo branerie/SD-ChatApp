@@ -1,26 +1,20 @@
-import React, { useState, useContext } from 'react'
+import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styles from './index.module.css'
 import Input from '../Input'
 import SubmitButton from '../Buttons/SubmitButton'
 import authenticate from '../../utils/authenticate'
-import UserContext from '../../Context'
+import { AuthenticateUser } from '../../context/authenticationContext'
 
-const LoginMain = (props) => {
+const LoginMain = () => {
     const url = 'http://localhost:5000/login'
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
-    const context = useContext(UserContext)
+    const context = AuthenticateUser()
     const history = useHistory()
 
     const handleSubmit = async (event) => {
         event.preventDefault()
-
-        // dev hack
-        // if (!password) {
-        //     history.push({ pathname: '/chat', username })
-        //     return;
-        // }
 
         await authenticate(url, { username, password },
             user => {
