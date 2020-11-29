@@ -1,10 +1,10 @@
-import React, {useState, useContext} from 'react'
+import React, {useState} from 'react'
 import styles from './index.module.css'
 import Input from '../Input'
 import Alert from '../Alert'
 import SubmitButton from '../Buttons/SubmitButton'
 import authenticate from '../../utils/authenticate'
-import UserContext from '../../Context'
+import { AuthenticateUser } from '../../context/authenticationContext'
 import inputValidation from '../../utils/inputValidation'
 import { useHistory } from "react-router-dom"
 
@@ -15,7 +15,7 @@ const RegisterMain = () => {
     const [rePassword, setRePassword] = useState ('')
 
     const [alertMessage, setAlertMessage] = useState ('')
-    const context = useContext(UserContext)
+    const auth = AuthenticateUser()
     const history = useHistory()
 
     const handleSubmit = async (event) =>{
@@ -32,7 +32,7 @@ const RegisterMain = () => {
             password
         }, (user) =>{
             console.log('Successful registration');
-            context.logIn(user)
+            auth.logIn(user)
             history.push({ pathname: '/chat', username })
         },(error) =>{
             console.log('Error', error);

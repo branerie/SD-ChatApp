@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import io from "socket.io-client"
-import { useLocation } from "react-router-dom"
+import { AuthenticateUser } from './authenticationContext'
 
 export const SocketContext = React.createContext()
 
 export default function SocketContextProvider(props) {
+    const auth = AuthenticateUser();
     const [socket, setSocket] = useState()
-    const location = useLocation()
-    const ME = location.username
+    const ME = auth.user.username
 
     useEffect(() => {
 
