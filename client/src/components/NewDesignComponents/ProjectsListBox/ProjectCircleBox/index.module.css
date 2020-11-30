@@ -1,0 +1,5 @@
+.project-circle-box {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
