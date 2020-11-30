@@ -10,7 +10,8 @@ const ChatList = () => {
     const context = useContext(MessagesContext)
     const [groupName, setGroupName] = useState()
 
-    function handleClick(item, isGroup) {
+    function handleClick(e, item, isGroup) {
+        if (e.target.nodeName === 'BUTTON') return
         context.changeWindow(item, isGroup)
         // if group fetch userlist and messages from server and set state for first request complete
         // if chat fetch chat messages from server and set state for first request complete
@@ -53,7 +54,7 @@ const ChatList = () => {
                                         ${item === context.activeWindow ? "selected" : ""} 
                                         ${(context.newMessages[item] && item !== context.activeWindow) ? 'new-messages' : ''}
                                         `}
-                                onClick={() => handleClick(item, item !== "STATUS")}>
+                                onClick={(e) => handleClick(e,item, item !== "STATUS")}>
                                 <span>{item}</span>
                                 <CloseButton name="X" type="group" item={item}/>
                             </li>
@@ -69,7 +70,7 @@ const ChatList = () => {
                                     ${item === context.activeWindow ? "selected" : ""}
                                     ${context.newMessages[item] && item !== context.activeWindow ? 'new-messages' : ''}
                                     `}
-                                onClick={() => handleClick(item, false)}>
+                                onClick={(e) => handleClick(e,item, false)}>
                                 <span>{item}</span>
                                 <CloseButton name="X" type="chat" item={item}/>
                             </li>

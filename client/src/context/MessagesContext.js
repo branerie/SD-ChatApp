@@ -38,15 +38,6 @@ export default function MessagesContextProvider(props) {
         setwindowIsGroup(isGroup)
         updateNewMessages(selectedWindow, false)
     }
-    
-
-    const updateChats = useCallback((user, action) => {
-        if (action === "open") {
-            !chats.includes(user) && setChats(prevChats => [...prevChats, user])
-        } else { // action == 'close'
-            setChats(prevChats => prevChats.filter(chat => chat !== user))
-        }
-    }, [chats])
 
     const updateNewMessages = useCallback((chat, state) => {
         setNewMessages(prevMessages => ({
@@ -54,6 +45,15 @@ export default function MessagesContextProvider(props) {
             [chat]: state
         }))
     }, [setNewMessages])
+
+    const updateChats = useCallback((user, action) => {
+        if (action === "open") {
+            !chats.includes(user) && setChats(prevChats => [...prevChats, user])
+        } else { // action == 'close'
+            setChats(prevChats => prevChats.filter(chat => chat !== user))
+            
+        }
+    }, [chats])
 
     // EVENTS SECTION
     useEffect(() => {

@@ -89,7 +89,7 @@ module.exports = io => {
             if (!socket.userData.chats.includes(recipient)) {
                 socket.userData.chats.push(recipient)
             }
-            
+
             if (nameToSocketIdCache[recipient]) {
                 console.log(`[${getTime()}] Message (private): ${socket.userData.name} >> ${recipient}`)
                 io.to(nameToSocketIdCache[recipient]).emit("single-chat-message", { user: socket.userData.name, msg })
@@ -98,6 +98,12 @@ module.exports = io => {
                 console.log(`[${getTime()}] Message (offline): ${socket.userData.name} >> ${recipient}`)
             }
             callback()
+        })
+
+        socket.on("close-chat", async (recipient) => {
+            console.log(recipient);
+            let chat = await User.findOne({username: recipient}, '_id')
+            await User.updateOne({username: queryName}, { $pullAll: { chats: [chat._id]}})
         })
 
         socket.on("join-request", async ({ group }, callback) => {
