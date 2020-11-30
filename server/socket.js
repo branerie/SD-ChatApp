@@ -101,14 +101,16 @@ module.exports = io => {
         })
 
         socket.on("close-chat", async (recipient) => {
-            console.log(recipient);
             let chat = await User.findOne({username: recipient}, '_id')
             await User.updateOne({username: queryName}, { $pullAll: { chats: [chat._id]}})
+            socket.userData.chats = socket.userData.chats.filter(name => name !== recipient)
+            console.log(socket.userData.chats);
         })
 
         socket.on("join-request", async ({ group }, callback) => {
             let msg = ''
             let requestedGroup = await Group.findOne({name: group}).populate({path: 'members', select: 'username -_id'}) // fetch
+            let members = requestedGroup ? requestedGroup.members.map(member => member.username) : []
             console.log(requestedGroup);
             if (!requestedGroup) {
                 msg = `${group} doesn't exist`
@@ -127,7 +129,6 @@ module.exports = io => {
                 await Group.updateOne({name: group}, { $addToSet: { members: [userData._id]}})
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Success.`)
                 socket.join(group)
-                let members = requestedGroup.members.map(member => member.username)
                 let online = io.sockets.adapter.rooms.get(group) || new Set()
                 online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name)
                 socket.userData.groups[group] = {
