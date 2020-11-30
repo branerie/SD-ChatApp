@@ -52,19 +52,18 @@ module.exports = io => {
         // console.log("groups", socket.userData.groups);
         // Welcome message from server to connected client
         // Send groups and chats to client for UI setup
-        await socket.emit("welcome-message", {
+        socket.emit("welcome-message", {
             groups: socket.userData.groups,
             chats: socket.userData.chats
         })
 
         // send join message to group online members so they could update their userlists
-        await groups.forEach(group => {
+        groups.forEach(group => {
             socket.to(group).emit("join-message", { user: socket.userData.name, group })
         })
 
         // Notify users on disconnect
         socket.on("disconnecting", (reason) => {
-            // console.log(`[${getTime()}] User ${socket.userData.name} has quit server (${reason})`)
             delete nameToSocketIdCache[socket.userData.name]
             clientsCount--
             console.log(`[${getTime()}] Disconnect @ ${socket.id} (${socket.userData.name}). Reason: ${reason}. Total connections in pool: ${clientsCount}.`)
@@ -82,7 +81,15 @@ module.exports = io => {
             callback()
         })
 
-        socket.on("single-chat-message", ({ msg, recipient }, callback) => {
+        socket.on("single-chat-message", async ({ msg, recipient }, callback) => {
+            let chat = await User.findOne({username: recipient}, '_id')
+            await User.updateOne({username: queryName}, { $addToSet: { chats: [chat._id]}})
+            await User.updateOne({username: recipient}, { $addToSet: { chats: [userData._id]}})
+
+            if (!socket.userData.chats.includes(recipient)) {
+                socket.userData.chats.push(recipient)
+            }
+            
             if (nameToSocketIdCache[recipient]) {
                 console.log(`[${getTime()}] Message (private): ${socket.userData.name} >> ${recipient}`)
                 io.to(nameToSocketIdCache[recipient]).emit("single-chat-message", { user: socket.userData.name, msg })
@@ -96,7 +103,7 @@ module.exports = io => {
         socket.on("join-request", async ({ group }, callback) => {
             let msg = ''
             let requestedGroup = await Group.findOne({name: group}).populate({path: 'members', select: 'username -_id'}) // fetch
-            let members = requestedGroup ? requestedGroup.members.map(member => member.username) : []
+            console.log(requestedGroup);
             if (!requestedGroup) {
                 msg = `${group} doesn't exist`
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
@@ -110,8 +117,11 @@ module.exports = io => {
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
                 callback(false, msg)
             } else {
+                await User.updateOne({username: queryName}, { $addToSet: { groups: [requestedGroup._id]}})
+                await Group.updateOne({name: group}, { $addToSet: { members: [userData._id]}})
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Success.`)
                 socket.join(group)
+                let members = requestedGroup.members.map(member => member.username)
                 let online = io.sockets.adapter.rooms.get(group) || new Set()
                 online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name)
                 socket.userData.groups[group] = {
