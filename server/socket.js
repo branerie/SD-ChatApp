@@ -1,4 +1,5 @@
 const { User, Group } = require('./models')
+const jwt = require('./utils/jwt')
 
 module.exports = io => {
     // names cache keeps track of connected users and their assigned socket id
@@ -8,7 +9,16 @@ module.exports = io => {
     let clientsCount = 0
 
     io.on("connect", async (socket) => {
-        let queryName = socket.handshake.query.username
+        let token = socket.handshake.auth.token
+        let data = await jwt.verifyToken(token)
+
+        if (!data) { // just in case
+            console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (JSON Web Token Error)`)
+            socket.disconnect()
+            return
+        }
+
+        let queryName = data.username
         let userData = await User.findOne({
             username: queryName
         }, 'groups chats').populate({
@@ -42,6 +52,7 @@ module.exports = io => {
         groupData.forEach(({ name, members }) => {
             members = members.map(member => member.username)
             let online = io.sockets.adapter.rooms.get(name) || new Set()
+            // console.log(online);
             online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name) // React likes Array
             socket.userData.groups[name] = {
                 online,
