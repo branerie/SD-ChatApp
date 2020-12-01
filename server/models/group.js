@@ -13,7 +13,7 @@ const GroupSchema = new mongoose.Schema ({
     },
     open: {
         type: Boolean,
-        default: false
+        default: true
     },
     members: [{
         type: 'ObjectId',

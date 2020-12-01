@@ -31,8 +31,18 @@ const ChatList = () => {
         })
     }
 
-    function addGroup(params) {
-        
+    function addGroup() {
+        socket.emit("create-group", { group: groupName }, (success, data) => {
+            if (success) {
+                context.setGroups(oldGroups => [...oldGroups, groupName])
+                context.changeWindow(groupName, true)
+                context.dispatchGroupMembers({ type: 'loadUsers', payload: { groups: data } })
+                context.dispatchMessages({ type: "join-request-message", payload: { group: groupName } })
+            } else {
+                if (data === "Already there") context.changeWindow(groupName, true)
+                else console.log(data)
+            }
+        })
     }
     return (
         <aside className="chat-sidebar">

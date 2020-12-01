@@ -1,4 +1,4 @@
-const {User, Group} = require('./models')
+const { User, Group } = require('./models')
 
 module.exports = io => {
     // names cache keeps track of connected users and their assigned socket id
@@ -39,7 +39,7 @@ module.exports = io => {
         let groups = groupData.map(group => group.name)
         socket.join(groups)
 
-        groupData.forEach(({name, members}) => {
+        groupData.forEach(({ name, members }) => {
             members = members.map(member => member.username)
             let online = io.sockets.adapter.rooms.get(name) || new Set()
             online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name) // React likes Array
@@ -82,9 +82,9 @@ module.exports = io => {
         })
 
         socket.on("single-chat-message", async ({ msg, recipient }, callback) => {
-            let chat = await User.findOne({username: recipient}, '_id')
-            await User.updateOne({username: queryName}, { $addToSet: { chats: [chat._id]}})
-            await User.updateOne({username: recipient}, { $addToSet: { chats: [userData._id]}})
+            let chat = await User.findOne({ username: recipient }, '_id')
+            await User.updateOne({ username: queryName }, { $addToSet: { chats: [chat._id] } })
+            await User.updateOne({ username: recipient }, { $addToSet: { chats: [userData._id] } })
 
             if (!socket.userData.chats.includes(recipient)) {
                 socket.userData.chats.push(recipient)
@@ -101,15 +101,15 @@ module.exports = io => {
         })
 
         socket.on("close-chat", async (recipient) => {
-            let chat = await User.findOne({username: recipient}, '_id')
-            await User.updateOne({username: queryName}, { $pullAll: { chats: [chat._id]}})
+            let chat = await User.findOne({ username: recipient }, '_id')
+            await User.updateOne({ username: queryName }, { $pullAll: { chats: [chat._id] } })
             socket.userData.chats = socket.userData.chats.filter(name => name !== recipient)
             console.log(socket.userData.chats);
         })
 
         socket.on("join-request", async ({ group }, callback) => {
             let msg = ''
-            let requestedGroup = await Group.findOne({name: group}).populate({path: 'members', select: 'username -_id'}) // fetch
+            let requestedGroup = await Group.findOne({ name: group }).populate({ path: 'members', select: 'username -_id' }) // fetch
             let members = requestedGroup ? requestedGroup.members.map(member => member.username) : []
             console.log(requestedGroup);
             if (!requestedGroup) {
@@ -125,8 +125,8 @@ module.exports = io => {
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
                 callback(false, msg)
             } else {
-                await User.updateOne({username: queryName}, { $addToSet: { groups: [requestedGroup._id]}})
-                await Group.updateOne({name: group}, { $addToSet: { members: [userData._id]}})
+                await User.updateOne({ username: queryName }, { $addToSet: { groups: [requestedGroup._id] } })
+                await Group.updateOne({ name: group }, { $addToSet: { members: [userData._id] } })
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Success.`)
                 socket.join(group)
                 let online = io.sockets.adapter.rooms.get(group) || new Set()
@@ -136,6 +136,26 @@ module.exports = io => {
                     offline: members ? members.filter(member => !online.includes(member)) : []
                 }
                 socket.to(group).emit("join-message", { user: socket.userData.name, group })
+                callback(true, socket.userData.groups)
+            }
+        })
+
+        socket.on('create-group', async ({ group }, callback) => {
+            let checkGroup = await Group.findOne({ name: group })
+            if (checkGroup) {
+                callback(false, "Group exists")
+            } else {
+                const newGroup = new Group({
+                    name: group,
+                    creator: userData._id,
+                    members: [userData._id]
+                })
+                const groupObject = await newGroup.save()
+                socket.join(group)
+                socket.userData.groups[group] = {
+                    online: [queryName],
+                    offline: []
+                }
                 callback(true, socket.userData.groups)
             }
         })
