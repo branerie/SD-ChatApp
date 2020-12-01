@@ -7,7 +7,6 @@ import authenticate from '../../utils/authenticate'
 import { AuthenticateUser } from '../../context/authenticationContext'
 
 const LoginMain = () => {
-    const url = 'http://localhost:5000/login'
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const context = AuthenticateUser()
@@ -16,12 +15,11 @@ const LoginMain = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
 
-        await authenticate(url, { username, password },
+        await authenticate({ username, password },
             user => {
-                console.log('You are logged in') //UX
-                console.log(user);
+                // console.log('You are logged in') //UX
                 context.logIn(user)
-                history.push({ pathname: '/chat', username })
+                history.push('/chat')
             },
             error => {
                 console.log(error) //UX

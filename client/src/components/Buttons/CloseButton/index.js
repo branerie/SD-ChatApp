@@ -1,11 +1,17 @@
-import React, { useContext } from "react"
+import React, { useContext } from 'react'
 import './index.css'
 import { MessagesContext } from '../../../context/MessagesContext'
+import { SocketContext } from '../../../context/SocketContext'
 
 const CloseButton = ({ name, type, item }) => {
-    const { updateChats } = useContext(MessagesContext)
+    const { updateChats, changeWindow } = useContext(MessagesContext)
+    const { socket } = useContext(SocketContext)
     function handleClick() {
-        if (type === "chat") updateChats(item, "close")
+        if (type === 'chat') {
+            changeWindow("STATUS", false)
+            updateChats(item, 'close')
+            socket.emit('close-chat', item)
+        }
         // else >>> group : Leave group logic
     }
     return (

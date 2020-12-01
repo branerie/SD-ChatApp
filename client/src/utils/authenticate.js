@@ -1,4 +1,5 @@
-const authenticate = async (url, body, onSuccess, onFailure) => {
+const url = 'http://localhost:5000/login'
+const authenticate = async (body, onSuccess, onFailure) => {
     try {
         const promise = await fetch(url, {
             method: 'POST',
@@ -7,15 +8,14 @@ const authenticate = async (url, body, onSuccess, onFailure) => {
                 'Content-Type': 'application/json'
             }
         })
-        console.log("Promise:", promise)
+        // console.log("Promise:", promise)
 
         const authToken = promise.headers.get("Authorization")
-        console.log("authToken", authToken)
 
         if (authToken) document.cookie = `x-auth-token=${authToken}`
 
         const response = await promise.json()
-        console.log("Response",response)
+        // console.log("Response", response)
 
         if (response.username && authToken) {
             onSuccess({

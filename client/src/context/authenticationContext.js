@@ -42,14 +42,18 @@ export default function AuthenticationProvider(props) {
                     }
                 })
                 const response = await promise.json()
-                console.log(response)
                 if (response.status) {
                     logIn({
                         username: response.user,
                         id: response.userID
                     })
+                } else {
+                    //handle false token error
+                    logOut()
                 }
             } catch (error) {
+                // handle server not accessible error
+                // maybe logOut is not neccessary here
                 logOut()
             }
         }

@@ -12,8 +12,8 @@ const createToken = (userObject) => {
 const verifyToken = async (token) => {
     let data = jwt.verify(token, secretKey, (error, data) => {
         if (error) {
-            console.error(error)
-            return
+            console.error(`Error: ${error.message}. JWT missing or modified.`)
+            return null
         }
         return data
     })

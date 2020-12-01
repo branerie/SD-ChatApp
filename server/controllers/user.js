@@ -1,7 +1,7 @@
-const { hashPassword, jwt, inputValidation} = require('../utils')
+const { hashPassword, jwt, inputValidation } = require('../utils')
 const express = require('express');
 const router = express.Router()
-const bcrypt = require ('bcrypt');
+const bcrypt = require('bcrypt');
 const models = require('../models');
 
 router.post('/login', async (request, response, next) => {
@@ -10,28 +10,29 @@ router.post('/login', async (request, response, next) => {
         password
     } = request.body
 
-    if(!inputValidation(username, password)){
-        response.status(401).send({error: 'Username and password are required!'})
+    if (!inputValidation(username, password)) {
+        response.status(401).send({ error: 'Username and password are required!' })
         return
     }
 
-    const userObject = await models.User.findOne({username})
-    if(!userObject){
+    const userObject = await models.User.findOne({ username })
+    if (!userObject) {
         console.error('User not found')
-        response.status(403).send({error: 'Username or password invalid!'})
+        response.status(403).send({ error: 'Username or password invalid!' })
         return
     }
     const isPasswordCorrect = await bcrypt.compare(password, userObject.password)
 
-    
-    if(!isPasswordCorrect){
+
+    if (!isPasswordCorrect) {
         console.error('Wrong password')
-        response.status(403).send({error: 'Username or password invalid!'})
+        response.status(403).send({ error: 'Username or password invalid!' })
         return
     }
     const token = jwt.createToken(userObject)
     response.header('Authorization', token)
-    response.send(userObject)
+    // console.log(userObject)
+    response.send({ username: userObject.username, _id: userObject._id })
 })
 
 router.post('/register', async (request, response, next) => {
@@ -41,27 +42,29 @@ router.post('/register', async (request, response, next) => {
     } = request.body
     const encryptedPassword = await hashPassword(password)
     const user = new models.User({
-        username, 
+        username,
         password: encryptedPassword
     })
     const userObject = await user.save()
     const token = jwt.createToken(userObject)
-    
+
     response.header('Authorization', token)
     response.send(userObject)
 })
 
-router.post('/verify', async (req, res, next) =>{
-    const token = req.headers.authorization || ''
+router.post('/verify', async (request, response, next) => {
+    const token = request.headers.authorization || ''
     const data = await jwt.verifyToken(token)
-    const user = await models.User.findById(data.userID)
-    console.log("Verify:", user);
-    if(!user){
-        res.send({
-            status: false        
-        }) 
+    if (!data) {
+        response.send({ status: false })
+        return
     }
-    res.send({
+    const user = await models.User.findById(data.userID)
+    if (!user) {
+        response.send({ status: false })
+        return
+    }
+    response.send({
         status: true,
         user: data.username,
         userID: data.userID
