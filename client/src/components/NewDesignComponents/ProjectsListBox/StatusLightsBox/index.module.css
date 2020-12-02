@@ -1,5 +1,6 @@
 .status-lights-box {
     display: flex;
-    /* height: 30px; */
+    height: 30px;
     flex: 1 0 40px;
+    flex-grow: 0;
 }

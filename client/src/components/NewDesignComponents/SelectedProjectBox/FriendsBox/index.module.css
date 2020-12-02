@@ -1,0 +1,5 @@
+.friends-box {
+    display: flex;
+    flex-basis: 225px;
+    flex-direction: column;
+}

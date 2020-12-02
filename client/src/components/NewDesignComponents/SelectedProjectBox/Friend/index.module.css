@@ -1,0 +1,19 @@
+.friends {
+    display: flex;
+    align-items: center;
+    margin-bottom: 11px;
+}
+
+.status-light {
+    margin-left: 20px;    
+}
+
+.avatar {
+    margin-left: 8px;
+}
+
+.name {
+    margin-left: 10px;
+    font-size: 14px;
+    color: #B5B5B5;
+}
