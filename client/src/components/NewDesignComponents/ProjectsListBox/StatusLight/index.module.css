@@ -1,6 +1,4 @@
 .circle {
-    height: 12px;
-    width: 12px;
     border-radius: 50%;
     display: inline-block;
     margin-left: 8.5px;
@@ -17,4 +15,14 @@
 
 .green {
     background-color: #29C941;
+}
+
+.small{
+    height: 6px;
+    width: 6px;
+}
+
+.large{
+    height: 12px;
+    width: 12px;
 }

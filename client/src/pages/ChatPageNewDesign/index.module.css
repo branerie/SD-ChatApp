@@ -1,4 +1,5 @@
 .chat-page-new-design {
     display: flex;    
     align-items: stretch;
+    height: 800px;
 }

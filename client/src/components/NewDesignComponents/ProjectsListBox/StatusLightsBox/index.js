@@ -5,9 +5,9 @@ import StatusLight from '../StatusLight'
 const StatusLightsBox = () => {
     return (
         <div className={styles['status-lights-box']}>
-            <StatusLight color='red' />
-            <StatusLight color='yellow' />
-            <StatusLight color='green' />
+            <StatusLight color='red' size='large' />
+            <StatusLight color='yellow' size='large' />
+            <StatusLight color='green' size='large' />
         </div>
     )
 }
