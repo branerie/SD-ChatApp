@@ -1,4 +1,4 @@
-const { User, Group } = require('./models')
+const { User, Group, Message } = require('./models')
 const jwt = require('./utils/jwt')
 
 module.exports = io => {
@@ -18,27 +18,37 @@ module.exports = io => {
             return
         }
 
-        let queryName = data.username
         let userData = await User.findOne({
-            username: queryName
+            username: data.username
         }, 'groups chats').populate({
             path: 'chats',
-            select: "username -_id"
+            select: "username"
         })
 
         // this check will be done at rest api to avoid unnecessary connections but may be left in case of leaks
         if (!userData) {
-            console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (Unknown username: ${queryName})`)
+            console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (Unknown username: ${data.username})`)
             socket.disconnect()
             return
         }
 
-        nameToSocketIdCache[queryName] = socket.id
+        console.log('Groups:', userData.groups);
+        console.log('Chats:', userData.chats);
+        let messagePool = await Message.find({
+            $or: [
+                { destination: { $in: userData.groups } },
+                { destination: { $in: userData.chats.map(chat => chat._id) }, source: userData._id },
+                { source: { $in: userData.chats.map(chat => chat._id) }, destination: userData._id },
+            ]
+        },'-_id -__v -updatedAt').populate({path: 'source', select: 'username'})
+        console.log("msgs:", messagePool);
+
+        nameToSocketIdCache[data.username] = socket.id
         clientsCount++
-        console.log(`[${getTime()}] Connect @ ${socket.id} (${queryName}). Total connections in pool: ${clientsCount}.`)
+        console.log(`[${getTime()}] Connect @ ${socket.id} (${data.username}). Total connections in pool: ${clientsCount}.`)
 
         socket.userData = {} // initialize empty object for user data from DB
-        socket.userData.name = queryName
+        socket.userData.name = data.username
         socket.userData.groups = {}
         socket.userData.chats = userData.chats.map(chat => chat.username)
 
@@ -86,7 +96,16 @@ module.exports = io => {
 
 
         // Get message from client and send to rest clients
-        socket.on("group-chat-message", ({ msg, recipient }, callback) => {
+        socket.on("group-chat-message", async ({ msg, recipient }, callback) => {
+            let group = await Group.findOne({ name: recipient })
+            let message = new Message({
+                source: userData._id,
+                destination: group._id,
+                onModel: 'Group',
+                content: msg
+            })
+            let msgObj = await message.save()
+            console.log(msgObj);
             console.log(`[${getTime()}] Message (group): ${socket.userData.name} >> ${recipient}`)
             socket.to(recipient).emit("group-chat-message", { user: socket.userData.name, msg, group: recipient })
             callback()
@@ -94,9 +113,16 @@ module.exports = io => {
 
         socket.on("single-chat-message", async ({ msg, recipient }, callback) => {
             let chat = await User.findOne({ username: recipient }, '_id')
-            await User.updateOne({ username: queryName }, { $addToSet: { chats: [chat._id] } })
+            await User.updateOne({ username: data.username }, { $addToSet: { chats: [chat._id] } })
             await User.updateOne({ username: recipient }, { $addToSet: { chats: [userData._id] } })
-
+            let message = new Message({
+                source: userData._id,
+                destination: chat._id,
+                onModel: 'User',
+                content: msg
+            })
+            let msgObj = await message.save()
+            console.log(msgObj);
             if (!socket.userData.chats.includes(recipient)) {
                 socket.userData.chats.push(recipient)
             }
@@ -113,7 +139,7 @@ module.exports = io => {
 
         socket.on("close-chat", async (recipient) => {
             let chat = await User.findOne({ username: recipient }, '_id')
-            await User.updateOne({ username: queryName }, { $pullAll: { chats: [chat._id] } })
+            await User.updateOne({ username: data.username }, { $pullAll: { chats: [chat._id] } })
             socket.userData.chats = socket.userData.chats.filter(name => name !== recipient)
             console.log(socket.userData.chats);
         })
@@ -136,7 +162,7 @@ module.exports = io => {
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
                 callback(false, msg)
             } else {
-                await User.updateOne({ username: queryName }, { $addToSet: { groups: [requestedGroup._id] } })
+                await User.updateOne({ username: data.username }, { $addToSet: { groups: [requestedGroup._id] } })
                 await Group.updateOne({ name: group }, { $addToSet: { members: [userData._id] } })
                 console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Success.`)
                 socket.join(group)
@@ -164,7 +190,7 @@ module.exports = io => {
                 const groupObject = await newGroup.save()
                 socket.join(group)
                 socket.userData.groups[group] = {
-                    online: [queryName],
+                    online: [data.username],
                     offline: []
                 }
                 callback(true, socket.userData.groups)
