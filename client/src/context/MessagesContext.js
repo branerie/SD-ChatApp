@@ -70,9 +70,9 @@ export default function MessagesContextProvider(props) {
         if (!socket) return
         socket.on('welcome-message', ({ groups, chats }) => {
             setGroups(["STATUS", ...Object.keys(groups)])
-            setChats(chats)
+            setChats(Object.keys(chats))
             dispatchGroupMembers({ type: 'loadUsers', payload: { groups } })
-            dispatchMessages({ type: "welcome-message", payload: { groups: Object.keys(groups), user: ME } })
+            dispatchMessages({ type: "welcome-message", payload: { groups, chats, user: ME } })
         })
         return () => socket.off('welcome-message')
     }, [socket, ME, setGroups, setChats, dispatchGroupMembers, dispatchMessages])

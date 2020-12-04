@@ -18,11 +18,20 @@ export default function MessagesReducer(messages, action) {
                     msg: `Welcome ${action.payload.user}`,
                     timestamp
                 }]
-            action.payload.groups.forEach(group => {
+            Object.entries(action.payload.groups).forEach(([group, data]) => {
                 newMessages[group] = [
-                    ...messages[group] || [], {
+                    ...messages[group] || data.messages, {
                         user: "SYSTEM",
                         msg: `You are now talking in ${group}`,
+                        timestamp
+                    }
+                ]
+            })
+            Object.entries(action.payload.chats).forEach(([chat, data]) => {
+                newMessages[chat] = [
+                    ...messages[chat] || data.messages, {
+                        user: "SYSTEM",
+                        msg: `You are now talking with ${chat}`,
                         timestamp
                     }
                 ]
