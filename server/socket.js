@@ -1,5 +1,6 @@
 const jwt = require('./utils/jwt')
 const db = require('./db/query')
+const cookie = require("cookie")
 
 module.exports = io => {
     // names cache keeps track of connected users and their assigned socket id
@@ -9,60 +10,52 @@ module.exports = io => {
     let clientsCount = 0
 
     io.on("connect", async (socket) => {
-        let token = socket.handshake.auth.token
+        const cookies = cookie.parse(socket.request.headers.cookie || '')
+        let token = cookies['x-auth-token'] || ''
         let data = await jwt.verifyToken(token)
 
-        if (!data) { // just in case
+        if (!data) { // overkill
             console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (JSON Web Token Error)`)
             socket.disconnect()
             return
         }
 
         let userData = await db.getUserData(data.userID)
-        console.log(userData);
 
-        // this check will be done at rest api to avoid unnecessary connections but may be left in case of leaks
-        if (!userData) {
+        if (!userData) {  // overkill
             console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (Unknown username: ${data.username})`)
             socket.disconnect()
             return
         }
 
-        nameToSocketIdCache[data.username] = socket.id
+        nameToSocketIdCache[userData.username] = socket.id
         clientsCount++
-        console.log(`[${getTime()}] Connect @ ${socket.id} (${data.username}). Total connections in pool: ${clientsCount}.`)
+        console.log(`[${getTime()}] Connect @ ${socket.id} (${userData.username}). Total connections in pool: ${clientsCount}.`)
 
-        socket.userData = {} // initialize empty object for user data from DB
-        socket.userData.name = data.username
-        socket.userData.groups = {}
-        socket.userData.chats = {}
+        socket.username = userData.username // save username for a later use
+        const groupsData = {}
+        const chatsData = {}
 
-        let groupData = await db.getUserGroupsData(userData.groups)
-
-        let groups = groupData.map(group => group.name)
-        socket.join(groups)
-
-        groupData.forEach(({ name, members }) => {
-            members = members.map(member => member.username)
-            let online = io.sockets.adapter.rooms.get(name) || new Set()
-            online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name) // React likes Array
-            socket.userData.groups[name] = {
+        userData.groups.forEach(({ name, members }) => {
+            socket.join(name)
+            socket.to(name).emit("join-message", { user: userData.username, group: name })
+            const { online, offline } = getGroupMembers(name, members)
+            groupsData[name] = {
                 online,
-                offline: members.filter(member => !online.includes(member)),
+                offline,
                 messages: []
             }
         })
 
         let messagePool = await db.getMessages(userData)
-        console.log("msgs:", messagePool);
 
         messagePool.forEach(msg => {
             switch (msg.onModel) {
                 case "User":
-                    // determine who is the partner in conversation
-                    let partner = msg.source.username === data.username ? msg.destination.username : msg.source.username
-                    if (!socket.userData.chats[partner]) socket.userData.chats[partner] = { messages: [] }
-                    socket.userData.chats[partner].messages.push({
+                    // determine who is the other party in conversation
+                    let party = msg.source.username === data.username ? msg.destination.username : msg.source.username
+                    if (!chatsData[party]) chatsData[party] = { messages: [] }
+                    chatsData[party].messages.push({
                         user: msg.source.username,
                         msg: msg.content,
                         timestamp: msg.createdAt
@@ -70,7 +63,7 @@ module.exports = io => {
                     break;
 
                 case "Group":
-                    socket.userData.groups[msg.destination.name].messages.push({
+                    groupsData[msg.destination.name].messages.push({
                         user: msg.source.username,
                         msg: msg.content,
                         timestamp: msg.createdAt
@@ -85,107 +78,92 @@ module.exports = io => {
         // Welcome message from server to connected client
         // Send groups and chats to client for UI setup
         socket.emit("welcome-message", {
-            groups: socket.userData.groups,
-            chats: socket.userData.chats
+            groups: groupsData,
+            chats: chatsData
         })
 
-        // send join message to group online members so they could update their userlists
-        groups.forEach(group => {
-            socket.to(group).emit("join-message", { user: socket.userData.name, group })
-        })
-
+        // EVENT LISTENERS SECTION
         // Notify users on disconnect
         socket.on("disconnecting", (reason) => {
-            delete nameToSocketIdCache[socket.userData.name]
+            delete nameToSocketIdCache[userData.username]
             clientsCount--
-            console.log(`[${getTime()}] Disconnect @ ${socket.id} (${socket.userData.name}). Reason: ${reason}. Total connections in pool: ${clientsCount}.`)
+            console.log(`[${getTime()}] Disconnect @ ${socket.id} (${userData.username}). Reason: ${reason}. Total connections in pool: ${clientsCount}.`)
             // send message to user groups that he quit
-            groups.forEach(group => {
-                socket.to(group).emit("quit-message", { user: socket.userData.name, reason, group })
+            socket.rooms.forEach(group => {
+                socket.to(group).emit("quit-message", { user: userData.username, reason, group })
             })
         })
-
 
         // Get message from client and send to rest clients
         socket.on("group-chat-message", async ({ msg, recipient }, callback) => {
             let newMessage = await db.createPublicMessage(userData._id, recipient, msg)
             if (!newMessage) return // validate query
-            console.log(newMessage);
-            console.log(`[${getTime()}] Message (group): ${socket.userData.name} >> ${recipient}`)
-            socket.to(recipient).emit("group-chat-message", { user: socket.userData.name, msg, group: recipient })
+            console.log(`[${getTime()}] Message (group): ${userData.username} >> ${recipient}`)
+            socket.to(recipient).emit("group-chat-message", { user: userData.username, msg, group: recipient })
             callback()
         })
 
         socket.on("single-chat-message", async ({ msg, recipient }, callback) => {
             let newMessage = await db.createPrivateMessage(userData._id, recipient, msg)
             if (!newMessage) return // validate query
-            if (!socket.userData.chats[recipient]) {
-                socket.userData.chats[recipient] = { messages: []}
-            }
 
             if (nameToSocketIdCache[recipient]) {
-                console.log(`[${getTime()}] Message (private): ${socket.userData.name} >> ${recipient}`)
-                io.to(nameToSocketIdCache[recipient]).emit("single-chat-message", { user: socket.userData.name, msg })
+                console.log(`[${getTime()}] Message (private): ${userData.username} >> ${recipient}`)
+                io.to(nameToSocketIdCache[recipient]).emit("single-chat-message", { user: userData.username, msg })
             } else {
                 // send offline msg to DB if not in blacklist
-                console.log(`[${getTime()}] Message (offline): ${socket.userData.name} >> ${recipient}`)
+                console.log(`[${getTime()}] Message (offline): ${userData.username} >> ${recipient}`)
             }
             callback()
         })
 
         socket.on("close-chat", async (recipient) => {
             await db.removeChat(userData._id, recipient)
-            delete socket.userData.chats[recipient]
         })
 
         socket.on("join-request", async ({ group }, callback) => {
-            let msg = ''
-            if (Object.keys(socket.userData.groups).includes(group)) {
-                msg = `Already there`
-                console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
-                callback(false, msg)
-                return
-            }
-
             let requestedGroup = await db.joinGroup(userData._id, group)
-            console.log(requestedGroup)
-            if (!requestedGroup) {
-                msg = `${group} doesn't exist`
-                console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Refused: ${msg}`)
-                callback(false, msg)
+            if (requestedGroup.error) {
+                console.log(`[${getTime()}] Join request: ${userData.username} >> ${group}. Refused: ${requestedGroup.error}`)
+                callback(false, requestedGroup.error)
             } else {
-                let members = requestedGroup.members.map(member => member.username)
-                console.log(`[${getTime()}] Join request: ${socket.userData.name} >> ${group}. Success.`)
+                console.log(`[${getTime()}] Join request: ${userData.username} >> ${group}. Success.`)
                 socket.join(group)
-                let online = io.sockets.adapter.rooms.get(group) || new Set()
-                online = [...online].map(sid => io.sockets.sockets.get(sid).userData.name)
-                socket.userData.groups[group] = {
+                socket.to(group).emit("join-message", { user: userData.username, group })
+                const {online, offline} = getGroupMembers(group, requestedGroup.members)
+                const groupData = {
                     online,
-                    offline: members.filter(member => !online.includes(member)),
-                    messages: []
+                    offline,
+                    messages: [] // get history messages ?
                 }
-                socket.to(group).emit("join-message", { user: socket.userData.name, group })
-                callback(true, socket.userData.groups)
+                callback(true, groupData)
             }
         })
 
         socket.on('create-group', async ({ group }, callback) => {
-            let request = await db.createGroup(group, userData._id)
+            const request = await db.createGroup(group, userData._id)
             if (request.success) {
                 socket.join(group)
-                socket.userData.groups[group] = {
-                    online: [data.username],
+                const groupData = {
+                    online: [userData.username],
                     offline: [],
                     messages: []
                 }
-                callback(true, socket.userData.groups)
+                callback(true, groupData)
             } else {
                 callback(false, request.message)
             }
         })
     })
-}
 
+    function getGroupMembers(group, members) {
+        members = members.map(member => member.username)
+        const onlineSIDs = io.sockets.adapter.rooms.get(group) || new Set()
+        const online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
+        const offline = members.filter(member => !online.includes(member))
+        return { online, offline }
+    }
+}
 
 function getTime() {
     return new Date().toLocaleTimeString()
