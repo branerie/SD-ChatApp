@@ -1,5 +1,4 @@
-const url = 'http://localhost:5000/login'
-const authenticate = async (body, onSuccess, onFailure) => {
+const authenticate = async (url, body, onSuccess, onFailure) => {
     try {
         const promise = await fetch(url, {
             method: 'POST',
