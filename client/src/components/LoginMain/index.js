@@ -7,6 +7,7 @@ import authenticate from '../../utils/authenticate'
 import { AuthenticateUser } from '../../context/authenticationContext'
 
 const LoginMain = () => {
+    const url = 'http://localhost:5000/login'
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const context = AuthenticateUser()
@@ -15,7 +16,7 @@ const LoginMain = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
 
-        await authenticate({ username, password },
+        await authenticate(url, { username, password },
             user => {
                 // console.log('You are logged in') //UX
                 context.logIn(user)

@@ -10,7 +10,7 @@ router.post('/login', async (request, response, next) => {
         password
     } = request.body
 
-    if (!inputValidation(username, password)) {
+    if (!inputValidation.login(username, password)) {
         response.status(401).send({ error: 'Username and password are required!' })
         return
     }
@@ -38,8 +38,15 @@ router.post('/login', async (request, response, next) => {
 router.post('/register', async (request, response, next) => {
     const {
         username,
-        password
+        password,
+        rePassword
     } = request.body
+
+    if (!inputValidation.register(username, password, rePassword)) {
+        response.status(401).send({ error: 'Username and matching passwords are required!' })
+        return
+    }
+
     const encryptedPassword = await hashPassword(password)
     const user = new models.User({
         username,
@@ -49,7 +56,7 @@ router.post('/register', async (request, response, next) => {
     const token = jwt.createToken(userObject)
 
     response.header('Authorization', token)
-    response.send(userObject)
+    response.send({ username: userObject.username, _id: userObject._id })
 })
 
 router.post('/verify', async (request, response, next) => {

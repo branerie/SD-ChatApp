@@ -12,7 +12,6 @@ const getUserData = async (id) => {
             select: 'username'
         }
     })
-    console.log(data.groups);
     return data
 }
 
