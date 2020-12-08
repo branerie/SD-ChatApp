@@ -1,11 +1,16 @@
 export default function GroupMembersReducer(groupMembers, action) {
     const { group, user } = action.payload
     switch (action.type) {
-        case "loadUsers":
+        case "load-users":
             return action.payload.groups
-        case "unloadUsers":
+        case "load-new-group-users":
+            return {
+                ...groupMembers,
+                [group]: { ...action.payload.data }
+            }
+        case "unload-users":
             return {}
-        case "addUser":
+        case "add-user":
             return {
                 ...groupMembers,
                 [group]: {
@@ -13,7 +18,7 @@ export default function GroupMembersReducer(groupMembers, action) {
                     offline: groupMembers[group].offline.filter(member => member !== user)
                 }
             }
-        case "remUser":
+        case "remove-user":
             return {
                 ...groupMembers,
                 [group]: {

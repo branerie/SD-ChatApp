@@ -71,7 +71,7 @@ export default function MessagesContextProvider(props) {
         socket.on('welcome-message', ({ groups, chats }) => {
             setGroups(["STATUS", ...Object.keys(groups)])
             setChats(Object.keys(chats))
-            dispatchGroupMembers({ type: 'loadUsers', payload: { groups } })
+            dispatchGroupMembers({ type: 'load-users', payload: { groups } })
             dispatchMessages({ type: "welcome-message", payload: { groups, chats, user: ME } })
         })
         return () => socket.off('welcome-message')
@@ -103,7 +103,7 @@ export default function MessagesContextProvider(props) {
         if (!socket) return
         socket.on('join-message', ({ user, group }) => {
             dispatchMessages({ type: "join-message", payload: { user, group } })
-            dispatchGroupMembers({ type: 'addUser', payload: { user, group } })
+            dispatchGroupMembers({ type: 'add-user', payload: { user, group } })
         })
         return () => socket.off('join-message')
     }, [socket, dispatchMessages, dispatchGroupMembers])
@@ -113,7 +113,7 @@ export default function MessagesContextProvider(props) {
         if (!socket) return
         socket.on('quit-message', ({ user, reason, group }) => {
             dispatchMessages({ type: "quit-message", payload: { user, reason, group } })
-            dispatchGroupMembers({ type: 'remUser', payload: { user, group } })
+            dispatchGroupMembers({ type: 'remove-user', payload: { user, group } })
         })
         return () => socket.off('quit-message')
     }, [socket, dispatchMessages, dispatchGroupMembers])
@@ -123,7 +123,7 @@ export default function MessagesContextProvider(props) {
         if (!socket) return
         socket.on('disconnect', (reason) => {
             dispatchMessages({ type: "disconnect-message", payload: { reason, groups: [...new Set(["STATUS", activeWindow])] } })
-            dispatchGroupMembers({ type: 'unloadUsers', payload: {} })
+            dispatchGroupMembers({ type: 'unload-users', payload: {} })
         })
         return () => socket.off('disconnect')
     }, [socket, activeWindow, dispatchMessages, dispatchGroupMembers])

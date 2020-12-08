@@ -22,7 +22,7 @@ const ChatList = () => {
             if (success) {
                 context.setGroups(oldGroups => [...oldGroups, groupName])
                 context.changeWindow(groupName, true)
-                context.dispatchGroupMembers({ type: 'loadUsers', payload: { groups: data } })
+                context.dispatchGroupMembers({ type: 'load-new-group-users', payload: { group: groupName, data } })
                 context.dispatchMessages({ type: "join-request-message", payload: { group: groupName } })
             } else {
                 if (data === "Already there") context.changeWindow(groupName, true)
@@ -36,10 +36,10 @@ const ChatList = () => {
             if (success) {
                 context.setGroups(oldGroups => [...oldGroups, groupName])
                 context.changeWindow(groupName, true)
-                context.dispatchGroupMembers({ type: 'loadUsers', payload: { groups: data } })
+                context.dispatchGroupMembers({ type: 'load-new-group-users', payload: { group: groupName, data } })
                 context.dispatchMessages({ type: "join-request-message", payload: { group: groupName } })
             } else {
-                if (data === "Already there") context.changeWindow(groupName, true)
+                if (data === "You are already there.") context.changeWindow(groupName, true)
                 else console.log(data)
             }
         })
