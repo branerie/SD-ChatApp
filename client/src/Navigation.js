@@ -17,7 +17,7 @@ const Navigation = () => {
                 <Route exact path='/login' component={LoginPage} />
                 <Route exact path='/register' component={RegisterPage} />
                 <Route path='/chat' component={ChatPage} />
-                {/* <Route path='/newchat' component={ChatPageNewDesign} /> */}
+                <Route path='/newchat' component={ChatPageNewDesign} />
                 
             </Switch>
         </BrowserRouter>

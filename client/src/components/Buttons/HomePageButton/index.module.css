@@ -1,10 +1,10 @@
 .btn {
 	cursor: pointer;
 	padding: 5px 15px;
-	background: #e6e9ff;
-	color:  #FF7F50;
+	background: none;
+	color:  #fff;
+	font-weight: bold;
+	font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 	border: 0;
-	font-size: 17px;
-	margin-top: 20px;
-	width: 100%;
+	font-size: 20px;
 }
