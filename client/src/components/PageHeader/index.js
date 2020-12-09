@@ -1,10 +1,13 @@
 import React from 'react'
 import styles from './index.module.css'
+import logo from '../../images/logo.svg'
+import HomePageNavigation from '../HomePageNavigation'
 
-const PageHeader = (props) => {
+const PageHeader = () => {
     return (
         <header className={styles['login-header']}>
-            <h1>{props.text}</h1>
+            <img src={logo} alt="Smart chat logo" />
+            <HomePageNavigation />
         </header>
     )
 }

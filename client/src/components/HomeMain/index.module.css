@@ -1,7 +1,33 @@
 .home-container {
-	padding: 30px 40px;
-	background:  #ffac8d;
-	border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    margin-bottom: 20px;
+	height: 100%;
+	display: flex;
+	justify-content: space-evenly;
+	flex-wrap: wrap;
+	align-items: center;
+	color: white;
+}
+.home-container div {
+	margin-bottom: 50px;
+}
+
+.home-container div h1 {
+	width: 80%;
+	margin-bottom: 30px;
+}
+
+.home-container div p {
+	margin-bottom: 50px;
+}
+
+.try-now-btn {
+	cursor: pointer;
+	margin: 0;
+	padding: 10px 15px;
+	background-color: #ACC8A4;
+	border: 0;
+	border-radius: 20px;
+	color: white;
+	font-weight: bold;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	font-size: larger;
 }
