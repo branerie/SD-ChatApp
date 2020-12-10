@@ -1,0 +1,12 @@
+.social-media-icon {
+    border-radius: 50%;
+    background-color: #E8E8EB;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    margin-right: 8px;
+}
+
+.icon {
+    margin: auto;
+}

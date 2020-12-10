@@ -1,0 +1,6 @@
+.chat-box {
+    display: flex;
+    background-color: white;
+    flex-grow: 1;
+    background: #4B4B4B;
+}

@@ -1,0 +1,38 @@
+.send-msg-box {
+    display: flex;
+    height: 70px;
+    border-top: 1px solid #8D8D8D;
+    align-items: center;
+}
+
+.send-file {
+    margin-left: 15px;
+}
+
+.voice-msg {
+    margin-left: 20px;
+}
+
+.text-area-box {
+    color:  #8D8D8D;
+    height: 50px;
+    flex-grow: 1;
+    margin-left: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+
+.input {
+    color:  #8D8D8D;
+    height: 100%;
+    width: 100%;
+    border: none;
+    
+}
+
+.emot-icon {
+    margin-right: 15px;
+    margin-left: 10px;
+}

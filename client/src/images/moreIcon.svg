@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3.5" height="15.5" viewBox="0 0 3.5 15.5">
+  <g id="Icon" opacity="0.3">
+    <path id="Shape" d="M2.75.5A1.75,1.75,0,1,1,1,2.25,1.75,1.75,0,0,1,2.75.5Z" transform="translate(-1 5.5)"/>
+    <path id="Shape-2" data-name="Shape" d="M2.25.5A1.75,1.75,0,1,1,.5,2.25,1.75,1.75,0,0,1,2.25.5Z" transform="translate(-0.5 -0.5)"/>
+    <path id="Shape-3" data-name="Shape" d="M2.25.5A1.75,1.75,0,1,1,.5,2.25,1.75,1.75,0,0,1,2.25.5Z" transform="translate(-0.5 11.5)"/>
+  </g>
+</svg>

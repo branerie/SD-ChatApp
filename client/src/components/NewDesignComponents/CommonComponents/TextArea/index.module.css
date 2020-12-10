@@ -1,0 +1,17 @@
+.text-area {
+    border: none;
+    color: black;
+    width: 155px;
+    outline: none;
+    width:100%;
+    resize: none;
+    /* overflow: hidden; */
+}
+
+.input-writing {
+    border: none;
+    color: black;
+    width: 155px;
+    outline: none;
+    width:100%;
+}
