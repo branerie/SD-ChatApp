@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './index.module.css'
-import StatusLight from '../StatusLight'
+import StatusLight from '../../CommonComponents/StatusLight'
 
 const StatusLightsBox = () => {
     return (
