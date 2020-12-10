@@ -45,7 +45,6 @@ const RegisterMain = () => {
 
     return (
         <form className={styles['register-main']} onSubmit={e => handleSubmit(e)}>
-            <Alert alert={alertMessage} />
             <Input
                 value={username}
                 onChange={e => setUsername(e.target.value)}
@@ -60,10 +59,11 @@ const RegisterMain = () => {
             <Input
                 value={rePassword}
                 onChange={e => setRePassword(e.target.value)}
-                label='RePassword'
+                label='Repeat password'
                 type='password'
             />
-            <SubmitButton title='Register' />
+            <Alert alert={alertMessage} />
+            <SubmitButton title='REGISTER' />
         </form>
     )
 }

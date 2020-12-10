@@ -1,7 +1,6 @@
 .login-main {
-	padding: 30px 40px;
-	background:  #ffac8d;
-	border-bottom-left-radius: 20px;
-    border-bottom-right-radius: 20px;
-    margin-bottom: 20px;
+	margin: 100px;
+	padding: 60px 80px;
+	border: 3px solid #e6e9ff;
+	border-radius: 50px;
 }

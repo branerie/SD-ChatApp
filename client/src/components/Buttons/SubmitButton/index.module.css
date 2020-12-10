@@ -2,9 +2,11 @@
 	cursor: pointer;
 	padding: 5px 15px;
 	background: #e6e9ff;
-	color:  #FF7F50;
-	border: 0;
+	font-weight: bolder;
+	border: none;
+	border-radius: 15px;
 	font-size: 17px;
 	margin-top: 20px;
 	width: 100%;
+	height: 50px;
 }

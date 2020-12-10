@@ -39,7 +39,7 @@ const LoginMain = () => {
                 onChange={e => setPassword(e.target.value)}
                 label='Password'
             />
-            <SubmitButton title='Login' />
+            <SubmitButton title='LOGIN' />
         </form>
     )
 }

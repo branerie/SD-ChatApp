@@ -1,5 +1,6 @@
 .register-container {
-	max-width: 600px;
-	margin: 80px auto;
-	color: #fff;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	background-color: #7F8C7B;
 }
