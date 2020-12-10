@@ -7,3 +7,7 @@
 .login-header img {
 	width: 120px;
 }
+
+.login-header img:hover {
+	cursor: pointer;
+}
