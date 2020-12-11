@@ -48,8 +48,15 @@
 
 .more-icon {
     margin-left: 23px;
-    margin-right: 50px;
+    margin-right: 20px;
 }
+
+.close-button {
+    align-self: flex-end;
+    margin-right: 5px;
+    color: #4B4B4B;
+}
+
 
 
 
