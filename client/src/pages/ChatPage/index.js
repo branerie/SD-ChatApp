@@ -17,8 +17,8 @@ const ChatPage = () => {
                 <ChatHeader />
                 <main className="chat-main">
                     <ChatList />
-                    <ChatWindow />
                     <ChatGroupMembers />
+                    <ChatWindow />
                 </main>
                 <ChatMessageInput />
             </div>

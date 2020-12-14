@@ -3,9 +3,9 @@
 	color: #fff;
 	padding: 20px 10px 60px;
 	overflow-y: scroll;
-	max-height: 500px;
 	min-width: 200px;
 	scrollbar-width: none;
+	border: 3px solid white;
 }
 
 h2 {
