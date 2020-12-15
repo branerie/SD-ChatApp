@@ -72,6 +72,7 @@ export default function MessagesContextProvider(props) {
         socket.on('welcome-message', ({ sites, groups, chats }) => {
             setSites(sites)
             setGroups(sites[Object.keys(sites)[0]])
+            setActiveWindow(sites[Object.keys(sites)[0]][0]._id)
             setChats(Object.keys(chats))
             dispatchGroupMembers({ type: 'load-users', payload: { groups } })
             dispatchMessages({ type: "welcome-message", payload: { groups, chats, user: ME } })

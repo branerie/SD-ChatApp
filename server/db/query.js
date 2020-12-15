@@ -117,7 +117,7 @@ const createSite = async (name, creator) => {
         console.log(newSite);
         const newGroup = await createGroup('General', creator, siteData._id)
         // await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
-        return { success: true , group: newGroup._id}
+        return { success: true , _id: newGroup._id}
     } catch (error) {
         if (error.code === 11000) {
             return { success: false, message: "Group exists" }
@@ -139,7 +139,7 @@ const createGroup = async (name, creator, site) => {
         const newGroup = await groupData.save()
         console.log(newGroup);
         await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
-        return { success: true }
+        return { success: true, _id: newGroup._id }
     } catch (error) {
         if (error.code === 11000) {
             return { success: false, message: "Group exists" }

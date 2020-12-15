@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 import { SocketContext } from '../../context/SocketContext'
@@ -10,6 +10,11 @@ const ChatList = () => {
     const context = useContext(MessagesContext)
     const [groupName, setGroupName] = useState()
     const [siteName, setSiteName] = useState()
+    const [siteClicked, setSiteClicked] = useState()
+
+    useEffect(() => {
+        setSiteClicked(Object.keys(context.sites)[0])
+    },[context.sites])
 
     function handleClick(e, item, isGroup) {
         if (e.target.nodeName === 'BUTTON') return
@@ -22,6 +27,7 @@ const ChatList = () => {
         if (e.target.nodeName === 'BUTTON') return
         context.changeWindow(context.sites[item][0]._id)
         context.setGroups([...context.sites[item]])
+        setSiteClicked(item)
     }
 
     function joinGroup() {
@@ -55,8 +61,10 @@ const ChatList = () => {
     function createSite() {
         socket.emit("create-site", { site: siteName }, (success, data) => {
             if (success) {
-                context.setGroups(oldGroups => [...oldGroups, siteName])
-                context.changeWindow(siteName, true)
+                context.setSites({ ...context.sites, [siteName]: [{_id: data._id , name: data.name}] })
+                context.setGroups([{_id: data._id , name: data.name}])
+                setSiteClicked(siteName)
+                context.changeWindow(data._id, true)
                 context.dispatchGroupMembers({ type: 'load-new-group-users', payload: { group: siteName, data } })
                 context.dispatchMessages({ type: "join-request-message", payload: { group: siteName } })
             } else {
@@ -87,7 +95,7 @@ const ChatList = () => {
                         return (
                             <li key={`group${i}`}
                                 className={`
-                                        ${item === context.activeWindow ? "selected" : ""} 
+                                        ${item === siteClicked ? "selected" : ""} 
                                         ${(context.newMessages[item] && item !== context.activeWindow) ? 'new-messages' : ''}
                                         `}
                                 onClick={(e) => handleClickSite(e,item)}>

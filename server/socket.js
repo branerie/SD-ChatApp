@@ -41,10 +41,10 @@ module.exports = io => {
         userData.groups.forEach(({ _id, name, members, site }) => {
             _id = _id.toString()
             socket.join(_id)
-            socket.to(_id).emit("join-message", { user: userData.username, group: {_id, name} })
+            socket.to(_id).emit("join-message", { user: userData.username, group: { _id, name } })
             const { online, offline } = getGroupMembers(_id, members)
             // console.log(online);
-            sitesData[site.name] = name === 'General' ? [{_id,name}, ...sitesData[site.name] || []] : [...sitesData[site.name] || [], {_id,name}] || []
+            sitesData[site.name] = name === 'General' ? [{ _id, name }, ...sitesData[site.name] || []] : [...sitesData[site.name] || [], { _id, name }] || []
             groupsData[_id] = {
                 name,
                 online,
@@ -138,7 +138,7 @@ module.exports = io => {
                 console.log(`[${getTime()}] Join request: ${userData.username} >> ${group}. Success.`)
                 socket.join(group)
                 socket.to(group).emit("join-message", { user: userData.username, group })
-                const {online, offline} = getGroupMembers(group, requestedGroup.members)
+                const { online, offline } = getGroupMembers(group, requestedGroup.members)
                 const groupData = {
                     online,
                     offline,
@@ -148,11 +148,13 @@ module.exports = io => {
             }
         })
 
-        socket.on('create-site', async ({site}, callback) => {
-            const request = await db.createSite(site,userData._id)
+        socket.on('create-site', async ({ site }, callback) => {
+            const request = await db.createSite(site, userData._id)
             if (request.success) {
-                socket.join(request.group)
+                let _id = request._id.toString()
+                socket.join(_id)
                 const groupData = {
+                    _id,
                     name: 'General',
                     online: [userData.username],
                     offline: [],
