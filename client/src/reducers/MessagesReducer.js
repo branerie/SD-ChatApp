@@ -22,7 +22,7 @@ export default function MessagesReducer(messages, action) {
                 newMessages[group] = [
                     ...messages[group] || data.messages, {
                         user: "SYSTEM",
-                        msg: `You are now talking in ${group}`,
+                        msg: `You are now talking in ${data.name}`,
                         timestamp
                     }
                 ]
@@ -49,10 +49,10 @@ export default function MessagesReducer(messages, action) {
             break
 
         case "join-message":
-            newMessages[action.payload.group] = [
-                ...messages[action.payload.group], {
+            newMessages[action.payload.group._id] = [
+                ...messages[action.payload.group._id], {
                     user: "SERVER",
-                    msg: `${action.payload.user} has joined ${action.payload.group}`,
+                    msg: `${action.payload.user} has joined ${action.payload.group.name}`,
                     timestamp
                 }
             ]
@@ -131,6 +131,7 @@ export default function MessagesReducer(messages, action) {
     }
 
     // console.log(newMessages)
+    // console.log(messages)
     return {
         ...messages,
         ...newMessages

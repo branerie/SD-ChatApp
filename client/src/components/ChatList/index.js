@@ -9,12 +9,19 @@ const ChatList = () => {
     const { socket } = useContext(SocketContext)
     const context = useContext(MessagesContext)
     const [groupName, setGroupName] = useState()
+    const [siteName, setSiteName] = useState()
 
     function handleClick(e, item, isGroup) {
         if (e.target.nodeName === 'BUTTON') return
         context.changeWindow(item, isGroup)
         // if group fetch userlist and messages from server and set state for first request complete
         // if chat fetch chat messages from server and set state for first request complete
+    }
+
+    function handleClickSite(e, item) {
+        if (e.target.nodeName === 'BUTTON') return
+        context.changeWindow(context.sites[item][0]._id)
+        context.setGroups([...context.sites[item]])
     }
 
     function joinGroup() {
@@ -44,6 +51,21 @@ const ChatList = () => {
             }
         })
     }
+
+    function createSite() {
+        socket.emit("create-site", { site: siteName }, (success, data) => {
+            if (success) {
+                context.setGroups(oldGroups => [...oldGroups, siteName])
+                context.changeWindow(siteName, true)
+                context.dispatchGroupMembers({ type: 'load-new-group-users', payload: { group: siteName, data } })
+                context.dispatchMessages({ type: "join-request-message", payload: { group: siteName } })
+            } else {
+                if (data === "You are already there.") context.changeWindow(siteName, true)
+                else console.log(data)
+            }
+        })
+    }
+
     return (
         <aside className="chat-sidebar">
             <div>
@@ -55,16 +77,20 @@ const ChatList = () => {
                 <input onChange={e => setGroupName(e.target.value)}/>
                 <button className="join-btn" onClick={addGroup}>Add</button>
                 </div>
-                <h2>GROUPS</h2>
+                <div>
+                <input onChange={e => setSiteName(e.target.value)}/>
+                <button className="join-btn" onClick={createSite}>New</button>
+                </div>
+                <h2>SITES</h2>
                 <ul>
-                    {context.groups.map((item, i) => {
+                    {Object.keys(context.sites).map((item, i) => {
                         return (
                             <li key={`group${i}`}
                                 className={`
                                         ${item === context.activeWindow ? "selected" : ""} 
                                         ${(context.newMessages[item] && item !== context.activeWindow) ? 'new-messages' : ''}
                                         `}
-                                onClick={(e) => handleClick(e,item, item !== "STATUS")}>
+                                onClick={(e) => handleClickSite(e,item)}>
                                 <span>{item}</span>
                                 <CloseButton name="X" type="group" item={item}/>
                             </li>

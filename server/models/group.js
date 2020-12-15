@@ -3,7 +3,12 @@ const mongoose = require ('mongoose')
 const GroupSchema = new mongoose.Schema ({
     name: {
         type: String,
-        unique: true,
+        // unique: true,
+        required: true
+    },
+    site: {
+        type: 'ObjectId',
+        ref: 'Site',
         required: true
     },
     creator: {

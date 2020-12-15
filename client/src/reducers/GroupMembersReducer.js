@@ -6,16 +6,16 @@ export default function GroupMembersReducer(groupMembers, action) {
         case "load-new-group-users":
             return {
                 ...groupMembers,
-                [group]: { ...action.payload.data }
+                [group._id]: { ...action.payload.data }
             }
         case "unload-users":
             return {}
         case "add-user":
             return {
                 ...groupMembers,
-                [group]: {
-                    online: [...groupMembers[group].online, user],
-                    offline: groupMembers[group].offline.filter(member => member !== user)
+                [group._id]: {
+                    online: [...groupMembers[group._id].online, user],
+                    offline: groupMembers[group._id].offline.filter(member => member !== user)
                 }
             }
         case "remove-user":

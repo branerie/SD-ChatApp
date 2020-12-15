@@ -26,3 +26,11 @@ ul li:hover {
 	color: darkgreen;
 	cursor: pointer;
 }
+
+.online {
+	color: greenyellow;
+}
+
+.offline {
+	color: lightgray;
+}

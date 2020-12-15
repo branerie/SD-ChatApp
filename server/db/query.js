@@ -1,4 +1,4 @@
-const { User, Group, Message } = require('../models')
+const { User, Site, Group, Message } = require('../models')
 
 const getUserData = async (id) => {
     let data = await User.findById(id, 'username groups chats').populate({
@@ -8,9 +8,15 @@ const getUserData = async (id) => {
         path: 'groups',
         select: 'name',
         populate: {
-            path: 'members',  
-            select: 'username'
-        }
+            path: 'members site',
+            // select: 'username',
+            //             path: 'site',
+            // select: 'name'
+        },
+        // populate: {
+        //     path: 'site',
+        //     select: 'name'
+        // }
     })
     return data
 }
@@ -30,10 +36,10 @@ const getMessages = async (userData) => {
 
 const createPublicMessage = async (sender, recipient, msg) => {
     // check if group is valid and if user has access to it
-    let group = await Group.findOne({ name: recipient })
+    await Group.findById(recipient)
     let message = new Message({
         source: sender,
-        destination: group._id,
+        destination: recipient,
         onModel: 'Group',
         content: msg
     })
@@ -99,10 +105,33 @@ const syncUserAndGroupData = async (uid, gid) => {
     }
 }
 
-const createGroup = async (name, creator) => {
+const createSite = async (name, creator) => {
+    const siteData = new Site({
+        name,
+        creator,
+        members: [creator]
+    })
+
+    try {
+        const newSite = await siteData.save()
+        console.log(newSite);
+        const newGroup = await createGroup('General', creator, siteData._id)
+        // await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
+        return { success: true , group: newGroup._id}
+    } catch (error) {
+        if (error.code === 11000) {
+            return { success: false, message: "Group exists" }
+        }
+        // add validations in model and check for more errors
+        return { success: false, message: error.code }
+    }
+}
+
+const createGroup = async (name, creator, site) => {
     const groupData = new Group({
         name,
         creator,
+        site,
         members: [creator]
     })
 
@@ -128,5 +157,6 @@ module.exports = {
     createPublicMessage,
     createPrivateMessage,
     joinGroup,
+    createSite,
     createGroup,
 }

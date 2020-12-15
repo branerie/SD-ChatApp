@@ -28,9 +28,10 @@ export default function MessagesContextProvider(props) {
     const [groupMembers, dispatchGroupMembers] = useReducer(GroupMembersReducer, {})
     const [messages, dispatchMessages] = useReducer(MessagesReducer, { "STATUS": [] })
     const [newMessages, setNewMessages] = useState({ "STATUS": false })
-    const [groups, setGroups] = useState(["STATUS"])
+    const [sites, setSites] = useState({})
+    const [groups, setGroups] = useState([])
     const [chats, setChats] = useState([])
-    const [activeWindow, setActiveWindow] = useState("STATUS")
+    const [activeWindow, setActiveWindow] = useState('')
     const [windowIsGroup, setwindowIsGroup] = useState(false)
 
     function changeWindow(selectedWindow, isGroup) {
@@ -68,8 +69,9 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('welcome-message', ({ groups, chats }) => {
-            setGroups(["STATUS", ...Object.keys(groups)])
+        socket.on('welcome-message', ({ sites, groups, chats }) => {
+            setSites(sites)
+            setGroups(sites[Object.keys(sites)[0]])
             setChats(Object.keys(chats))
             dispatchGroupMembers({ type: 'load-users', payload: { groups } })
             dispatchMessages({ type: "welcome-message", payload: { groups, chats, user: ME } })
@@ -168,6 +170,7 @@ export default function MessagesContextProvider(props) {
 
     return (
         <MessagesContext.Provider value={{
+            sites, setSites,
             groups, setGroups,
             groupMembers, dispatchGroupMembers,
             messages, dispatchMessages,

@@ -33,19 +33,26 @@ module.exports = io => {
         console.log(`[${getTime()}] Connect @ ${socket.id} (${userData.username}). Total connections in pool: ${clientsCount}.`)
 
         socket.username = userData.username // save username for a later use
+        const sitesData = {}
         const groupsData = {}
         const chatsData = {}
 
-        userData.groups.forEach(({ name, members }) => {
-            socket.join(name)
-            socket.to(name).emit("join-message", { user: userData.username, group: name })
-            const { online, offline } = getGroupMembers(name, members)
-            groupsData[name] = {
+        // console.log(userData);
+        userData.groups.forEach(({ _id, name, members, site }) => {
+            _id = _id.toString()
+            socket.join(_id)
+            socket.to(_id).emit("join-message", { user: userData.username, group: {_id, name} })
+            const { online, offline } = getGroupMembers(_id, members)
+            // console.log(online);
+            sitesData[site.name] = name === 'General' ? [{_id,name}, ...sitesData[site.name] || []] : [...sitesData[site.name] || [], {_id,name}] || []
+            groupsData[_id] = {
+                name,
                 online,
                 offline,
                 messages: []
             }
         })
+        console.log(sitesData);
 
         let messagePool = await db.getMessages(userData)
 
@@ -63,7 +70,7 @@ module.exports = io => {
                     break;
 
                 case "Group":
-                    groupsData[msg.destination.name].messages.push({
+                    groupsData[msg.destination._id].messages.push({
                         user: msg.source.username,
                         msg: msg.content,
                         timestamp: msg.createdAt
@@ -78,6 +85,7 @@ module.exports = io => {
         // Welcome message from server to connected client
         // Send groups and chats to client for UI setup
         socket.emit("welcome-message", {
+            sites: sitesData,
             groups: groupsData,
             chats: chatsData
         })
@@ -137,6 +145,22 @@ module.exports = io => {
                     messages: [] // get history messages ?
                 }
                 callback(true, groupData)
+            }
+        })
+
+        socket.on('create-site', async ({site}, callback) => {
+            const request = await db.createSite(site,userData._id)
+            if (request.success) {
+                socket.join(request.group)
+                const groupData = {
+                    name: 'General',
+                    online: [userData.username],
+                    offline: [],
+                    messages: []
+                }
+                callback(true, groupData)
+            } else {
+                callback(false, request.message)
             }
         })
 
