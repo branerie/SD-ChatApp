@@ -32,7 +32,7 @@ export default function MessagesContextProvider(props) {
     const [groups, setGroups] = useState([])
     const [chats, setChats] = useState([])
     const [activeWindow, setActiveWindow] = useState('')
-    const [windowIsGroup, setwindowIsGroup] = useState(false)
+    const [windowIsGroup, setwindowIsGroup] = useState(true)
 
     function changeWindow(selectedWindow, isGroup) {
         setActiveWindow(selectedWindow)
