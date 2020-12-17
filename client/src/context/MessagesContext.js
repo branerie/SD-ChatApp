@@ -31,6 +31,7 @@ export default function MessagesContextProvider(props) {
     const [sites, setSites] = useState({})
     const [groups, setGroups] = useState([])
     const [chats, setChats] = useState([])
+    const [activeSite, setActiveSite] = useState()
     const [activeWindow, setActiveWindow] = useState('')
     const [windowIsGroup, setwindowIsGroup] = useState(true)
 
@@ -72,6 +73,7 @@ export default function MessagesContextProvider(props) {
         socket.on('welcome-message', ({ sites, groups, chats }) => {
             setSites(sites)
             setGroups(sites[Object.keys(sites)[0]])
+            setActiveSite(Object.keys(sites)[0])
             setActiveWindow(sites[Object.keys(sites)[0]][0]._id)
             setChats(Object.keys(chats))
             dispatchGroupMembers({ type: 'load-users', payload: { groups } })
@@ -177,6 +179,7 @@ export default function MessagesContextProvider(props) {
             messages, dispatchMessages,
             newMessages, updateNewMessages,
             chats, setChats, updateChats,
+            activeSite, setActiveSite,
             activeWindow, changeWindow,
             windowIsGroup
         }}>

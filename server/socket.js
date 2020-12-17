@@ -15,7 +15,7 @@ module.exports = io => {
         let data = await jwt.verifyToken(token)
 
         if (!data) { // overkill
-            console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (JSON Web Token Error)`)
+            sysLog(`Connect @ ${socket.id}. Connection refused (JSON Web Token Error)`)
             socket.disconnect()
             return
         }
@@ -23,14 +23,14 @@ module.exports = io => {
         let userData = await db.getUserData(data.userID)
 
         if (!userData) {  // overkill
-            console.log(`[${getTime()}] Connect @ ${socket.id}. Connection refused (Unknown username: ${data.username})`)
+            sysLog(`Connect @ ${socket.id}. Connection refused (Unknown username: ${data.username})`)
             socket.disconnect()
             return
         }
 
         nameToSocketIdCache[userData.username] = socket.id
         clientsCount++
-        console.log(`[${getTime()}] Connect @ ${socket.id} (${userData.username}). Total connections in pool: ${clientsCount}.`)
+        sysLog(`Connect @ ${socket.id} (${userData.username}). Total connections in pool: ${clientsCount}.`)
 
         socket.username = userData.username // save username for a later use
         const sitesData = {}
@@ -52,7 +52,7 @@ module.exports = io => {
                 messages: []
             }
         })
-        console.log(sitesData);
+        // console.log(sitesData);
 
         let messagePool = await db.getMessages(userData)
 
@@ -95,7 +95,7 @@ module.exports = io => {
         socket.on("disconnecting", (reason) => {
             delete nameToSocketIdCache[userData.username]
             clientsCount--
-            console.log(`[${getTime()}] Disconnect @ ${socket.id} (${userData.username}). Reason: ${reason}. Total connections in pool: ${clientsCount}.`)
+            sysLog(`Disconnect @ ${socket.id} (${userData.username}). Reason: ${reason}. Total connections in pool: ${clientsCount}.`)
             // send message to user groups that he quit
             socket.rooms.forEach(group => {
                 socket.to(group).emit("quit-message", { user: userData.username, reason, group })
@@ -106,7 +106,7 @@ module.exports = io => {
         socket.on("group-chat-message", async ({ msg, recipient }, callback) => {
             let newMessage = await db.createPublicMessage(userData._id, recipient, msg)
             if (!newMessage) return // validate query
-            console.log(`[${getTime()}] Message (group): ${userData.username} >> ${recipient}`)
+            sysLog(`Message (group): ${userData.username} >> ${recipient}`)
             socket.to(recipient).emit("group-chat-message", { user: userData.username, msg, group: recipient })
             callback()
         })
@@ -116,11 +116,11 @@ module.exports = io => {
             if (!newMessage) return // validate query
 
             if (nameToSocketIdCache[recipient]) {
-                console.log(`[${getTime()}] Message (private): ${userData.username} >> ${recipient}`)
+                sysLog(`Message (private): ${userData.username} >> ${recipient}`)
                 io.to(nameToSocketIdCache[recipient]).emit("single-chat-message", { user: userData.username, msg })
             } else {
                 // send offline msg to DB if not in blacklist
-                console.log(`[${getTime()}] Message (offline): ${userData.username} >> ${recipient}`)
+                sysLog(`Message (offline): ${userData.username} >> ${recipient}`)
             }
             callback()
         })
@@ -132,10 +132,10 @@ module.exports = io => {
         socket.on("join-request", async ({ group }, callback) => {
             let requestedGroup = await db.joinGroup(userData._id, group)
             if (requestedGroup.error) {
-                console.log(`[${getTime()}] Join request: ${userData.username} >> ${group}. Refused: ${requestedGroup.error}`)
+                sysLog(`Join request: ${userData.username} >> ${group}. Refused: ${requestedGroup.error}`)
                 callback(false, requestedGroup.error)
             } else {
-                console.log(`[${getTime()}] Join request: ${userData.username} >> ${group}. Success.`)
+                sysLog(`Join request: ${userData.username} >> ${group}. Success.`)
                 socket.join(group)
                 socket.to(group).emit("join-message", { user: userData.username, group })
                 const { online, offline } = getGroupMembers(group, requestedGroup.members)
@@ -166,11 +166,27 @@ module.exports = io => {
             }
         })
 
-        socket.on('create-group', async ({ group }, callback) => {
-            const request = await db.createGroup(group, userData._id)
+        socket.on('create-group', async ({ site, group }, callback) => {
+            if (group === undefined) {
+                // Avoid db query but validate it in the schema with required flag. Also set this check on Client Side.
+                sysLog(`${userData._id} @ ${socket.id} attempt to create group with no name in ${site}`)
+                callback(false, 'Group name is required')
+                return
+            }
+
+            if (group === 'General') {
+                // Avoid db query. Also set this check on Client Side.
+                sysLog(`${userData._id} @ ${socket.id} attempt to create General group in ${site}`)
+                callback(false, 'General is reserved name')
+                return
+            }
+            const request = await db.createGroup(site, group, userData._id)
             if (request.success) {
-                socket.join(group)
+                let _id = request._id.toString()
+                socket.join(_id)
                 const groupData = {
+                    _id,
+                    name: group,
                     online: [userData.username],
                     offline: [],
                     messages: []
@@ -193,4 +209,8 @@ module.exports = io => {
 
 function getTime() {
     return new Date().toLocaleTimeString()
+}
+
+function sysLog(message) {
+    console.log(`[${getTime()}] ${message}`)
 }

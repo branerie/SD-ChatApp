@@ -59,10 +59,10 @@ export default function MessagesReducer(messages, action) {
             break
 
         case "join-request-message":
-            newMessages[action.payload.group] = [
-                ...messages[action.payload.group] || [], {
+            newMessages[action.payload.group._id] = [
+                ...messages[action.payload.group._id] || [], {
                     user: "SYSTEM",
-                    msg: `You are now talking in ${action.payload.group}`,
+                    msg: `You are now talking in ${action.payload.group.name}`,
                     timestamp
                 }
             ]

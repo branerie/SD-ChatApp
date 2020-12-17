@@ -115,21 +115,20 @@ const createSite = async (name, creator) => {
     try {
         const newSite = await siteData.save()
         console.log(newSite);
-        const newGroup = await createGroup('General', creator, siteData._id)
-        // await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
-        return { success: true , _id: newGroup._id}
+        const generalGroup = await createGeneralGroup(creator, siteData._id)
+        return { success: true , _id: generalGroup._id}
     } catch (error) {
         if (error.code === 11000) {
-            return { success: false, message: "Group exists" }
+            return { success: false, message: "Site exists" }
         }
         // add validations in model and check for more errors
         return { success: false, message: error.code }
     }
 }
 
-const createGroup = async (name, creator, site) => {
+const createGeneralGroup = async (creator, site) => {
     const groupData = new Group({
-        name,
+        name: 'General',
         creator,
         site,
         members: [creator]
@@ -141,9 +140,39 @@ const createGroup = async (name, creator, site) => {
         await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
         return { success: true, _id: newGroup._id }
     } catch (error) {
-        if (error.code === 11000) {
-            return { success: false, message: "Group exists" }
-        }
+        // add validations in model and check for more errors
+        return { success: false, message: error.code }
+    }
+}
+
+const createGroup = async (site, name, creator) => {
+    // check privileges
+    // 1. find site creator and compare ids
+    const siteCheck = await Site.findOne({name: site, creator})
+    if (siteCheck === null) {
+        // syslog required (might be attack)
+        return { success: false, message: 'Site not found or restricted' }
+    }
+
+    // 2. check that group name is unique (for this site, not in model)
+    const groupCheck = await Group.findOne({name, site: siteCheck._id})
+    if (groupCheck !== null) {
+        return { success: false, message: 'Group exists' }
+    }
+
+    const groupData = new Group({
+        name,
+        creator,
+        site: siteCheck._id,
+        members: [creator]
+    })
+
+    try {
+        const newGroup = await groupData.save()
+        console.log(newGroup);
+        await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
+        return { success: true, _id: newGroup._id }
+    } catch (error) {
         // add validations in model and check for more errors
         return { success: false, message: error.code }
     }
