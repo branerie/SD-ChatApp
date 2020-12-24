@@ -28,3 +28,4 @@ yarn-error.log*
 /server/mock*.js
 .vscode/
 TODO
+/client/debug.log

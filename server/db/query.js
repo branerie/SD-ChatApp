@@ -6,17 +6,11 @@ const getUserData = async (id) => {
         select: 'username'
     }).populate({
         path: 'groups',
-        select: 'name',
+        select: 'name members site',
         populate: {
             path: 'members site',
-            // select: 'username',
-            //             path: 'site',
-            // select: 'name'
-        },
-        // populate: {
-        //     path: 'site',
-        //     select: 'name'
-        // }
+            select: 'username name',
+        }
     })
     return data
 }
@@ -58,12 +52,11 @@ const removeChat = async (id, recipient) => {
 }
 
 const createPrivateMessage = async (sender, recipient, msg) => {
-    let chat = await User.findOne({ username: recipient }, '_id')
-    await User.findByIdAndUpdate(sender, { $addToSet: { chats: [chat._id] } })
-    await User.findByIdAndUpdate(chat._id, { $addToSet: { chats: [sender] } })
+    await User.findByIdAndUpdate(sender, { $addToSet: { chats: [recipient] } })
+    await User.findByIdAndUpdate(recipient, { $addToSet: { chats: [sender] } })
     let message = new Message({
         source: sender,
-        destination: chat._id,
+        destination: recipient,
         onModel: 'User',
         content: msg
     })
@@ -116,7 +109,7 @@ const createSite = async (name, creator) => {
         const newSite = await siteData.save()
         console.log(newSite);
         const generalGroup = await createGeneralGroup(creator, siteData._id)
-        return { success: true , _id: generalGroup._id}
+        return { success: true , groupID: generalGroup._id, siteID: siteData._id}
     } catch (error) {
         if (error.code === 11000) {
             return { success: false, message: "Site exists" }
@@ -148,14 +141,14 @@ const createGeneralGroup = async (creator, site) => {
 const createGroup = async (site, name, creator) => {
     // check privileges
     // 1. find site creator and compare ids
-    const siteCheck = await Site.findOne({name: site, creator})
+    const siteCheck = await Site.findOne({_id: site, creator})
     if (siteCheck === null) {
         // syslog required (might be attack)
         return { success: false, message: 'Site not found or restricted' }
     }
 
     // 2. check that group name is unique (for this site, not in model)
-    const groupCheck = await Group.findOne({name, site: siteCheck._id})
+    const groupCheck = await Group.findOne({name, site})
     if (groupCheck !== null) {
         return { success: false, message: 'Group exists' }
     }
@@ -163,7 +156,7 @@ const createGroup = async (site, name, creator) => {
     const groupData = new Group({
         name,
         creator,
-        site: siteCheck._id,
+        site,
         members: [creator]
     })
 

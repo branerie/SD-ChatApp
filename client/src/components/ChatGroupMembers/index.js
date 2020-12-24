@@ -1,20 +1,39 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatGroupMembers = () => {
     const context = useContext(MessagesContext)
+    const [memberName, setMemberName] = useState('')
 
     function handleClick(user) {
-        context.updateChats(user, "open")
-        context.changeWindow(user, false)
+        // TODO
+        // context.updateChats(user, "open")
+        // context.changeWindow(user, false)
     }
+
+    function addMember() {
+        const group = context.groups.find(group => group._id === context.activeWindow).name
+        console.log(group, memberName);
+        if (group === 'General') {
+            // send invitation for site
+        } else {
+            // add user to group
+        }
+    }
+
+    if (!context.userData) return null
+    const members = context.userData.sites[context.userData.activeSite].groups[context.userData.activeGroup].members
 
     return (
         <div>
-            <h2>members: {context.groupMembers[context.activeWindow] && context.groupMembers[context.activeWindow].online.length + context.groupMembers[context.activeWindow].offline.length}</h2>
+            <h2>members: {members.online.length + members.offline.length}</h2>
+            <div>
+                <input onChange={e => setMemberName(e.target.value)} />
+                <button className="join-btn" onClick={addMember}>Add</button>
+            </div>
             <ul>
-                {context.groupMembers[context.activeWindow] && context.groupMembers[context.activeWindow].online.map((user, i) => {
+                {members.online.map((user, i) => {
                     return <li
                         key={`onUser${i}`}
                         className="online"
@@ -23,7 +42,7 @@ const ChatGroupMembers = () => {
                 })}
             </ul>
             <ul>
-                {context.groupMembers[context.activeWindow] && context.groupMembers[context.activeWindow].offline.map((user, i) => {
+                {members.offline.map((user, i) => {
                     return <li
                         key={`offUser${i}`}
                         className="offline"

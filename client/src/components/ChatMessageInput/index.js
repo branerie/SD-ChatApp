@@ -4,31 +4,32 @@ import { MessagesContext } from '../../context/MessagesContext'
 import { SocketContext } from '../../context/SocketContext'
 
 const ChatMessageInput = () => {
-    const [message, setMessage] = useState('')
-    const { windowIsGroup, activeWindow, dispatchMessages } = useContext(MessagesContext)
+    const [msg, setMsg] = useState('')
+    const context = useContext(MessagesContext)
     const { socket, ME } = useContext(SocketContext)
     const messageRef = useRef()
 
     function sendMessage(e) {
         e.preventDefault()
 
-        socket.emit(windowIsGroup ? 'group-chat-message' : 'single-chat-message', { 
-            recipient: activeWindow, 
-            msg: message 
-        }, () => attachMsg())
+        let recipientType, recipient, site
+        if (context.userData.activeChat) {
+            recipientType = 'single-chat-message'
+            recipient = context.userData.activeChat
+            site = null
+        } else {
+            recipientType = 'group-chat-message'
+            recipient = context.userData.activeGroup
+            site = context.userData.activeSite
+        }
+
+        socket.emit(recipientType, { site, recipient, msg }, () => attachMsg(recipientType, recipient, site))
         return
     }
 
-    function attachMsg() {
-        dispatchMessages({ 
-            type: "chat-message",
-            payload: {
-                user: ME,
-                msg: message,
-                group: activeWindow
-            }
-        })
-        setMessage('')
+    function attachMsg(recipientType, recipient, site) {
+        context.dispatchUserData({type: recipientType, payload: { user: ME, msg, site, group: recipient }})
+        setMsg('')
     }
 
     useEffect(() => messageRef.current.focus())
@@ -36,7 +37,7 @@ const ChatMessageInput = () => {
     return (
         <div className="chat-form-container">
             <form onSubmit={e => sendMessage(e)}>
-                <input ref={messageRef} type="text" autoFocus value={message} required autoComplete="off" onChange={e => setMessage(e.target.value)} />
+                <input ref={messageRef} type="text" autoFocus value={msg} required autoComplete="off" onChange={e => setMsg(e.target.value)} />
                 <button className="btn">Send</button>
             </form>
         </div>

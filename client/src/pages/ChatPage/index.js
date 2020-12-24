@@ -13,15 +13,15 @@ const ChatPage = () => {
     return (
         <SocketContextProvider>
             <MessagesContextProvider>
-            <div className="chat-container">
-                <ChatHeader />
-                <main className="chat-main">
-                    <ChatProjectsSideBar />
-                    <ChatGroupsSideBar />
-                    <ChatWindow />
-                </main>
-                <ChatMessageInput />
-            </div>
+                <div className="chat-container">
+                    <ChatHeader />
+                    <main className="chat-main">
+                        <ChatProjectsSideBar />
+                        <ChatGroupsSideBar />
+                        <ChatWindow />
+                    </main>
+                    <ChatMessageInput />
+                </div>
             </MessagesContextProvider>
         </SocketContextProvider>
     )
