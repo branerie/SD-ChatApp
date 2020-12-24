@@ -1,37 +1,56 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatGroupMembers = () => {
-    const { windowIsGroup, groupMembers, activeWindow, changeWindow, updateChats }  = useContext(MessagesContext)
+    const context = useContext(MessagesContext)
+    const [memberName, setMemberName] = useState('')
 
     function handleClick(user) {
-        updateChats(user, "open")
-        changeWindow(user, false)
+        // TODO
+        // context.updateChats(user, "open")
+        // context.changeWindow(user, false)
     }
 
-    if (!windowIsGroup) return null
+    function addMember() {
+        const group = context.groups.find(group => group._id === context.activeWindow).name
+        console.log(group, memberName);
+        if (group === 'General') {
+            // send invitation for site
+        } else {
+            // add user to group
+        }
+    }
+
+    if (!context.userData) return null
+    const members = context.userData.sites[context.userData.activeSite].groups[context.userData.activeGroup].members
+
     return (
-        <aside className="chat-sidebar">
-            <h2>ONLINE</h2>
+        <div>
+            <h2>members: {members.online.length + members.offline.length}</h2>
+            <div>
+                <input onChange={e => setMemberName(e.target.value)} />
+                <button className="join-btn" onClick={addMember}>Add</button>
+            </div>
             <ul>
-                {groupMembers[activeWindow] && groupMembers[activeWindow].online.map((user, i) => {
-                    return <li 
-                    key={`onUser${i}`} 
-                    onDoubleClick={() => handleClick(user)}
+                {members.online.map((user, i) => {
+                    return <li
+                        key={`onUser${i}`}
+                        className="online"
+                        onDoubleClick={() => handleClick(user)}
                     >{user}</li>
                 })}
             </ul>
-            <h2>OFFLINE</h2>
             <ul>
-                {groupMembers[activeWindow] && groupMembers[activeWindow].offline.map((user, i) => {
-                    return <li 
-                    key={`offUser${i}`} 
-                    onDoubleClick={() => handleClick(user)}
+                {members.offline.map((user, i) => {
+                    return <li
+                        key={`offUser${i}`}
+                        className="offline"
+                        onDoubleClick={() => handleClick(user)}
                     >{user}</li>
                 })}
             </ul>
-        </aside>
+        </div>
     )
 }
 

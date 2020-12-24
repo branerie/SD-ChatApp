@@ -1,6 +1,6 @@
 .chat-messages {
 	padding: 30px;
-	max-height: 500px;
+	/* max-height: 600px; */
 	overflow-y: auto;
 }
 .chat-messages .message {
@@ -11,7 +11,7 @@
 }
 
 .chat-messages .message .text-self {
-	color: green;
+	color: blue;
 }
 
 .chat-messages .message .text-SYSTEM {
@@ -20,6 +20,14 @@
 
 .chat-messages .message .text-SERVER {
 	color: mediumblue;
+}
+
+.chat-messages .message .text-server-online {
+	color: green;
+}
+
+.chat-messages .message .text-server-offline {
+	color: red;
 }
 .chat-messages .message .timestamp {
 	font-size: 15px;

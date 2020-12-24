@@ -1,4 +1,4 @@
-const { User, Group, Message } = require('../models')
+const { User, Site, Group, Message } = require('../models')
 
 const getUserData = async (id) => {
     let data = await User.findById(id, 'username groups chats').populate({
@@ -6,10 +6,10 @@ const getUserData = async (id) => {
         select: 'username'
     }).populate({
         path: 'groups',
-        select: 'name',
+        select: 'name members site',
         populate: {
-            path: 'members',  
-            select: 'username'
+            path: 'members site',
+            select: 'username name',
         }
     })
     return data
@@ -30,10 +30,10 @@ const getMessages = async (userData) => {
 
 const createPublicMessage = async (sender, recipient, msg) => {
     // check if group is valid and if user has access to it
-    let group = await Group.findOne({ name: recipient })
+    await Group.findById(recipient)
     let message = new Message({
         source: sender,
-        destination: group._id,
+        destination: recipient,
         onModel: 'Group',
         content: msg
     })
@@ -52,12 +52,11 @@ const removeChat = async (id, recipient) => {
 }
 
 const createPrivateMessage = async (sender, recipient, msg) => {
-    let chat = await User.findOne({ username: recipient }, '_id')
-    await User.findByIdAndUpdate(sender, { $addToSet: { chats: [chat._id] } })
-    await User.findByIdAndUpdate(chat._id, { $addToSet: { chats: [sender] } })
+    await User.findByIdAndUpdate(sender, { $addToSet: { chats: [recipient] } })
+    await User.findByIdAndUpdate(recipient, { $addToSet: { chats: [sender] } })
     let message = new Message({
         source: sender,
-        destination: chat._id,
+        destination: recipient,
         onModel: 'User',
         content: msg
     })
@@ -99,10 +98,32 @@ const syncUserAndGroupData = async (uid, gid) => {
     }
 }
 
-const createGroup = async (name, creator) => {
-    const groupData = new Group({
+const createSite = async (name, creator) => {
+    const siteData = new Site({
         name,
         creator,
+        members: [creator]
+    })
+
+    try {
+        const newSite = await siteData.save()
+        console.log(newSite);
+        const generalGroup = await createGeneralGroup(creator, siteData._id)
+        return { success: true , groupID: generalGroup._id, siteID: siteData._id}
+    } catch (error) {
+        if (error.code === 11000) {
+            return { success: false, message: "Site exists" }
+        }
+        // add validations in model and check for more errors
+        return { success: false, message: error.code }
+    }
+}
+
+const createGeneralGroup = async (creator, site) => {
+    const groupData = new Group({
+        name: 'General',
+        creator,
+        site,
         members: [creator]
     })
 
@@ -110,11 +131,41 @@ const createGroup = async (name, creator) => {
         const newGroup = await groupData.save()
         console.log(newGroup);
         await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
-        return { success: true }
+        return { success: true, _id: newGroup._id }
     } catch (error) {
-        if (error.code === 11000) {
-            return { success: false, message: "Group exists" }
-        }
+        // add validations in model and check for more errors
+        return { success: false, message: error.code }
+    }
+}
+
+const createGroup = async (site, name, creator) => {
+    // check privileges
+    // 1. find site creator and compare ids
+    const siteCheck = await Site.findOne({_id: site, creator})
+    if (siteCheck === null) {
+        // syslog required (might be attack)
+        return { success: false, message: 'Site not found or restricted' }
+    }
+
+    // 2. check that group name is unique (for this site, not in model)
+    const groupCheck = await Group.findOne({name, site})
+    if (groupCheck !== null) {
+        return { success: false, message: 'Group exists' }
+    }
+
+    const groupData = new Group({
+        name,
+        creator,
+        site,
+        members: [creator]
+    })
+
+    try {
+        const newGroup = await groupData.save()
+        console.log(newGroup);
+        await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
+        return { success: true, _id: newGroup._id }
+    } catch (error) {
         // add validations in model and check for more errors
         return { success: false, message: error.code }
     }
@@ -128,5 +179,6 @@ module.exports = {
     createPublicMessage,
     createPrivateMessage,
     joinGroup,
+    createSite,
     createGroup,
 }

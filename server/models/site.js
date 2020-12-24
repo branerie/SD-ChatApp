@@ -1,15 +1,13 @@
 const mongoose = require ('mongoose')
 
-const GroupSchema = new mongoose.Schema ({
+const SiteSchema = new mongoose.Schema ({
     name: {
         type: String,
-        // unique: true,
+        unique: true,
         required: true
     },
-    site: {
-        type: 'ObjectId',
-        ref: 'Site',
-        required: true
+    description: {
+        type: String
     },
     creator: {
         type: 'ObjectId',
@@ -26,4 +24,4 @@ const GroupSchema = new mongoose.Schema ({
     }]
 })
 
-module.exports = mongoose.model('Group', GroupSchema)
+module.exports = mongoose.model('Site', SiteSchema)
