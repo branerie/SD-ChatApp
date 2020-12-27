@@ -3,7 +3,7 @@ const db = require('./db/query')
 const cookie = require("cookie")
 
 module.exports = io => {
-    // names cache keeps track of connected users by id and their assigned socket id
+    // cache keeps track of connected users by id and their assigned socket id
     // it is updated on every connect and disconnect 
     const userIDToSocketIDCache = {}
     let clientsCount = 0
@@ -20,9 +20,9 @@ module.exports = io => {
         }
 
         let userData = await db.getUserData(data.userID)
-        // console.log(JSON.stringify(userData,null,4))
+        console.log(JSON.stringify(userData,null,4))
         const reactUserData = {sites: {}, chats: {}}
-        let allMembers = []
+        const allMembers = new Set()
 
         if (!userData) {  // overkill
             sysLog(`Connect @ ${socket.id}. Connection refused (Unknown username: ${data.username})`)
@@ -36,32 +36,22 @@ module.exports = io => {
 
         socket.username = userData.username // save username for a later use
 
-        userData.groups.forEach( ({ site }) => {
-            reactUserData.sites[site._id] = {
-                name: site.name,
-                groups: {}
-            }
-        })
-
         let groupToSiteCache = {}
         userData.groups.forEach(({ _id, name, site, members }) => {
-            // console.log(members);
-            allMembers = [...allMembers, ...members]
+            members.map(m => allMembers.add(m._id))
             groupToSiteCache[_id] = site._id
+            if (!reactUserData.sites[site._id]) {
+                reactUserData.sites[site._id] = {
+                    name: site.name,
+                    groups: {}
+                }
+            }
             reactUserData.sites[site._id].groups[_id] = {
                 name,
-                members: {
-                    online: [],
-                    offline: [],
-                },
+                members,
                 messages: []
             }
         })
-
-        // console.log(allMembers);
-        allMembers = new Set(allMembers.map(String))
-        // console.log(allMembers);
-
 
         let messagePool = await db.getMessages(userData)
         messagePool.forEach(msg => {
@@ -96,21 +86,13 @@ module.exports = io => {
             }
         })      
 
-        // console.log(JSON.stringify(reactUserData,null,4))
-
-        // Send welcome message with user data to client for UI setup.
-        // To avoid (or minimize?) race conditions, get and send userlist to client
-        // right after joining and emiting join message to room, in the callback
-        // note to fix: by the time client get old messages from db and joining rooms - some new messages and other events might be lost
-        socket.emit("welcome-message", { userData: reactUserData}, () => { // acknowlegment callback
-            userData.groups.forEach(({ _id, site, members }) => {
-                _id = _id.toString()
-                socket.join(_id)
-                socket.to(_id).emit("join-message", { user: userData.username, site: site._id, group: _id } )
-                const groupMembers = getGroupMembers(_id, members)
-                socket.emit("load-members", { site: site._id, group: _id, members: groupMembers })
-            })
+        userData.groups.forEach(({ _id, site }) => {
+            _id = _id.toString()
+            socket.join(_id)
+            socket.to(_id).emit("join-message", { user: { _id: userData._id.toString(), username: userData.username}, site: site._id, group: _id } )
         })
+        reactUserData.onlineMembers = getOnlineMembers([...allMembers])
+        socket.emit("welcome-message", { userData: reactUserData })
 
         // EVENT LISTENERS SECTION
         // Notify users on disconnect
@@ -121,7 +103,7 @@ module.exports = io => {
             // send message to user groups that he quit
             socket.rooms.forEach(group => {
                 // console.log(group, groupToSiteCache[group]);      
-                socket.to(group).emit("quit-message", { user: userData.username, reason, group, site: groupToSiteCache[group] })
+                socket.to(group).emit("quit-message", { user: { _id: userData._id.toString(), username: userData.username}, reason, group, site: groupToSiteCache[group] })
             })
         })
 
@@ -240,6 +222,11 @@ module.exports = io => {
         const online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
         const offline = members.filter(member => !online.includes(member))
         return { online, offline }
+    }
+
+    function getOnlineMembers(allMembers) {
+        return allMembers.filter(m => userIDToSocketIDCache[m])
+
     }
 }
 

@@ -166,21 +166,15 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.sites[site].groups[group].messages,
                                     {
                                         user: "SERVER",
-                                        msg: `${user} is online.`,
+                                        msg: `${user.username} is online.`,
                                         timestamp
                                     }
                                 ],
-                                members: {
-                                    online: [
-                                        ...userData.sites[site].groups[group].members.online,
-                                        user
-                                    ],
-                                    offline: userData.sites[site].groups[group].members.offline.filter(member => member !== user)
-                                }
                             }
                         }
                     }
-                }
+                },
+                onlineMembers: [...new Set([...userData.onlineMembers, user._id])]
             }
         }
 
@@ -201,21 +195,15 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.sites[site].groups[group].messages,
                                     {
                                         user: "SERVER",
-                                        msg: `${user} is offline.`,
+                                        msg: `${user.username} is offline.`,
                                         timestamp
                                     }
                                 ],
-                                members: {
-                                    online: userData.sites[site].groups[group].members.online.filter(member => member !== user),
-                                    offline: [
-                                        ...userData.sites[site].groups[group].members.offline,
-                                        user
-                                    ]
-                                }
                             }
                         }
                     }
-                }
+                },
+                onlineMembers: userData.onlineMembers.filter(m => m !== user._id)
             }
         }
 

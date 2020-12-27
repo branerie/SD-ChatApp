@@ -42,9 +42,8 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('welcome-message', ({ userData }, joinRooms) => {
+        socket.on('welcome-message', ({ userData }) => {
             dispatchUserData({ type: "welcome-message", payload: { userData }})
-            joinRooms()
         })
         return () => socket.off('welcome-message')
     }, [socket])

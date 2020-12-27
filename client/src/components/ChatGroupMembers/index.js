@@ -3,7 +3,7 @@ import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatGroupMembers = () => {
-    const context = useContext(MessagesContext)
+    const { userData } = useContext(MessagesContext)
     const [memberName, setMemberName] = useState('')
 
     function handleClick(user) {
@@ -13,7 +13,7 @@ const ChatGroupMembers = () => {
     }
 
     function addMember() {
-        const group = context.groups.find(group => group._id === context.activeWindow).name
+        const group = userData.sites[userData.activeSite].groups[userData.activeGroup].name
         console.log(group, memberName);
         if (group === 'General') {
             // send invitation for site
@@ -22,32 +22,25 @@ const ChatGroupMembers = () => {
         }
     }
 
-    if (!context.userData) return null
-    const members = context.userData.sites[context.userData.activeSite].groups[context.userData.activeGroup].members
-
+    if (!userData) return null
+    let members = userData.sites[userData.activeSite].groups[userData.activeGroup].members.sort((A,B) => {
+        // default sort: alphabetical with online users on top and offline on bottom
+        return userData.onlineMembers.includes(B._id) - userData.onlineMembers.includes(A._id) || A.username.localeCompare(B.username)
+    })
     return (
         <div>
-            <h2>members: {members.online.length + members.offline.length}</h2>
+            <h2>members: {members.length}</h2>
             <div>
                 <input onChange={e => setMemberName(e.target.value)} />
                 <button className="join-btn" onClick={addMember}>Add</button>
             </div>
             <ul>
-                {members.online.map((user, i) => {
+                {members.map(member => {
                     return <li
-                        key={`onUser${i}`}
-                        className="online"
-                        onDoubleClick={() => handleClick(user)}
-                    >{user}</li>
-                })}
-            </ul>
-            <ul>
-                {members.offline.map((user, i) => {
-                    return <li
-                        key={`offUser${i}`}
-                        className="offline"
-                        onDoubleClick={() => handleClick(user)}
-                    >{user}</li>
+                        key={member._id}
+                        className={userData.onlineMembers.includes(member._id) ? "online" : "offline"}
+                        onDoubleClick={() => handleClick(member)}
+                    >{member.username}</li>
                 })}
             </ul>
         </div>

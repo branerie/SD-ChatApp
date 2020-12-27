@@ -6,19 +6,19 @@ import { SocketContext } from '../../context/SocketContext'
 
 const ChatGroupsList = () => {
     const { socket } = useContext(SocketContext)
-    const { userData , dispatchUserData } = useContext(MessagesContext)
+    const { userData, dispatchUserData } = useContext(MessagesContext)
     const [groupName, setGroupName] = useState()
 
     function handleClick(e, group) {
         if (e.target.nodeName === 'BUTTON') return
-        dispatchUserData({type: "load-group", payload: {group}})
+        dispatchUserData({ type: "load-group", payload: { group } })
     }
 
     function createGroup() {
         let site = userData.activeSite
-        socket.emit("create-group", { site , group: groupName }, (success, data) => {
+        socket.emit("create-group", { site, group: groupName }, (success, data) => {
             if (success) {
-                dispatchUserData({type: "join-group", payload: { site, ...data }})
+                dispatchUserData({ type: "join-group", payload: { site, ...data } })
             } else {
                 // if (data === "You are already there.") dispatchUserData({type: "load-group", payload: {group}})
                 // else console.log(data)
@@ -27,9 +27,10 @@ const ChatGroupsList = () => {
     }
 
     if (!userData) return null //<div>Loading...</div>
-    let sortedGroups = Object.entries(userData.sites[userData.activeSite].groups).sort((A,B) => A[1].name.localeCompare(B[1].name))
-    let groups = [sortedGroups.find(group => group[1].name === "General"), ...sortedGroups.filter(group => group[1].name !== "General")]
-    // console.log(groups);
+    let groups = Object.entries(userData.sites[userData.activeSite].groups).sort((A, B) => {
+        // default sort: Group "General" on top and the rest alphabetical
+        return (B[1].name === 'General') - (A[1].name === 'General') || A[1].name.localeCompare(B[1].name)
+    })
     return (
         <div>
             <h2>groups: {groups.length}</h2>
