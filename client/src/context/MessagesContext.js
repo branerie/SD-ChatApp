@@ -71,7 +71,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('single-chat-message', ({ user, msg }) => {
-            dispatchUserData({type: 'single-chat-message', payload: { user, msg, group: user }})
+            dispatchUserData({type: 'single-chat-message', payload: { user: user.username, msg, group: user._id }})
             // updateChats(user, "open")
             // updateNewMessages(user, user !== activeWindow)
         })

@@ -107,7 +107,7 @@ export default function UserDataReducer(userData, action) {
 
         case "single-chat-message": {
             let timestamp = new Date().toLocaleTimeString()
-            let { group, msg, user } = action.payload
+            let { user, msg, group } = action.payload
             return {
                 ...userData,
                 chats: {

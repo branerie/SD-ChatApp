@@ -9,7 +9,7 @@ const getUserData = async (id) => {
         select: 'name members site',
         populate: {
             path: 'members site',
-            select: 'username name',
+            select: 'username name creator',
         }
     }).lean()
     return data

@@ -20,8 +20,15 @@ module.exports = io => {
         }
 
         let userData = await db.getUserData(data.userID)
-        console.log(JSON.stringify(userData,null,4))
-        const reactUserData = {sites: {}, chats: {}}
+        console.log(JSON.stringify(userData, null, 4))
+        const reactUserData = {
+            sites: {},
+            chats: {},
+            personal: {
+                username: userData.username,
+                _id: userData._id
+            }
+        }
         const allMembers = new Set()
 
         if (!userData) {  // overkill
@@ -43,6 +50,7 @@ module.exports = io => {
             if (!reactUserData.sites[site._id]) {
                 reactUserData.sites[site._id] = {
                     name: site.name,
+                    creator: site.creator,
                     groups: {}
                 }
             }
@@ -63,7 +71,7 @@ module.exports = io => {
                     if (!reactUserData.chats[partyID]) {
                         reactUserData.chats[partyID] = {
                             username: partyName,
-                            messages: [] 
+                            messages: []
                         }
                     }
                     reactUserData.chats[partyID].messages.push({
@@ -84,14 +92,15 @@ module.exports = io => {
                 default:
                     break;
             }
-        })      
+        })
 
         userData.groups.forEach(({ _id, site }) => {
             _id = _id.toString()
             socket.join(_id)
-            socket.to(_id).emit("join-message", { user: { _id: userData._id.toString(), username: userData.username}, site: site._id, group: _id } )
+            socket.to(_id).emit("join-message", { user: { _id: userData._id.toString(), username: userData.username }, site: site._id, group: _id })
         })
         reactUserData.onlineMembers = getOnlineMembers([...allMembers])
+        console.log(JSON.stringify(reactUserData, null, 4),"\n","reactUserData END")
         socket.emit("welcome-message", { userData: reactUserData })
 
         // EVENT LISTENERS SECTION
@@ -103,13 +112,13 @@ module.exports = io => {
             // send message to user groups that he quit
             socket.rooms.forEach(group => {
                 // console.log(group, groupToSiteCache[group]);      
-                socket.to(group).emit("quit-message", { user: { _id: userData._id.toString(), username: userData.username}, reason, group, site: groupToSiteCache[group] })
+                socket.to(group).emit("quit-message", { user: { _id: userData._id.toString(), username: userData.username }, reason, group, site: groupToSiteCache[group] })
             })
         })
 
         socket.on('disconnect', () => {
             socket.removeAllListeners()
-         })
+        })
 
         // Get message from client and send to rest clients
         socket.on("group-chat-message", async ({ msg, recipient, site }, callback) => {
@@ -126,7 +135,7 @@ module.exports = io => {
 
             if (userIDToSocketIDCache[recipient]) {
                 sysLog(`Message (private): ${userData.username} >> ${recipient}`)
-                io.to(userIDToSocketIDCache[recipient]).emit("single-chat-message", { user: userData.username, msg })
+                io.to(userIDToSocketIDCache[recipient]).emit("single-chat-message", { user: { _id: userData._id.toString(), username: userData.username }, msg })
             } else {
                 // send offline msg to DB if not in blacklist
                 sysLog(`Message (offline): ${userData.username} >> ${recipient}`)
@@ -165,7 +174,7 @@ module.exports = io => {
                 const siteData = {
                     name: site,
                     groups: {
-                        [groupID] : {
+                        [groupID]: {
                             name: 'General',
                             members: {
                                 online: [userData.username],
@@ -175,7 +184,7 @@ module.exports = io => {
                         }
                     }
                 }
-                callback(true, {siteID: request.siteID, siteData, groupID})
+                callback(true, { siteID: request.siteID, siteData, groupID })
             } else {
                 callback(false, request.message)
             }
@@ -208,12 +217,12 @@ module.exports = io => {
                     },
                     messages: []
                 }
-                callback(true, {groupID, groupData})
+                callback(true, { groupID, groupData })
             } else {
                 callback(false, request.message)
             }
         })
-    
+
     })
 
     function getGroupMembers(group, members) {

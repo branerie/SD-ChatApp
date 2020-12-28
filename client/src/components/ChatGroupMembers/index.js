@@ -1,25 +1,15 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
+import ChatGroupAddMember from '../ChatGroupAddMember'
 
 const ChatGroupMembers = () => {
     const { userData } = useContext(MessagesContext)
-    const [memberName, setMemberName] = useState('')
 
-    function handleClick(user) {
+    function handleClick(member) {
         // TODO
         // context.updateChats(user, "open")
         // context.changeWindow(user, false)
-    }
-
-    function addMember() {
-        const group = userData.sites[userData.activeSite].groups[userData.activeGroup].name
-        console.log(group, memberName);
-        if (group === 'General') {
-            // send invitation for site
-        } else {
-            // add user to group
-        }
     }
 
     if (!userData) return null
@@ -30,10 +20,7 @@ const ChatGroupMembers = () => {
     return (
         <div>
             <h2>members: {members.length}</h2>
-            <div>
-                <input onChange={e => setMemberName(e.target.value)} />
-                <button className="join-btn" onClick={addMember}>Add</button>
-            </div>
+            {userData.sites[userData.activeSite].creator === userData.personal._id && <ChatGroupAddMember />}
             <ul>
                 {members.map(member => {
                     return <li
