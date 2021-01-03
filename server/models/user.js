@@ -17,6 +17,11 @@ const UserSchema = new mongoose.Schema({
         ref: 'Group'
     }],
 
+    invitations: [{
+        type: 'ObjectId',
+        ref: 'Site'
+    }],
+
     chats: [{
         type: 'ObjectId',
         ref: 'User'

@@ -20,7 +20,7 @@ module.exports = io => {
         }
 
         let userData = await db.getUserData(data.userID)
-        console.log(JSON.stringify(userData, null, 4))
+        // console.log(JSON.stringify(userData, null, 4))
         const reactUserData = {
             sites: {},
             chats: {},
@@ -29,10 +29,16 @@ module.exports = io => {
                 _id: userData._id
             }
         }
+        if (userData.invitations) reactUserData.invitations = userData.invitations
         const allMembers = new Set()
 
         if (!userData) {  // overkill
             sysLog(`Connect @ ${socket.id}. Connection refused (Unknown username: ${data.username})`)
+            socket.disconnect()
+            return
+        }
+        if (userIDToSocketIDCache[userData._id]) { // temporary dublicate connection fix
+            sysLog(`Connect @ ${socket.id}. Connection refused (Username already connected: ${data.username})`)
             socket.disconnect()
             return
         }
@@ -100,7 +106,7 @@ module.exports = io => {
             socket.to(_id).emit("join-message", { user: { _id: userData._id.toString(), username: userData.username }, site: site._id, group: _id })
         })
         reactUserData.onlineMembers = getOnlineMembers([...allMembers])
-        console.log(JSON.stringify(reactUserData, null, 4),"\n","reactUserData END")
+        // console.log(JSON.stringify(reactUserData, null, 4),"\n","reactUserData END")
         socket.emit("welcome-message", { userData: reactUserData })
 
         // EVENT LISTENERS SECTION
@@ -176,10 +182,10 @@ module.exports = io => {
                     groups: {
                         [groupID]: {
                             name: 'General',
-                            members: {
-                                online: [userData.username],
-                                offline: [],
-                            },
+                            members: [{
+                                _id: userData._id,
+                                username: userData.username,
+                            }],
                             messages: []
                         }
                     }
@@ -211,16 +217,29 @@ module.exports = io => {
                 const groupData = {
                     // _id,
                     name: group,
-                    members: {
-                        online: [userData.username],
-                        offline: [],
-                    },
+                    members: [{
+                        _id: userData._id,
+                        username: userData.username,
+                    }],
                     messages: []
                 }
                 callback(true, { groupID, groupData })
             } else {
                 callback(false, request.message)
             }
+        })
+
+        socket.on("invite-user", async ({user, site}) => {
+            const inviteData = await db.inviteUser(user, site, userData._id)
+            if (inviteData.success) {
+                if (userIDToSocketIDCache[inviteData.userID]) {
+                    io.to(userIDToSocketIDCache[inviteData.userID]).emit('invite-message', inviteData.siteData)
+                }
+                sysLog(`${userData.username} invited ${user} to join ${site}`)
+            } else {
+                sysLog(`Invitation from ${userData.username} to ${user} for ${site} failed: ${inviteData}`)
+            }
+
         })
 
     })

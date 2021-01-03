@@ -81,6 +81,15 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
+        socket.on('invite-message', siteData => {
+            dispatchUserData({type: 'invite-message', payload: { siteData }})
+        })
+        return () => socket.off('invite-message')
+    }, [socket])
+
+    
+    useEffect(() => {
+        if (!socket) return
         socket.on('join-message', ({ user, site, group }) => {
             dispatchUserData({type: 'join-message', payload: { user, site, group }})
         })

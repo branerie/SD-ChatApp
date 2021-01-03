@@ -207,6 +207,15 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
+        case "invite-message": {
+            return {
+                ...userData,
+                invitations: [
+                    ...userData.invitations || [],
+                    action.payload.siteData
+                ]
+            }
+        }
 
         //     case "join-request-message":
         //         break

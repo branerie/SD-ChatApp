@@ -1,9 +1,12 @@
 const { User, Site, Group, Message } = require('../models')
 
 const getUserData = async (id) => {
-    let data = await User.findById(id, 'username groups chats').populate({
+    let data = await User.findById(id, 'username groups chats invitations').populate({
         path: 'chats',
         select: 'username'
+    }).populate({
+        path: 'invitations',
+        select: 'name',
     }).populate({
         path: 'groups',
         select: 'name members site',
@@ -171,6 +174,30 @@ const createGroup = async (site, name, creator) => {
     }
 }
 
+const inviteUser = async (username, siteID, siteCreator) => {
+    try {
+        // check userId from socket and compare to site creator
+        const site = await Site.findById(siteID, 'name creator invitations')
+        if (site === null) throw new Error(`Site with id ${siteID} not found. Illegal operation.`)
+        if (site.creator.toString() !== siteCreator.toString()) {
+            throw new Error("Site creator doesn't match. Illegal operation.")
+        }
+        const user = await User.findOne({username})
+        if (user === null) throw new Error(`User ${username} not found.`)
+        if (site.invitations.includes(user._id.toString())) {
+            throw new Error(`Invitation for user ${user._id} (${username}) is already pending.`)
+        }
+        const generalGroup = await Group.findOne({site: siteID, name: "General"},'name site members').populate({path: 'site', select: 'name'})
+        // console.log(generalGroup);
+        if (generalGroup.members.includes(user._id.toString())) throw new Error(`User ${username} is already a member.`)
+        await Site.findByIdAndUpdate(siteID, {$addToSet: {invitations: [user._id]}})
+        await User.findByIdAndUpdate(user._id, {$addToSet: {invitations: [site._id]}})
+        return { success: true, userID: user._id, siteData: {_id: site._id, name: site.name} }
+    } catch (error) {
+        return error.message
+    }
+}
+
 
 module.exports = {
     getUserData,
@@ -181,4 +208,5 @@ module.exports = {
     joinGroup,
     createSite,
     createGroup,
+    inviteUser
 }
