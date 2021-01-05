@@ -1,15 +1,10 @@
 import React, { useContext } from 'react'
-import './index.css'
 import { MessagesContext } from '../../context/MessagesContext'
 
-const ChatProjectsPendingList = () => {
+const ChatProjectPendingMembers = () => {
     const { userData } = useContext(MessagesContext)
 
-    function acceptInvitation(invitation) {
-        console.log(invitation)
-    }
-
-    function rejectInvitation(invitation) {
+    function cancelInvitation(invitation) {
         console.log(invitation)
     }
 
@@ -17,7 +12,11 @@ const ChatProjectsPendingList = () => {
         console.log(invitation)
     }
 
-    function cancelRequest(request) {
+    function acceptRequest(request) {
+        console.log(request)
+    }
+
+    function rejectRequest(request) {
         console.log(request)
     }
 
@@ -27,16 +26,15 @@ const ChatProjectsPendingList = () => {
 
     return (
         <div>
-            <h2>pending</h2>
-            {userData.invitations && userData.invitations.length > 0 && (
+            <h2>Pending</h2>
+            {userData.sites[userData.activeSite].invitations && userData.sites[userData.activeSite].invitations.length > 0 && (
                 <ul><span className='header'>Invitations</span>
-                    {userData.invitations.map(invitation => {
+                    {userData.sites[userData.activeSite].invitations.map(invitation => {
                         return (
                             <li key={invitation._id}>
-                                <span>{invitation.name}</span>
+                                <span>{invitation.username}</span>
                                 <div>
-                                    <button onClick={() => acceptInvitation(invitation)}>Accept</button>
-                                    <button onClick={() => rejectInvitation(invitation)}>Reject</button>
+                                    <button onClick={() => cancelInvitation(invitation)}>Cancel</button>
                                     <span className="arrow down" onClick={() => showInvitationInfo(invitation)}></span>
                                 </div>
                             </li>
@@ -45,14 +43,15 @@ const ChatProjectsPendingList = () => {
                 </ul>
             )}
 
-            {userData.requests && userData.requests.length > 0 && (
+            {userData.sites[userData.activeSite].requests && userData.sites[userData.activeSite].requests.length > 0 && (
                 <ul><span className='header'>Requests</span>
-                    {userData.requests.map(request => {
+                    {userData.sites[userData.activeSite].requests.map(request => {
                         return (
                             <li key={request._id}>
-                                <span>{request.name}</span>
+                                <span>{request.username}</span>
                                 <div>
-                                    <button onClick={() => cancelRequest(request)}>Cancel</button>
+                                    <button onClick={() => acceptRequest(request)}>Accept</button>
+                                    <button onClick={() => rejectRequest(request)}>Reject</button>
                                     <span className="arrow down" onClick={() => showRequestInfo(request)}></span>
                                 </div>
                             </li>
@@ -60,8 +59,9 @@ const ChatProjectsPendingList = () => {
                     })}
                 </ul>
             )}
+
         </div>
     )
 }
 
-export default ChatProjectsPendingList
+export default ChatProjectPendingMembers

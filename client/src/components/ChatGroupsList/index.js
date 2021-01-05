@@ -11,7 +11,7 @@ const ChatGroupsList = () => {
         dispatchUserData({ type: "load-group", payload: { group } })
     }
 
-    if (!userData) return null //<div>Loading...</div>
+    if (!userData || !userData.activeSite) return null //<div>Loading...</div>
     let groups = Object.entries(userData.sites[userData.activeSite].groups).sort((A, B) => {
         // default sort: Group "General" on top and the rest alphabetical
         return (B[1].name === 'General') - (A[1].name === 'General') || A[1].name.localeCompare(B[1].name)

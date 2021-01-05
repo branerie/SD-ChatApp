@@ -22,6 +22,11 @@ const UserSchema = new mongoose.Schema({
         ref: 'Site'
     }],
 
+    requests: [{
+        type: 'ObjectId',
+        ref: 'Site'
+    }],
+
     chats: [{
         type: 'ObjectId',
         ref: 'User'

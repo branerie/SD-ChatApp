@@ -1,19 +1,34 @@
 const { User, Site, Group, Message } = require('../models')
 
 const getUserData = async (id) => {
-    let data = await User.findById(id, 'username groups chats invitations').populate({
+    let data = await User.findById(id, 'username groups chats invitations requests').populate({
         path: 'chats',
         select: 'username'
     }).populate({
         path: 'invitations',
         select: 'name',
     }).populate({
+        path: 'requests',
+        select: 'name',
+    }).populate({
         path: 'groups',
         select: 'name members site',
-        populate: {
-            path: 'members site',
-            select: 'username name creator',
-        }
+        // populate: {
+        //     path: 'members site',
+        //     select: 'username name creator',
+        // },
+        populate: [{
+            path: 'members',
+            select: 'username',
+        },
+        {
+            path: 'site',
+            select: 'name creator invitations requests',
+            populate: {
+                path: 'invitations requests',
+                select: 'username'
+            }
+        }],
     }).lean()
     return data
 }
@@ -72,23 +87,23 @@ const createPrivateMessage = async (sender, recipient, msg) => {
     }
 }
 
-const joinGroup = async (uid, group) => {
-    try {
-        const newGroup = await Group.findOne({ name: group }).populate({ path: 'members', select: 'username' })
-        if (newGroup === null) throw new Error('Group doesn\'t exist.')
+// const joinGroup = async (uid, group) => {
+//     try {
+//         const newGroup = await Group.findOne({ name: group }).populate({ path: 'members', select: 'username' })
+//         if (newGroup === null) throw new Error('Group doesn\'t exist.')
 
-        const members = newGroup.members.map(member => member._id)
-        if (members.includes(uid)) throw new Error("You are already there.")
+//         const members = newGroup.members.map(member => member._id)
+//         if (members.includes(uid)) throw new Error("You are already there.")
 
-        if (newGroup.open === false) throw new Error("Group is private.") //todo
+//         if (newGroup.open === false) throw new Error("Group is private.") //todo
 
-        await syncUserAndGroupData(uid, newGroup._id)
-        return newGroup
-    } catch (error) {
-        console.error(error.message)
-        return { error: error.message }
-    }
-}
+//         await syncUserAndGroupData(uid, newGroup._id)
+//         return newGroup
+//     } catch (error) {
+//         console.error(error.message)
+//         return { error: error.message }
+//     }
+// }
 
 // add group id to user groups and user id to group members
 const syncUserAndGroupData = async (uid, gid) => {
@@ -187,17 +202,39 @@ const inviteUser = async (username, siteID, siteCreator) => {
         if (site.invitations.includes(user._id.toString())) {
             throw new Error(`Invitation for user ${user._id} (${username}) is already pending.`)
         }
-        const generalGroup = await Group.findOne({site: siteID, name: "General"},'name site members').populate({path: 'site', select: 'name'})
-        // console.log(generalGroup);
+        const generalGroup = await Group.findOne({site: siteID, name: "General"},'members')
         if (generalGroup.members.includes(user._id.toString())) throw new Error(`User ${username} is already a member.`)
-        await Site.findByIdAndUpdate(siteID, {$addToSet: {invitations: [user._id]}})
-        await User.findByIdAndUpdate(user._id, {$addToSet: {invitations: [site._id]}})
-        return { success: true, userID: user._id, siteData: {_id: site._id, name: site.name} }
+
+        if (user.invitations && user.invitations.includes(siteID)) console.log("User should join general group immediately") //todo
+        else {
+            await Site.findByIdAndUpdate(siteID, {$addToSet: {invitations: [user._id]}})
+            await User.findByIdAndUpdate(user._id, {$addToSet: {invitations: [site._id]}})
+            return { success: true, userID: user._id, siteData: {_id: site._id, name: site.name} }
+        }
     } catch (error) {
         return error.message
     }
 }
 
+const requestJoin = async (siteName, userID) => {
+    try {
+        const site = await Site.findOne({name: siteName})
+        if (site === null) throw new Error(`${siteName} doesn't exist.`)
+        const generalGroup = await Group.findOne({site: site._id, name: "General"},'members')
+        // console.log(generalGroup);
+        if (generalGroup.members.includes(userID)) throw new Error(`You are already a member.`)
+        if (site.requests && site.requests.includes(userID)) throw new Error(`Request already exist.`)
+
+        if (site.invitations && site.invitations.includes(userID)) console.log("User should join general group immediately") // todo
+        else {
+            await Site.findByIdAndUpdate(site._id, {$addToSet: {requests: [userID]}})
+            await User.findByIdAndUpdate(userID, {$addToSet: {requests: [site._id]}})
+            return { success: true, site }
+        }
+    } catch (error) {
+        return error.message
+    }
+}
 
 module.exports = {
     getUserData,
@@ -205,8 +242,9 @@ module.exports = {
     removeChat,
     createPublicMessage,
     createPrivateMessage,
-    joinGroup,
+    // joinGroup,
     createSite,
     createGroup,
-    inviteUser
+    inviteUser,
+    requestJoin
 }

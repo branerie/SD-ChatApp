@@ -4,8 +4,8 @@ export default function UserDataReducer(userData, action) {
         //     break
 
         case "welcome-message": {
-            let activeSite = Object.keys(action.payload.userData.sites)[0]
-            let activeGroup = Object.keys(action.payload.userData.sites[activeSite].groups)[0]
+            let activeSite = Object.keys(action.payload.userData.sites)[0] || false
+            let activeGroup = activeSite ? Object.keys(action.payload.userData.sites[activeSite].groups)[0] : false
             return {
                 ...action.payload.userData,
                 activeSite,
@@ -36,6 +36,8 @@ export default function UserDataReducer(userData, action) {
         case "load-chat": { // load selected chat data
             return {
                 ...userData,
+                activeSite: false,
+                activeGroup: false,
                 activeChat: action.payload.chat
             }
         }
@@ -207,6 +209,27 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
+        case "invite-user": {
+            let { site, username, _id } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        invitations: [
+                            ...userData.sites[site].invitations || [],
+                            {
+                                _id,
+                                username
+                            }
+                        ]
+                    }
+                },
+            }
+        }
+
+
         case "invite-message": {
             return {
                 ...userData,
@@ -217,8 +240,35 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        //     case "join-request-message":
-        //         break
+        case "request-join": {
+            return {
+                ...userData,
+                requests: [
+                    ...userData.requests || [],
+                    action.payload.data
+                ]
+            }
+        }
+
+        case "request-message": {
+            let { site, username, _id } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        requests: [
+                            ...userData.sites[site].requests || [],
+                            {
+                                _id,
+                                username
+                            }
+                        ]
+                    }
+                },
+            }
+        }
 
         case "disconnect-message": {
             return false

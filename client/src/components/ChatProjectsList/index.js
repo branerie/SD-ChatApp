@@ -7,22 +7,18 @@ import { SocketContext } from '../../context/SocketContext'
 const ChatProjectsList = () => {
     const { socket } = useContext(SocketContext)
     const {userData, dispatchUserData } = useContext(MessagesContext)
-    const [groupName, setGroupName] = useState()
-    const [siteName, setSiteName] = useState()
+    const [joinSite, setJoinSite] = useState()
+    const [newSite, setNewSite] = useState()
 
     function handleClick(e, site) {
         if (e.target.nodeName === 'BUTTON') return
         dispatchUserData({ type: "load-site", payload: { site } })
     }
 
-    function joinGroup() {
-        socket.emit("join-request", { group: groupName }, (success, data) => {
+    function requestJoin() {
+        socket.emit("request-join", { site: joinSite }, (success, data) => {
             if (success) {
-                // TODO: userDataReducer
-                // context.setGroups(oldGroups => [...oldGroups, groupName])
-                // context.changeWindow(groupName, true)
-                // context.dispatchGroupMembers({ type: 'load-new-group-users', payload: { group: groupName, data } })
-                // context.dispatchMessages({ type: "join-request-message", payload: { group: groupName } })
+                dispatchUserData({ type: 'request-join', payload: { data } })
             } else {
                 // if (data === "Already there") context.changeWindow(groupName, true)
                 // else console.log(data)
@@ -31,7 +27,7 @@ const ChatProjectsList = () => {
     }
 
     function createSite() {
-        socket.emit("create-site", { site: siteName }, (success, data) => {
+        socket.emit("create-site", { site: newSite }, (success, data) => {
             if (success) {
                 dispatchUserData({ type: 'create-site', payload: { ...data } })
             } else {
@@ -50,12 +46,12 @@ const ChatProjectsList = () => {
     return (
         <div>
             <div>
-                <input onChange={e => setGroupName(e.target.value)} />
-                <button className="join-btn" onClick={joinGroup}>Join</button>
+                <input onChange={e => setJoinSite(e.target.value)} />
+                <button className="join-btn" onClick={requestJoin}>Join</button>
             </div>
             <h2>SITES</h2>
             <div>
-                <input onChange={e => setSiteName(e.target.value)} />
+                <input onChange={e => setNewSite(e.target.value)} />
                 <button className="join-btn" onClick={createSite}>New</button>
             </div>
             <ul>

@@ -87,6 +87,15 @@ export default function MessagesContextProvider(props) {
         return () => socket.off('invite-message')
     }, [socket])
 
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('request-message', ({ site, username, _id }) => {
+            dispatchUserData({type: 'request-message', payload: { site, username, _id }})
+        })
+        return () => socket.off('request-message')
+    }, [socket])
+
     
     useEffect(() => {
         if (!socket) return

@@ -30,7 +30,8 @@ module.exports = io => {
             }
         }
         if (userData.invitations) reactUserData.invitations = userData.invitations
-        const allMembers = new Set()
+        if (userData.requests) reactUserData.requests = userData.requests
+        const allMembers = new Set([userData._id])
 
         if (!userData) {  // overkill
             sysLog(`Connect @ ${socket.id}. Connection refused (Unknown username: ${data.username})`)
@@ -58,6 +59,10 @@ module.exports = io => {
                     name: site.name,
                     creator: site.creator,
                     groups: {}
+                }
+                if (site.creator.toString() === userData._id.toString()) {
+                    reactUserData.sites[site._id].invitations = site.invitations || []
+                    reactUserData.sites[site._id].requests = site.requests || []
                 }
             }
             reactUserData.sites[site._id].groups[_id] = {
@@ -106,7 +111,7 @@ module.exports = io => {
             socket.to(_id).emit("join-message", { user: { _id: userData._id.toString(), username: userData.username }, site: site._id, group: _id })
         })
         reactUserData.onlineMembers = getOnlineMembers([...allMembers])
-        // console.log(JSON.stringify(reactUserData, null, 4),"\n","reactUserData END")
+        console.log(JSON.stringify(reactUserData, null, 4),"\n","reactUserData END")
         socket.emit("welcome-message", { userData: reactUserData })
 
         // EVENT LISTENERS SECTION
@@ -153,24 +158,24 @@ module.exports = io => {
             await db.removeChat(userData._id, recipient)
         })
 
-        socket.on("join-request", async ({ group }, callback) => {
-            let requestedGroup = await db.joinGroup(userData._id, group)
-            if (requestedGroup.error) {
-                sysLog(`Join request: ${userData.username} >> ${group}. Refused: ${requestedGroup.error}`)
-                callback(false, requestedGroup.error)
-            } else {
-                sysLog(`Join request: ${userData.username} >> ${group}. Success.`)
-                socket.join(group)
-                socket.to(group).emit("join-message", { user: userData.username, group })
-                const { online, offline } = getGroupMembers(group, requestedGroup.members)
-                const groupData = {
-                    online,
-                    offline,
-                    messages: [] // get history messages ?
-                }
-                callback(true, groupData)
-            }
-        })
+        // socket.on("join-request", async ({ group }, callback) => {
+        //     let requestedGroup = await db.joinGroup(userData._id, group)
+        //     if (requestedGroup.error) {
+        //         sysLog(`Join request: ${userData.username} >> ${group}. Refused: ${requestedGroup.error}`)
+        //         callback(false, requestedGroup.error)
+        //     } else {
+        //         sysLog(`Join request: ${userData.username} >> ${group}. Success.`)
+        //         socket.join(group)
+        //         socket.to(group).emit("join-message", { user: userData.username, group })
+        //         const { online, offline } = getGroupMembers(group, requestedGroup.members)
+        //         const groupData = {
+        //             online,
+        //             offline,
+        //             messages: [] // get history messages ?
+        //         }
+        //         callback(true, groupData)
+        //     }
+        // })
 
         socket.on('create-site', async ({ site }, callback) => {
             const request = await db.createSite(site, userData._id)
@@ -179,6 +184,7 @@ module.exports = io => {
                 socket.join(groupID)
                 const siteData = {
                     name: site,
+                    creator: userData._id,
                     groups: {
                         [groupID]: {
                             name: 'General',
@@ -229,15 +235,30 @@ module.exports = io => {
             }
         })
 
-        socket.on("invite-user", async ({user, site}) => {
+        socket.on("invite-user", async ({user, site}, callback) => {
             const inviteData = await db.inviteUser(user, site, userData._id)
             if (inviteData.success) {
                 if (userIDToSocketIDCache[inviteData.userID]) {
                     io.to(userIDToSocketIDCache[inviteData.userID]).emit('invite-message', inviteData.siteData)
                 }
                 sysLog(`${userData.username} invited ${user} to join ${site}`)
+                callback(true, inviteData.userID.toString())
             } else {
                 sysLog(`Invitation from ${userData.username} to ${user} for ${site} failed: ${inviteData}`)
+            }
+
+        })
+
+        socket.on("request-join", async ({site}, callback) => {
+            const request = await db.requestJoin(site, userData._id)
+            if (request.success) {
+                if (userIDToSocketIDCache[request.site.creator]) {
+                    io.to(userIDToSocketIDCache[request.site.creator]).emit('request-message', { site: request.site._id , username: userData.username, _id: userData._id })
+                }
+                sysLog(`${userData.username} request to join ${site}`)
+                callback(true, {_id: request.site._id, name: request.site.name})
+            } else {
+                sysLog(`Join request from ${userData.username} to ${site} failed: ${request}`)
             }
 
         })

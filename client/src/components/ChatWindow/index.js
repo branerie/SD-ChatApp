@@ -14,11 +14,19 @@ const ChatWindow = () => {
         <div className="chat-messages" ref={messagesRef}>Loading messages....</div>
     )
 
-    let messages = []
+    let messages
     if (context.userData.activeChat) {
         messages = context.userData.chats[context.userData.activeChat].messages
-    } else {
+    } else if (context.userData.activeSite) {
         messages = context.userData.sites[context.userData.activeSite].groups[context.userData.activeGroup].messages
+    } else {
+        messages = [{ 
+            user: "SERVER", 
+            msg: `Welcome to SmartChat Network ${context.userData.personal.username}.
+            It seems like you don't have any membership yet.\n
+            Add or join a project from left menu.`, 
+            timestamp: new Date().toLocaleTimeString()
+        }]
     }
 
     return (

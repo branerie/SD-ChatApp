@@ -3,12 +3,14 @@ import { MessagesContext } from '../../context/MessagesContext'
 import { SocketContext } from '../../context/SocketContext'
 
 const ChatGroupAddMember = () => {
-    const { userData } = useContext(MessagesContext)
+    const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
     const [memberName, setMemberName] = useState('')
 
     function inviteMember() {
-        socket.emit("invite-user", {user: memberName, site: userData.activeSite})
+        socket.emit("invite-user", {user: memberName, site: userData.activeSite}, (success, userID) => {
+            if (success) dispatchUserData({type: 'invite-user', payload: {site: userData.activeSite, username: memberName, _id: userID}})
+        })
     }
 
     function addMember() { //todo

@@ -14,11 +14,11 @@ const ChatHeader = () => {
     )
 
     const chat = userData.activeChat
-    const site = userData.sites[userData.activeSite].name
-    const group = userData.sites[userData.activeSite].groups[userData.activeGroup].name
+    const site = userData.activeSite ? userData.sites[userData.activeSite].name : false
+    const group = site ? userData.sites[userData.activeSite].groups[userData.activeGroup].name : false
     return (
         <header className="chat-header">
-            <h1>SmartChat / {chat ? userData.chats[chat].username : `${site} / ${group}`}</h1>
+            <h1>SmartChat / {chat ? userData.chats[chat].username : site ? `${site} / ${group}` : `Welcome ${userData.personal.username}`}</h1>
             <a href="/login" className="btn" onClick={logOut}>Logout</a>
         </header>
     )
