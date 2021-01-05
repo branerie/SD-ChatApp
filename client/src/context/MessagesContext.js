@@ -71,7 +71,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('single-chat-message', ({ user, msg }) => {
-            dispatchUserData({type: 'single-chat-message', payload: { user, msg, group: user }})
+            dispatchUserData({type: 'single-chat-message', payload: { user: user.username, msg, group: user._id }})
             // updateChats(user, "open")
             // updateNewMessages(user, user !== activeWindow)
         })
@@ -79,6 +79,24 @@ export default function MessagesContextProvider(props) {
     }, [socket, updateNewMessages, updateChats])
 
 
+    useEffect(() => {
+        if (!socket) return
+        socket.on('invite-message', siteData => {
+            dispatchUserData({type: 'invite-message', payload: { siteData }})
+        })
+        return () => socket.off('invite-message')
+    }, [socket])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('request-message', ({ site, username, _id }) => {
+            dispatchUserData({type: 'request-message', payload: { site, username, _id }})
+        })
+        return () => socket.off('request-message')
+    }, [socket])
+
+    
     useEffect(() => {
         if (!socket) return
         socket.on('join-message', ({ user, site, group }) => {

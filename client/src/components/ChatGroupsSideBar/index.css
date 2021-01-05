@@ -7,6 +7,12 @@
 	scrollbar-width: none;
 	border: 3px solid white;
 }
+.chat-sidebar select {
+	font-size: 16px;
+	padding: 5px;
+	height: 40px;
+	width: 180px;
+}
 
 h2 {
 	font-size: 20px;
@@ -23,7 +29,7 @@ ul li {
 
 
 ul li:hover {
-	color: darkgreen;
+	color: black;
 	cursor: pointer;
 }
 

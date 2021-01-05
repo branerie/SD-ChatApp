@@ -21,6 +21,14 @@ const SiteSchema = new mongoose.Schema ({
     members: [{
         type: 'ObjectId',
         ref: 'User'
+    }],    
+    invitations: [{
+        type: 'ObjectId',
+        ref: 'User'
+    }],
+    requests: [{
+        type: 'ObjectId',
+        ref: 'User'
     }]
 })
 

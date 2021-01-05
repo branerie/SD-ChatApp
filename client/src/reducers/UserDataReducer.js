@@ -4,8 +4,8 @@ export default function UserDataReducer(userData, action) {
         //     break
 
         case "welcome-message": {
-            let activeSite = Object.keys(action.payload.userData.sites)[0]
-            let activeGroup = Object.keys(action.payload.userData.sites[activeSite].groups)[0]
+            let activeSite = Object.keys(action.payload.userData.sites)[0] || false
+            let activeGroup = activeSite ? Object.keys(action.payload.userData.sites[activeSite].groups)[0] : false
             return {
                 ...action.payload.userData,
                 activeSite,
@@ -36,6 +36,8 @@ export default function UserDataReducer(userData, action) {
         case "load-chat": { // load selected chat data
             return {
                 ...userData,
+                activeSite: false,
+                activeGroup: false,
                 activeChat: action.payload.chat
             }
         }
@@ -107,7 +109,7 @@ export default function UserDataReducer(userData, action) {
 
         case "single-chat-message": {
             let timestamp = new Date().toLocaleTimeString()
-            let { group, msg, user } = action.payload
+            let { user, msg, group } = action.payload
             return {
                 ...userData,
                 chats: {
@@ -207,9 +209,66 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
+        case "invite-user": {
+            let { site, username, _id } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        invitations: [
+                            ...userData.sites[site].invitations || [],
+                            {
+                                _id,
+                                username
+                            }
+                        ]
+                    }
+                },
+            }
+        }
 
-        //     case "join-request-message":
-        //         break
+
+        case "invite-message": {
+            return {
+                ...userData,
+                invitations: [
+                    ...userData.invitations || [],
+                    action.payload.siteData
+                ]
+            }
+        }
+
+        case "request-join": {
+            return {
+                ...userData,
+                requests: [
+                    ...userData.requests || [],
+                    action.payload.data
+                ]
+            }
+        }
+
+        case "request-message": {
+            let { site, username, _id } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        requests: [
+                            ...userData.sites[site].requests || [],
+                            {
+                                _id,
+                                username
+                            }
+                        ]
+                    }
+                },
+            }
+        }
 
         case "disconnect-message": {
             return false

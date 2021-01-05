@@ -24,16 +24,15 @@ ul li {
 }
 
 ul li.selected {
-	background-color: gray;
-	color: darkgreen;
+	color: black;
+}
+
+ul li.selected::after {
+	content: "|";
 }
 
 ul li.new-messages {
 	color: red;
-}
-
-ul li:hover {
-	color: darkgreen;
 }
 
 .chat-sidebar input {

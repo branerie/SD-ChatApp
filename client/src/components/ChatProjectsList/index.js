@@ -1,28 +1,24 @@
 import React, { useContext, useState } from 'react'
-// import "./index.css"
+import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 import { SocketContext } from '../../context/SocketContext'
 
 
 const ChatProjectsList = () => {
     const { socket } = useContext(SocketContext)
-    const context = useContext(MessagesContext)
-    const [groupName, setGroupName] = useState()
-    const [siteName, setSiteName] = useState()
+    const {userData, dispatchUserData } = useContext(MessagesContext)
+    const [joinSite, setJoinSite] = useState()
+    const [newSite, setNewSite] = useState()
 
     function handleClick(e, site) {
         if (e.target.nodeName === 'BUTTON') return
-        context.dispatchUserData({ type: "load-site", payload: { site } })
+        dispatchUserData({ type: "load-site", payload: { site } })
     }
 
-    function joinGroup() {
-        socket.emit("join-request", { group: groupName }, (success, data) => {
+    function requestJoin() {
+        socket.emit("request-join", { site: joinSite }, (success, data) => {
             if (success) {
-                // TODO: userDataReducer
-                // context.setGroups(oldGroups => [...oldGroups, groupName])
-                // context.changeWindow(groupName, true)
-                // context.dispatchGroupMembers({ type: 'load-new-group-users', payload: { group: groupName, data } })
-                // context.dispatchMessages({ type: "join-request-message", payload: { group: groupName } })
+                dispatchUserData({ type: 'request-join', payload: { data } })
             } else {
                 // if (data === "Already there") context.changeWindow(groupName, true)
                 // else console.log(data)
@@ -31,9 +27,9 @@ const ChatProjectsList = () => {
     }
 
     function createSite() {
-        socket.emit("create-site", { site: siteName }, (success, data) => {
+        socket.emit("create-site", { site: newSite }, (success, data) => {
             if (success) {
-                context.dispatchUserData({ type: 'create-site', payload: { ...data } })
+                dispatchUserData({ type: 'create-site', payload: { ...data } })
             } else {
                 // if (data === "You are already there.") context.dispatchUserData({type: "load-site", payload: {site}})
                 // else console.log(data)
@@ -41,30 +37,34 @@ const ChatProjectsList = () => {
         })
     }
 
-    if (!context.userData) return null //<div>Loading...</div>
-    const sites = context.userData.sites
+    if (!userData) return null //<div>Loading...</div>
+    const sites = Object.entries(userData.sites).sort((A,B) => {
+        // default sort: user sites first, then alphabetically
+        return (B[1].creator === userData.personal._id) - (A[1].creator === userData.personal._id) || A[1].name.localeCompare(B[1].name)
+    })
 
     return (
         <div>
             <div>
-                <input onChange={e => setGroupName(e.target.value)} />
-                <button className="join-btn" onClick={joinGroup}>Join</button>
+                <input onChange={e => setJoinSite(e.target.value)} />
+                <button className="join-btn" onClick={requestJoin}>Join</button>
             </div>
             <h2>SITES</h2>
             <div>
-                <input onChange={e => setSiteName(e.target.value)} />
+                <input onChange={e => setNewSite(e.target.value)} />
                 <button className="join-btn" onClick={createSite}>New</button>
             </div>
             <ul>
-                {Object.keys(sites).map(site => {
+                {sites.map(site => {
                     const classList = []
-                    if (site === context.userData.activeSite) classList.push("selected")
-                    if (context.newMessages[site] && site !== context.userData.activeGroup) classList.push("new-messages")
+                    if (site[0] === userData.activeSite) classList.push("selected")
+                    if (site[1].creator === userData.personal._id) classList.push("owner")
+                    // if (context.newMessages[site] && site !== context.userData.activeGroup) classList.push("new-messages")
                     return (
-                        <li key={site}
+                        <li key={site[0]}
                             className={classList.join(" ")}
-                            onClick={(e) => handleClick(e, site)}>
-                            <span>{sites[site].name}</span>
+                            onClick={(e) => handleClick(e, site[0])}>
+                            <span>{site[1].name}</span>
                         </li>
                     )
                 })}
