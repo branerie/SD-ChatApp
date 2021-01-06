@@ -19,7 +19,7 @@ const ChatHeader = () => {
     return (
         <header className="chat-header">
             <h1>SmartChat / {chat ? userData.chats[chat].username : site ? `${site} / ${group}` : `Welcome ${userData.personal.username}`}</h1>
-            <a href="/login" className="btn" onClick={logOut}>Logout</a>
+            <a href="/" className="btn" onClick={logOut}>Logout</a>
         </header>
     )
 }

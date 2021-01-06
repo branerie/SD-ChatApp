@@ -11,6 +11,7 @@
 
 # production
 /build
+/client/build
 
 # misc
 .DS_Store
@@ -29,3 +30,5 @@ yarn-error.log*
 .vscode/
 TODO
 /client/debug.log
+/server/debug.log
+debug.log

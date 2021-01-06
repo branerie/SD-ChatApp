@@ -1,0 +1,20 @@
+{
+  "name": "sd-chatapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server/server.js",
+  "scripts": {
+    "heroku-prebuild": "cd client && npm install && npm run build && cd .. && cd server && npm install",
+    "start": "cd server && npm run start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartdesign2006/SD-ChatApp.git"
+  },
+  "author": "Gergan Ruschev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/smartdesign2006/SD-ChatApp/issues"
+  },
+  "homepage": "https://github.com/smartdesign2006/SD-ChatApp#readme"
+}

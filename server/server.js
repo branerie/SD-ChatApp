@@ -10,7 +10,7 @@ require('./config/routes')(app)
 const connectDB = require ('./config/database')
 connectDB()
 
-const server = app.listen(config.port, console.log(`Listening on port ${config.port}!`))
+const server = app.listen(config.PORT, console.log(`Listening on port ${config.PORT}!`))
 
 const socketio = require("socket.io")
 const io = socketio(server)

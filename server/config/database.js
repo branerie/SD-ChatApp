@@ -10,7 +10,7 @@ const options = {
 }
 
 function connectDB() {
-    mongoose.connect(config.URL, options, error => {
+    mongoose.connect(config.DB_URL, options, error => {
         if (error) {
             console.log(error);
             throw error;

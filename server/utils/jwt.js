@@ -1,16 +1,16 @@
 const jwt = require('jsonwebtoken')
-const secretKey = process.env.SECRET_KEY
+const config = require("../config/config")
 
 const createToken = (userObject) => {
     const token = jwt.sign({
         userID: userObject._id,
         username: userObject.username
-    }, secretKey)
+    }, config.SECRET_KEY)
     return token
 }
 
 const verifyToken = async (token) => {
-    let data = jwt.verify(token, secretKey, (error, data) => {
+    let data = jwt.verify(token, config.SECRET_KEY, (error, data) => {
         if (error) {
             console.error(`Error: ${error.message}. JWT missing or modified.`)
             return null
