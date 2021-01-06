@@ -27,6 +27,7 @@ export default function AuthenticationProvider(props) {
 
     useEffect(() => {
         const token = getCookie('x-auth-token')
+        const url = process.env.NODE_ENV === 'production' ? 'https://smartdesignchatapp.herokuapp.com/verify' : 'http://localhost:5000/verify'
         if (!token) {
             logOut()
             return
@@ -34,7 +35,7 @@ export default function AuthenticationProvider(props) {
 
         async function fetchData() {
             try {
-                const promise = await fetch('http://localhost:5000/verify', {
+                const promise = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
