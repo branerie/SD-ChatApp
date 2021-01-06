@@ -57,7 +57,7 @@ const createPublicMessage = async (sender, recipient, msg) => {
     })
     try {
         let newMessage = await message.save()
-        console.log(newMessage)
+        // console.log(newMessage)
         return newMessage
     } catch (error) {
         return false
@@ -80,7 +80,7 @@ const createPrivateMessage = async (sender, recipient, msg) => {
     })
     try {
         let newMessage = await message.save()
-        console.log(newMessage)
+        // console.log(newMessage)
         return newMessage
     } catch (error) {
         return false
@@ -125,7 +125,7 @@ const createSite = async (name, creator) => {
 
     try {
         const newSite = await siteData.save()
-        console.log(newSite);
+        // console.log(newSite);
         const generalGroup = await createGeneralGroup(creator, siteData._id)
         return { success: true , groupID: generalGroup._id, siteID: siteData._id}
     } catch (error) {
@@ -147,7 +147,7 @@ const createGeneralGroup = async (creator, site) => {
 
     try {
         const newGroup = await groupData.save()
-        console.log(newGroup);
+        // console.log(newGroup);
         await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
         return { success: true, _id: newGroup._id }
     } catch (error) {
@@ -180,7 +180,7 @@ const createGroup = async (site, name, creator) => {
 
     try {
         const newGroup = await groupData.save()
-        console.log(newGroup);
+        // console.log(newGroup);
         await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
         return { success: true, _id: newGroup._id }
     } catch (error) {

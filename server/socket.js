@@ -111,7 +111,7 @@ module.exports = io => {
             socket.to(_id).emit("join-message", { user: { _id: userData._id.toString(), username: userData.username }, site: site._id, group: _id })
         })
         reactUserData.onlineMembers = getOnlineMembers([...allMembers])
-        console.log(JSON.stringify(reactUserData, null, 4),"\n","reactUserData END")
+        // console.log(JSON.stringify(reactUserData, null, 4),"\n","reactUserData END")
         socket.emit("welcome-message", { userData: reactUserData })
 
         // EVENT LISTENERS SECTION
