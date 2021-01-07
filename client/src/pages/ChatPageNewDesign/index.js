@@ -8,19 +8,20 @@ import ProjectsList from '../../components/NewDesignComponents/ProjectsListBox/P
 import SelectedProject from '../../components/NewDesignComponents/SelectedProjectBox/SelectedProject'
 import ChatPage from '../../components/NewDesignComponents/ChatBox/'
 import ProfileInfoBox from '../../components/NewDesignComponents/ProfileInfoBox'
-
+import IsOpenedContext from '../../context/isOpened'
 
 const ChatPageNewDesign = () => {
     return (
         <SocketContextProvider>
             <MessagesContextProvider>
-                <div className={styles['chat-page-new-design']}>
-                    <ProjectsList />
-                    <SelectedProject />
-                    <ChatPage />
-                    <ProfileInfoBox />
-                </div>
-
+                <IsOpenedContext>
+                    <div className={styles['chat-page-new-design']}>
+                        <ProjectsList />
+                        <SelectedProject />
+                        <ChatPage />
+                        <ProfileInfoBox />
+                    </div>
+                </IsOpenedContext>
             </MessagesContextProvider>
         </SocketContextProvider>
     )

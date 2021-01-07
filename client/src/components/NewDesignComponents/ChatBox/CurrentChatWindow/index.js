@@ -5,11 +5,10 @@ import NewMessage from './NewMessage/'
 import DevLine from './DevLine/'
 import SendMessageBox from './SendMessageBox'
 
-
-const CurrentChatWindow = () => {
+const CurrentChatWindow = (props) => {
     return (
         <div className={styles['current-chat-window']}>
-            <ChatTitle />
+            <ChatTitle title={props.title}/>
             <div className={styles['message-box']}>
                 <NewMessage />
                 <DevLine />

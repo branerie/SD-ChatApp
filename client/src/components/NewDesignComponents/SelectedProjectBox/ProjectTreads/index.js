@@ -1,18 +1,15 @@
 import React from 'react'
 import styles from './index.module.css'
+import Tread from './Tread'
 
 const ProjectTreads = () => {
+    
+
     return (
         <div className={styles['project-treads']}>
-            <div className={styles['tread']}>
-                Ship Design
-            </div>
-            <div className={styles['tread']}>
-                Power Plant
-            </div>
-            <div className={styles['tread']}>
-                3D Laser Scanning
-            </div>
+            <Tread title='Ship Design' />
+            <Tread title='Power Plant' />
+            <Tread title='3D Laser Scanning' />
         </div>
     )
 }
