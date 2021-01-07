@@ -10,7 +10,7 @@ export function IsOpenedUseContext() {
 export default function  IsOpened (props) {
 
     const [openedTreads, setOpenedTreads] = useState({})
-   
+
     const changeOpenState = (chatWindow, state) => {
         setOpenedTreads({
             ...openedTreads,

@@ -1,27 +1,26 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import styles from './index.module.css'
 import CurrentChatWindow from './CurrentChatWindow/'
+import {IsOpenedUseContext} from '../../../context/isOpened'
 
 const ChatBox = () => {
-<<<<<<< Updated upstream
-=======
+
+    const context = IsOpenedUseContext()
+    let treads = Object.keys(context.openedTreads)
+    useEffect(() => {
+    }, [context.openedTreads])
+
+    const [isOpened, setIsOpened] = useState(true)
+    let [flag, setFlag] = useState(true)
     const context = IsOpenedUseContext()
     let treads = Object.keys(context.openedTreads)
 
-    
     useEffect(() => {
-    
-    }, [context.openedTreads])
+        return
+    }, [])
 
-
-
->>>>>>> Stashed changes
     return (
         <div className={styles['chat-box']}>
-<<<<<<< Updated upstream
-            <CurrentChatWindow />
-            <CurrentChatWindow />  
-=======
             {   
                 treads.map(tread => {
                     if (context.openedTreads[tread]) {
@@ -29,8 +28,20 @@ const ChatBox = () => {
                     }
                 })
             }
+            {
+                treads.forEach(tread => {
+                    // if(context.openedTreads[tread]){
+                    //     console.log(context.openedTreads);
+                    //     flag= !flag
+                    //     return <CurrentChatWindow title={tread} />
+                    // }
 
->>>>>>> Stashed changes
+                    context.openedTreads[tread] ? <CurrentChatWindow title={tread} /> : <div> </div>
+
+                    // return <CurrentChatWindow title={'tread'} />
+                })
+            }
+
         </div>
     )
 }

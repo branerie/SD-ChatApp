@@ -1,22 +1,15 @@
-import React, {useState}from 'react'
+import React, {useState, useEffect} from 'react'
 import styles from './index.module.css'
 import searchIcon from '../../../../../images/searchIcon.svg'
-
 import moreIcon from '../../../../../images/moreIcon.svg'
 import Input from '../../../CommonComponents/Input'
-<<<<<<< Updated upstream
-
-const ChatTitle = () => {
-=======
-
-
-import FavIcon from './FavIcon'
-import NotificationIcon from './NotificationIcon'
-import CloseButton from './CloseButton'
+import closeButton from '../../../../../images/closeButton.svg'
+import closeButtonHover from '../../../../../images/closeButtonHover.svg'
+import {IsOpenedUseContext} from '../../../../../context/isOpened'
 
 const ChatTitle = (props) => {
-    
->>>>>>> Stashed changes
+    const [closeButtonSrc, setCloseButtonSrc] = useState(closeButton)
+    const context = IsOpenedUseContext()
     
     return (
         <div className={styles['chat-title']}>
@@ -24,7 +17,7 @@ const ChatTitle = (props) => {
                 <FavIcon />
             </div>                
             <div className={styles['title']}>
-                Ship Design
+                {props.title}
             </div>
             <div className={styles['input-box']}>
                 <Input placeholder='Search...' />
@@ -36,12 +29,9 @@ const ChatTitle = (props) => {
             <div>
                 <img src={moreIcon} className={styles['more-icon']} />
             </div>
-<<<<<<< Updated upstream
-=======
             <div>
                 <CloseButton title={props.title} />
             </div>
->>>>>>> Stashed changes
         </div>
     )
 }
