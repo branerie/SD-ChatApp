@@ -1,32 +1,47 @@
 import React, {useState}from 'react'
 import styles from './index.module.css'
-import favouriteStar from '../../../../../images/favouriteStar.svg'
 import searchIcon from '../../../../../images/searchIcon.svg'
-import notificationIcon from '../../../../../images/notificationIcon.svg'
+
 import moreIcon from '../../../../../images/moreIcon.svg'
 import Input from '../../../CommonComponents/Input'
+<<<<<<< Updated upstream
 
 const ChatTitle = () => {
+=======
+
+
+import FavIcon from './FavIcon'
+import NotificationIcon from './NotificationIcon'
+import CloseButton from './CloseButton'
+
+const ChatTitle = (props) => {
+    
+>>>>>>> Stashed changes
     
     return (
         <div className={styles['chat-title']}>
             <div>
-                <img src={favouriteStar} className={styles['fav-star']}/>
-            </div>
+                <FavIcon />
+            </div>                
             <div className={styles['title']}>
                 Ship Design
             </div>
             <div className={styles['input-box']}>
-                <Input placeholder='Search...'/>
-               
-                <img src={searchIcon} className={styles['search-icon']}/>
+                <Input placeholder='Search...' />
+                <img src={searchIcon} className={styles['search-icon']} />
             </div>
             <div>
-                <img src={notificationIcon} className={styles['notification-icon']}/>   
+                <NotificationIcon />
             </div>
             <div>
-                <img src={moreIcon} className={styles['more-icon']}/>   
+                <img src={moreIcon} className={styles['more-icon']} />
             </div>
+<<<<<<< Updated upstream
+=======
+            <div>
+                <CloseButton title={props.title} />
+            </div>
+>>>>>>> Stashed changes
         </div>
     )
 }

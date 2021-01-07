@@ -8,12 +8,8 @@ const Input = (props) => {
     useEffect(() => {
         if (searchWord) {
             setInputTextSyle('input-writing')
-            console.log(searchWord)
-            console.log(inputTextSyle)
         } else {
             setInputTextSyle('input')
-            console.log(searchWord)
-            console.log(inputTextSyle)
         }
         return
     }, [searchWord])

@@ -11,11 +11,6 @@
     margin-right: 15px;
 }
 
-.fav-star {
-    align-items: center;
-    margin-left: 25px;
-}
-
 .title {
     font-size: 20px;
     font-weight: bold;
@@ -42,14 +37,17 @@
     margin-right: 10px;
 }
 
-.notification-icon {
-    margin-left: 18px;
-}
+
 
 .more-icon {
     margin-left: 23px;
     margin-right: 50px;
 }
 
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
 
 
