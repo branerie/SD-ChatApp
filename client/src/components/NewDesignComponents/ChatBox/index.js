@@ -4,6 +4,12 @@ import CurrentChatWindow from './CurrentChatWindow/'
 import {IsOpenedUseContext} from '../../../context/isOpened'
 
 const ChatBox = () => {
+
+    const context = IsOpenedUseContext()
+    let treads = Object.keys(context.openedTreads)
+    useEffect(() => {
+    }, [context.openedTreads])
+
     const [isOpened, setIsOpened] = useState(true)
     let [flag, setFlag] = useState(true)
     const context = IsOpenedUseContext()
@@ -13,11 +19,15 @@ const ChatBox = () => {
         return
     }, [])
 
-
-
     return (
-        
         <div className={styles['chat-box']}>
+            {   
+                treads.map(tread => {
+                    if (context.openedTreads[tread]) {
+                        return <CurrentChatWindow title={tread} />
+                    }
+                })
+            }
             {
                 treads.forEach(tread => {
                     // if(context.openedTreads[tread]){
@@ -31,7 +41,7 @@ const ChatBox = () => {
                     // return <CurrentChatWindow title={'tread'} />
                 })
             }
-           
+
         </div>
     )
 }

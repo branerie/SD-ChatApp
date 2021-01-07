@@ -9,7 +9,6 @@ const ProjectTreads = (props) => {
             <div 
                 className={styles['tread']}   
                 onClick={() => { 
-                    console.log(context)
                     context.changeOpenState([props.title], true) 
                 }}
             >

@@ -11,11 +11,6 @@ export default function  IsOpened (props) {
 
     const [openedTreads, setOpenedTreads] = useState({})
 
-    useEffect(()=>{
-        console.log(openedTreads)
-        return
-    },[openedTreads])
-    
     const changeOpenState = (chatWindow, state) => {
         setOpenedTreads({
             ...openedTreads,
