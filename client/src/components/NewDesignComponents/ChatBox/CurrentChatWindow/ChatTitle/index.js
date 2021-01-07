@@ -6,6 +6,9 @@ import Input from '../../../CommonComponents/Input'
 import closeButton from '../../../../../images/closeButton.svg'
 import closeButtonHover from '../../../../../images/closeButtonHover.svg'
 import {IsOpenedUseContext} from '../../../../../context/isOpened'
+import FavIcon from './FavIcon'
+import NotificationIcon from './NotificationIcon'
+import CloseButton from './CloseButton'
 
 const ChatTitle = (props) => {
     const [closeButtonSrc, setCloseButtonSrc] = useState(closeButton)

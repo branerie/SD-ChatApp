@@ -12,8 +12,6 @@ const ChatBox = () => {
 
     const [isOpened, setIsOpened] = useState(true)
     let [flag, setFlag] = useState(true)
-    const context = IsOpenedUseContext()
-    let treads = Object.keys(context.openedTreads)
 
     useEffect(() => {
         return
