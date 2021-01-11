@@ -49,13 +49,13 @@ export default function MessagesContextProvider(props) {
     }, [socket])
 
 
-    useEffect(() => {
-        if (!socket) return
-        socket.on('load-members', ({ site, group, members }) => {
-            dispatchUserData({ type: "load-members", payload: { site, group, members }})
-        })
-        return () => socket.off('load-members')
-    }, [socket])
+    // useEffect(() => {
+    //     if (!socket) return
+    //     socket.on('load-members', ({ site, group, members }) => {
+    //         dispatchUserData({ type: "load-members", payload: { site, group, members }})
+    //     })
+    //     return () => socket.off('load-members')
+    // }, [socket])
 
 
     useEffect(() => {
@@ -103,6 +103,15 @@ export default function MessagesContextProvider(props) {
             dispatchUserData({type: 'join-message', payload: { user, site, group }})
         })
         return () => socket.off('join-message')
+    }, [socket])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('online-message', ({ user, site, group }) => {
+            dispatchUserData({type: 'online-message', payload: { user, site, group }})
+        })
+        return () => socket.off('online-message')
     }, [socket])
 
 
