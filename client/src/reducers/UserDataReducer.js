@@ -129,29 +129,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "load-members": {
-            let { site, group, members } = action.payload
-            return {
-                ...userData,
-                sites: {
-                    ...userData.sites,
-                    [site]: {
-                        ...userData.sites[site],
-                        groups: {
-                            ...userData.sites[site].groups,
-                            [group]: {
-                                ...userData.sites[site].groups[group],
-                                members: {
-                                    ...members
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        case "join-message": {
+        case "online-message": {
             let timestamp = new Date().toLocaleTimeString()
             let { user, site, group } = action.payload
             return {
@@ -177,6 +155,40 @@ export default function UserDataReducer(userData, action) {
                     }
                 },
                 onlineMembers: [...new Set([...userData.onlineMembers, user._id])]
+            }
+        }
+
+        case "join-message": {
+            let timestamp = new Date().toLocaleTimeString()
+            let { user, online, site, group } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        ...(userData.sites[site].invitations) && {invitations: userData.sites[site].invitations.filter(i => i._id !== user._id)},
+                        groups: {
+                            ...userData.sites[site].groups,
+                            [group]: {
+                                ...userData.sites[site].groups[group],
+                                members: [
+                                    ...userData.sites[site].groups[group].members,
+                                    user
+                                ],
+                                messages: [
+                                    ...userData.sites[site].groups[group].messages,
+                                    {
+                                        user: "SERVER",
+                                        msg: `${user.username} has joined.`,
+                                        timestamp
+                                    }
+                                ],
+                            }
+                        }
+                    }
+                },
+                ...(online) && {onlineMembers: [...new Set([...userData.onlineMembers, user._id])]}
             }
         }
 
@@ -230,6 +242,52 @@ export default function UserDataReducer(userData, action) {
         }
 
 
+        case "cancel-invitation": {
+            let { invitation, site } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        invitations: userData.sites[site].invitations.filter(i => i._id !== invitation._id)
+                    }
+                },
+            }
+        }
+
+
+        case "accept-request": 
+        case "reject-request": {
+            let { request, site } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        requests: userData.sites[site].requests.filter(i => i._id !== request._id)
+                    }
+                },
+            }
+        }
+
+
+        case "request-accepted": {
+            let { site, onlineMembers } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    ...site
+                },
+                onlineMembers: [...new Set([...userData.onlineMembers, ...onlineMembers])],
+                requests: userData.requests.filter(r => r._id !== Object.keys(site)[0]),
+            }
+        }
+
+
+
         case "invite-message": {
             return {
                 ...userData,
@@ -250,6 +308,20 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
+        case "cancel-request": {
+            return {
+                ...userData,
+                requests: userData.requests.filter(r => r._id !== action.payload.request._id)
+            }
+        }
+
+        case "reject-invitation": {
+            return {
+                ...userData,
+                invitations: userData.invitations.filter(i => i._id !== action.payload.invitation._id)
+            }
+        }
+
         case "request-message": {
             let { site, username, _id } = action.payload
             return {
@@ -267,6 +339,19 @@ export default function UserDataReducer(userData, action) {
                         ]
                     }
                 },
+            }
+        }
+
+
+        case "accept-invitation": {
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    ...action.payload.siteData
+                },
+                invitations: userData.invitations.filter(i => i._id !== Object.keys(action.payload.siteData)[0]) || [],
+                onlineMembers: [...new Set([...userData.onlineMembers, ...action.payload.onlineMembers])]
             }
         }
 

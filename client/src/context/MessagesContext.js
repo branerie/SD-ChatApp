@@ -11,7 +11,6 @@ export default function MessagesContextProvider(props) {
 
     const [userData, dispatchUserData] = useReducer(UserDataReducer, false)
     const [newMessages, setNewMessages] = useState({ "STATUS": false })
-    const [chats, setChats] = useState([])
 
     const updateNewMessages = useCallback((chat, state) => {
         setNewMessages(prevMessages => ({
@@ -20,20 +19,11 @@ export default function MessagesContextProvider(props) {
         }))
     }, [setNewMessages])
 
-    const updateChats = useCallback((user, action) => {
-        if (action === "open") {
-            !chats.includes(user) && setChats(prevChats => [...prevChats, user])
-        } else { // action == 'close'
-            setChats(prevChats => prevChats.filter(chat => chat !== user))
-            
-        }
-    }, [chats])
-
     // EVENTS SECTION
     useEffect(() => {
         if (!socket) return
         socket.on('connect', () => {
-            document.title = ME
+            document.title = `SmartChat | ${ME}`
             // dispatchMessages({ type: "connect-message" })
         })
         return () => socket.off('connect')
@@ -51,15 +41,6 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('load-members', ({ site, group, members }) => {
-            dispatchUserData({ type: "load-members", payload: { site, group, members }})
-        })
-        return () => socket.off('load-members')
-    }, [socket])
-
-
-    useEffect(() => {
-        if (!socket) return
         socket.on('group-chat-message', ({ user, msg, group, site }) => {
             dispatchUserData({type: 'group-chat-message', payload: { user, msg, site, group }})
             // updateNewMessages(group, group !== activeWindow)
@@ -72,11 +53,10 @@ export default function MessagesContextProvider(props) {
         if (!socket) return
         socket.on('single-chat-message', ({ user, msg }) => {
             dispatchUserData({type: 'single-chat-message', payload: { user: user.username, msg, group: user._id }})
-            // updateChats(user, "open")
             // updateNewMessages(user, user !== activeWindow)
         })
         return () => socket.off('single-chat-message')
-    }, [socket, updateNewMessages, updateChats])
+    }, [socket])
 
 
     useEffect(() => {
@@ -96,13 +76,31 @@ export default function MessagesContextProvider(props) {
         return () => socket.off('request-message')
     }, [socket])
 
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('request-accepted', ({ site, onlineMembers }) => {
+            dispatchUserData({type: 'request-accepted', payload: { site, onlineMembers }})
+        })
+        return () => socket.off('request-accepted')
+    }, [socket])
+
     
     useEffect(() => {
         if (!socket) return
-        socket.on('join-message', ({ user, site, group }) => {
-            dispatchUserData({type: 'join-message', payload: { user, site, group }})
+        socket.on('join-message', ({ user, online, site, group }) => {
+            dispatchUserData({type: 'join-message', payload: { user, online, site, group }})
         })
         return () => socket.off('join-message')
+    }, [socket])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('online-message', ({ user, site, group }) => {
+            dispatchUserData({type: 'online-message', payload: { user, site, group }})
+        })
+        return () => socket.off('online-message')
     }, [socket])
 
 
@@ -165,8 +163,7 @@ export default function MessagesContextProvider(props) {
     return (
         <MessagesContext.Provider value={{
             userData, dispatchUserData,
-            newMessages, updateNewMessages,
-            chats, setChats, updateChats,
+            newMessages, updateNewMessages
         }}>
             {props.children}
         </MessagesContext.Provider>
