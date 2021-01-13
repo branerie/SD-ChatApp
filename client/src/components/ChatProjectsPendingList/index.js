@@ -8,9 +8,9 @@ const ChatProjectsPendingList = () => {
     const { socket } = useContext(SocketContext)
 
     function acceptInvitation(invitation) {
-        socket.emit('join-project', invitation, (success, { siteData, onlineMembers }) => {
+        socket.emit('accept-invitation', invitation, (success, { siteData, onlineMembers }) => {
             if (success) {
-                dispatchUserData({ type: 'join-project', payload: { siteData, onlineMembers } })
+                dispatchUserData({ type: 'accept-invitation', payload: { siteData, onlineMembers } })
             }
         })
     }

@@ -1,11 +1,15 @@
 import React, { useContext } from 'react'
 import { MessagesContext } from '../../context/MessagesContext'
+import { SocketContext } from '../../context/SocketContext'
 
 const ChatProjectPendingMembers = () => {
-    const { userData } = useContext(MessagesContext)
+    const { userData, dispatchUserData } = useContext(MessagesContext)
+    const { socket } = useContext(SocketContext)
 
     function cancelInvitation(invitation) {
-        console.log(invitation)
+        socket.emit('cancel-invitation', { invitation, site: userData.activeSite }, () => {
+            dispatchUserData({ type: 'cancel-invitation', payload: { invitation, site: userData.activeSite } })
+        })
     }
 
     function showInvitationInfo(invitation) {
@@ -13,11 +17,15 @@ const ChatProjectPendingMembers = () => {
     }
 
     function acceptRequest(request) {
-        console.log(request)
+        socket.emit('accept-request', { request, site: userData.activeSite }, () => {
+            dispatchUserData({ type: 'accept-request', payload: { request, site: userData.activeSite } })
+        })
     }
 
     function rejectRequest(request) {
-        console.log(request)
+        socket.emit('reject-request', { request, site: userData.activeSite }, () => {
+            dispatchUserData({ type: 'reject-request', payload: { request, site: userData.activeSite } })
+        })
     }
 
     function showRequestInfo(request) {

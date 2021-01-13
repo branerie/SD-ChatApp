@@ -129,28 +129,6 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        // case "load-members": {
-        //     let { site, group, members } = action.payload
-        //     return {
-        //         ...userData,
-        //         sites: {
-        //             ...userData.sites,
-        //             [site]: {
-        //                 ...userData.sites[site],
-        //                 groups: {
-        //                     ...userData.sites[site].groups,
-        //                     [group]: {
-        //                         ...userData.sites[site].groups[group],
-        //                         members: {
-        //                             ...members
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
         case "online-message": {
             let timestamp = new Date().toLocaleTimeString()
             let { user, site, group } = action.payload
@@ -182,14 +160,14 @@ export default function UserDataReducer(userData, action) {
 
         case "join-message": {
             let timestamp = new Date().toLocaleTimeString()
-            let { user, site, group } = action.payload
+            let { user, online, site, group } = action.payload
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        invitations: userData.sites[site].invitations.filter(i => i._id !== user._id) || [],
+                        ...(userData.sites[site].invitations) && {invitations: userData.sites[site].invitations.filter(i => i._id !== user._id)},
                         groups: {
                             ...userData.sites[site].groups,
                             [group]: {
@@ -210,7 +188,7 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                onlineMembers: [...new Set([...userData.onlineMembers, user._id])]
+                ...(online) && {onlineMembers: [...new Set([...userData.onlineMembers, user._id])]}
             }
         }
 
@@ -262,6 +240,52 @@ export default function UserDataReducer(userData, action) {
                 },
             }
         }
+
+
+        case "cancel-invitation": {
+            let { invitation, site } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        invitations: userData.sites[site].invitations.filter(i => i._id !== invitation._id)
+                    }
+                },
+            }
+        }
+
+
+        case "accept-request": 
+        case "reject-request": {
+            let { request, site } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        requests: userData.sites[site].requests.filter(i => i._id !== request._id)
+                    }
+                },
+            }
+        }
+
+
+        case "request-accepted": {
+            let { site, onlineMembers } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    ...site
+                },
+                onlineMembers: [...new Set([...userData.onlineMembers, ...onlineMembers])],
+                requests: userData.requests.filter(r => r._id !== Object.keys(site)[0]),
+            }
+        }
+
 
 
         case "invite-message": {
@@ -319,7 +343,7 @@ export default function UserDataReducer(userData, action) {
         }
 
 
-        case "join-project": {
+        case "accept-invitation": {
             return {
                 ...userData,
                 sites: {
