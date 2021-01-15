@@ -6,6 +6,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 10px;
 }
 
 .img {
@@ -15,6 +16,7 @@
 
 .box {
     display: flex;
+    flex-direction: column;
     width: 70px;
     flex-basis: auto;
     align-items: center;

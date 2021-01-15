@@ -14,7 +14,8 @@ export default function AuthenticationProvider(props) {
     const logIn = (user) => {
         setUser({
             ...user,
-            loggedIn: true
+            loggedIn: true,
+            newDesign: false
         })
     }
 
@@ -22,6 +23,18 @@ export default function AuthenticationProvider(props) {
         document.cookie = "x-auth-token= ; expires = Thu, 01 Jan 1970 00:00:00 GMT"
         setUser({
             loggedIn: false
+        })
+    }
+
+    const newDesign = () => {
+        setUser({
+            newDesign: true
+        })
+    }
+
+    const oldDesign = () => {
+        setUser({
+            newDesign: false
         })
     }
 
@@ -65,7 +78,7 @@ export default function AuthenticationProvider(props) {
     }, [])
 
     return (
-        <AuthenticationContext.Provider value={{ user, logIn, logOut }}>
+        <AuthenticationContext.Provider value={{ user, logIn, logOut, newDesign, oldDesign }}>
             {props.children}
         </AuthenticationContext.Provider>
     )
