@@ -13,15 +13,10 @@ const getUserData = async (id) => {
     }).populate({
         path: 'groups',
         select: 'name members site',
-        // populate: {
-        //     path: 'members site',
-        //     select: 'username name creator',
-        // },
         populate: [{
             path: 'members',
             select: 'username',
-        },
-        {
+        }, {
             path: 'site',
             select: 'name creator invitations requests',
             populate: {
@@ -87,24 +82,6 @@ const createPrivateMessage = async (sender, recipient, msg) => {
     }
 }
 
-// const joinGroup = async (uid, group) => {
-//     try {
-//         const newGroup = await Group.findOne({ name: group }).populate({ path: 'members', select: 'username' })
-//         if (newGroup === null) throw new Error('Group doesn\'t exist.')
-
-//         const members = newGroup.members.map(member => member._id)
-//         if (members.includes(uid)) throw new Error("You are already there.")
-
-//         if (newGroup.open === false) throw new Error("Group is private.") //todo
-
-//         await syncUserAndGroupData(uid, newGroup._id)
-//         return newGroup
-//     } catch (error) {
-//         console.error(error.message)
-//         return { error: error.message }
-//     }
-// }
-
 // add group id to user groups and user id to group members
 const syncUserAndProjectData = async (uid, gid, sid) => {
     try {
@@ -120,8 +97,7 @@ const syncUserAndProjectData = async (uid, gid, sid) => {
 const createSite = async (name, creator) => {
     const siteData = new Site({
         name,
-        creator,
-        members: [creator]
+        creator
     })
 
     try {
@@ -217,6 +193,31 @@ const inviteUser = async (username, siteID, siteCreator) => {
     }
 }
 
+const addUserToGroup = async (userID, siteID, groupID, adminID) => {
+    try {
+        // check if site is valid and site admin match
+        const siteData = await Site.findOne({ _id: siteID, creator: adminID })
+        if (siteData === null) throw new Error(`Site not found or admin mismatch. Site: ${siteID}. Admin: ${adminID}`)
+        // check if user is valid and exists
+        const userData = await User.findById(userID)
+        if (userData === null) throw new Error(`User ${userID} not found`)
+        // check if user is a member of project (project general group)
+        const generalGroup = await Group.findOne({ site: siteID, name: 'General' }, 'members')
+        if (!generalGroup.members.includes(userID)) throw new Error(`User ${userID} (${userData.username}) is not a member of project ${siteID} (${siteData.name})`)
+        // check if group exists and if user is not already a member of this group
+        const groupData = await Group.findOne({ _id: groupID, site: siteID }).populate({path: 'members', select: 'username'})
+        if (groupData === null) throw new Error(`Group ${groupID} in project ${siteID} not found`)
+        if (groupData.members.map(m => m._id).includes(userID)) throw new Error(`User ${userID} (${userData.username}) is already part of group ${groupID} (${groupData.name})`)
+
+        await User.findByIdAndUpdate(userID, { $addToSet: { groups: [groupID] } })
+        await Group.findByIdAndUpdate(groupID, { $addToSet: { members: [userID] } })
+        return { success: true, siteData, generalGroup, userData, groupData }
+    } catch (error) {
+        if (error.name === "CastError") return `CastError: ${error.message}`
+        return error.message
+    }
+}
+
 const requestJoin = async (siteName, userID) => {
     try {
         const site = await Site.findOne({ name: siteName })
@@ -291,10 +292,10 @@ module.exports = {
     removeChat,
     createPublicMessage,
     createPrivateMessage,
-    // joinGroup,
     createSite,
     createGroup,
     inviteUser,
+    addUserToGroup,
     requestJoin,
     acceptInvitation,
     cancelRequest,

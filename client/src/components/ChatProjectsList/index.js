@@ -27,9 +27,9 @@ const ChatProjectsList = () => {
     }
 
     function createSite() {
-        socket.emit("create-site", { site: newSite }, (success, data) => {
+        socket.emit("create-site", { site: newSite }, (success, siteData) => {
             if (success) {
-                dispatchUserData({ type: 'create-site', payload: { ...data } })
+                dispatchUserData({ type: 'create-site', payload: { siteData, activeConnection: true } })
             } else {
                 // if (data === "You are already there.") context.dispatchUserData({type: "load-site", payload: {site}})
                 // else console.log(data)

@@ -20,7 +20,7 @@ const Navigation = () => {
                 <Route exact path='/try' component={TryPage} />
                 <Route exact path='/login' component={LoginPage} />
                 <Route exact path='/register' component={RegisterPage} />
-                <Route path='/chat' component={ChatPage} />
+                <Route path='/chat' component={authContextObj.user.loggedIn ? ChatPage : LoginPage} />
                 <Route path='/newchat' component={ChatPageNewDesign} />
                 
             </Switch>

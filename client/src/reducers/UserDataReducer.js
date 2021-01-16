@@ -64,18 +64,18 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "create-site": { // create site and join general group
-            let { siteID, siteData, groupID } = action.payload
+            let { siteData, activeConnection } = action.payload
+            let activeSite = Object.keys(siteData)[0]
+            let activeGroup = Object.keys(siteData[activeSite].groups)[0]
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
-                    [siteID]: {
-                        ...siteData
-                    }
+                    ...siteData
                 },
-                activeSite: siteID,
-                activeGroup: groupID,
-                activeChat: false
+                ...(activeConnection) && { activeSite },
+                ...(activeConnection) && { activeGroup },
+                ...(activeConnection) && { activeChat: false }
             }
         }
 
@@ -109,15 +109,15 @@ export default function UserDataReducer(userData, action) {
 
         case "single-chat-message": {
             let timestamp = new Date().toLocaleTimeString()
-            let { user, msg, group } = action.payload
+            let { user, chat, msg } = action.payload
             return {
                 ...userData,
                 chats: {
                     ...userData.chats,
-                    [group]: {
-                        ...userData.chats[group],
+                    [chat]: {
+                        ...userData.chats[chat],
                         messages: [
-                            ...userData.chats[group].messages,
+                            ...userData.chats[chat].messages,
                             {
                                 user,
                                 msg,
@@ -167,7 +167,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        ...(userData.sites[site].invitations) && {invitations: userData.sites[site].invitations.filter(i => i._id !== user._id)},
+                        ...(userData.sites[site].invitations) && { invitations: userData.sites[site].invitations.filter(i => i._id !== user._id) },
                         groups: {
                             ...userData.sites[site].groups,
                             [group]: {
@@ -188,7 +188,7 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                ...(online) && {onlineMembers: [...new Set([...userData.onlineMembers, user._id])]}
+                ...(online) && { onlineMembers: [...new Set([...userData.onlineMembers, user._id])] }
             }
         }
 
@@ -257,7 +257,7 @@ export default function UserDataReducer(userData, action) {
         }
 
 
-        case "accept-request": 
+        case "accept-request":
         case "reject-request": {
             let { request, site } = action.payload
             return {
@@ -266,7 +266,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        requests: userData.sites[site].requests.filter(i => i._id !== request._id)
+                        requests: userData.sites[site].requests.filter(r => r._id !== request._id)
                     }
                 },
             }
@@ -287,6 +287,23 @@ export default function UserDataReducer(userData, action) {
         }
 
 
+        case 'added-to-group': {
+            let { site, group } = action.payload
+            console.log(group);
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        groups: {
+                            ...userData.sites[site].groups,
+                            ...group
+                        }
+                    }
+                },
+            }
+        }
 
         case "invite-message": {
             return {

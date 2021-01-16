@@ -51,14 +51,23 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('single-chat-message', ({ user, msg }) => {
-            dispatchUserData({type: 'single-chat-message', payload: { user: user.username, msg, group: user._id }})
+        socket.on('single-chat-message', ({ user, chat, msg }) => {
+            dispatchUserData({type: 'single-chat-message', payload: { user, chat, msg }})
             // updateNewMessages(user, user !== activeWindow)
         })
         return () => socket.off('single-chat-message')
     }, [socket])
 
 
+    useEffect(() => {
+        if (!socket) return
+        socket.on('create-site', siteData => {
+            dispatchUserData({type: 'create-site', payload: { siteData }})
+        })
+        return () => socket.off('create-site')
+    }, [socket])
+
+    
     useEffect(() => {
         if (!socket) return
         socket.on('invite-message', siteData => {
@@ -83,6 +92,16 @@ export default function MessagesContextProvider(props) {
             dispatchUserData({type: 'request-accepted', payload: { site, onlineMembers }})
         })
         return () => socket.off('request-accepted')
+    }, [socket])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('added-to-group', ({ site, group }) => {
+            console.log(group);
+            dispatchUserData({type: 'added-to-group', payload: { site, group }})
+        })
+        return () => socket.off('added-to-group')
     }, [socket])
 
     

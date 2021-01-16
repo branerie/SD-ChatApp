@@ -8,6 +8,7 @@ module.exports = io => {
     const userIDToSocketIDCache = {}
     const groupToSiteCache = {}
 
+    let socketsCount = 0
     let clientsCount = 0
 
     io.on("connect", async (socket) => {
@@ -40,15 +41,16 @@ module.exports = io => {
             socket.disconnect()
             return
         }
-        if (userIDToSocketIDCache[userData._id]) { // temporary dublicate connection fix
-            sysLog(`Connect @ ${socket.id}. Connection refused (Username already connected: ${data.username})`)
-            socket.disconnect()
-            return
-        }
+        // if (userIDToSocketIDCache[userData._id]) { // temporary dublicate connection fix
+        //     sysLog(`Connect @ ${socket.id}. Connection refused (Username already connected: ${data.username})`)
+        //     socket.disconnect()
+        //     return
+        // }
 
-        userIDToSocketIDCache[userData._id] = socket.id
-        clientsCount++
-        sysLog(`Connect @ ${socket.id} (${userData.username}). Total connections in pool: ${clientsCount}.`)
+        userIDToSocketIDCache[userData._id] = [...userIDToSocketIDCache[userData._id] || [], socket.id]
+        if (userIDToSocketIDCache[userData._id].length === 1) clientsCount++
+        socketsCount++
+        sysLog(`Connect @ ${socket.id} (${userData.username}). Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
 
         socket.username = userData.username // save username for a later use
 
@@ -110,7 +112,17 @@ module.exports = io => {
         userData.groups.forEach(({ _id, site }) => {
             _id = _id.toString()
             socket.join(_id)
-            socket.to(_id).emit("online-message", { user: { _id: userData._id.toString(), username: userData.username }, site: site._id, group: _id })
+            // send online status if first connection 
+            if (userIDToSocketIDCache[userData._id].length === 1) {
+                socket.to(_id).emit("online-message", {
+                    user: {
+                        _id: userData._id.toString(),
+                        username: userData.username
+                    },
+                    site: site._id,
+                    group: _id
+                })
+            }
         })
         reactUserData.onlineMembers = getOnlineMembers([...allMembers])
         // console.log(JSON.stringify(reactUserData, null, 4),"\n","reactUserData END")
@@ -119,22 +131,26 @@ module.exports = io => {
         // EVENT LISTENERS SECTION
         // Notify users on disconnect
         socket.on("disconnecting", (reason) => {
-            delete userIDToSocketIDCache[userData._id]
-            clientsCount--
-            sysLog(`Disconnect @ ${socket.id} (${userData.username}). Reason: ${reason}. Total connections in pool: ${clientsCount}.`)
-            // send message to user groups that he quit
-            socket.rooms.forEach(group => {
-                // console.log(group, groupToSiteCache[group]);      
-                socket.to(group).emit("quit-message", {
-                    user: {
-                        _id: userData._id.toString(),
-                        username: userData.username
-                    },
-                    reason,
-                    group,
-                    site: groupToSiteCache[group]
+            userIDToSocketIDCache[userData._id] = userIDToSocketIDCache[userData._id].filter(s => s !== socket.id)
+            socketsCount--
+
+            // send offline status if last connection
+            if (userIDToSocketIDCache[userData._id].length === 0) {
+                delete userIDToSocketIDCache[userData._id]
+                clientsCount--
+                socket.rooms.forEach(group => {
+                    socket.to(group).emit("quit-message", {
+                        user: {
+                            _id: userData._id.toString(),
+                            username: userData.username
+                        },
+                        reason,
+                        group,
+                        site: groupToSiteCache[group]
+                    })
                 })
-            })
+            }
+            sysLog(`Disconnect @ ${socket.id} (${userData.username}). Reason: ${reason}. Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
         })
 
         socket.on('disconnect', () => {
@@ -152,14 +168,33 @@ module.exports = io => {
 
         socket.on("single-chat-message", async ({ msg, recipient }, callback) => {
             let newMessage = await db.createPrivateMessage(userData._id, recipient, msg)
-            if (!newMessage) return // validate query
+            if (!newMessage) return // validate query            
 
+            // send message to all sockets associated with recipient if any
             if (userIDToSocketIDCache[recipient]) {
                 sysLog(`Message (private): ${userData.username} >> ${recipient}`)
-                io.to(userIDToSocketIDCache[recipient]).emit("single-chat-message", { user: { _id: userData._id.toString(), username: userData.username }, msg })
+                userIDToSocketIDCache[recipient].forEach(socketID => {
+                    io.to(socketID).emit("single-chat-message", {
+                        user: userData.username,
+                        chat: userData._id.toString(),
+                        msg
+                    })
+                })
             } else {
                 // send offline msg to DB if not in blacklist
                 sysLog(`Message (offline): ${userData.username} >> ${recipient}`)
+            }
+
+            // self-send message to rest of your sockets
+            if (userIDToSocketIDCache[userData._id].length > 1) {
+                let myConnections = userIDToSocketIDCache[userData._id].filter(s => s !== socket.id)
+                myConnections.forEach(socketID => {
+                    io.to(socketID).emit("single-chat-message", {
+                        user: userData.username,
+                        chat: recipient,
+                        msg
+                    })
+                })
             }
             callback()
         })
@@ -175,20 +210,30 @@ module.exports = io => {
                 groupToSiteCache[groupID] = request.siteID
                 socket.join(groupID)
                 const siteData = {
-                    name: site,
-                    creator: userData._id,
-                    groups: {
-                        [groupID]: {
-                            name: 'General',
-                            members: [{
-                                _id: userData._id,
-                                username: userData.username,
-                            }],
-                            messages: []
+                    [request.siteID] : {
+                        name: site,
+                        creator: userData._id,
+                        groups: {
+                            [groupID]: {
+                                name: 'General',
+                                members: [{
+                                    _id: userData._id,
+                                    username: userData.username,
+                                }],
+                                messages: []
+                            }
                         }
                     }
                 }
-                callback(true, { siteID: request.siteID, siteData, groupID })
+
+                // multiply devices connection check
+                if (userIDToSocketIDCache[userData._id].length > 1) {
+                    let myConnections = userIDToSocketIDCache[userData._id].filter(s => s !== socket.id)
+                    myConnections.forEach(socketID => {
+                        io.to(socketID).emit("create-site", siteData)
+                    })
+                }
+                callback(true, siteData)
             } else {
                 callback(false, request.message)
             }
@@ -222,6 +267,7 @@ module.exports = io => {
                     messages: []
                 }
                 callback(true, { groupID, groupData })
+                // multiply devices connection check
             } else {
                 callback(false, request.message)
             }
@@ -238,7 +284,54 @@ module.exports = io => {
             } else {
                 sysLog(`Invitation from ${userData.username} to ${user} for ${site} failed: ${inviteData}`)
             }
+        })
 
+        socket.on('add-user', async ({ user, site, group }) => {
+            if (user === '') return // stop this on client side also
+            const addedUser = await db.addUserToGroup(user, site, group, userData._id)
+            if (addedUser.success) {
+                let online = true
+                if (userIDToSocketIDCache[user]) {
+                    // user is online
+                    let userSocket = io.sockets.sockets.get(userIDToSocketIDCache[user])
+                    userSocket.join(group)
+                    userSocket.to(group).emit("join-message", {
+                        user: {
+                            _id: user,
+                            username: addedUser.userData.username,
+                        },
+                        online,
+                        site,
+                        group
+                    })
+                    let groupData = {
+                        [addedUser.groupData._id]: {
+                            name: addedUser.groupData.name,
+                            members: [
+                                ...addedUser.groupData.members,
+                                {
+                                    _id: user,
+                                    username: addedUser.userData.username,
+                                },
+                            ],
+                            messages: []
+                        }
+                    }
+                    userSocket.emit('added-to-group', { site, group: groupData })
+                } else {
+                    online = false
+                    io.to(group).emit("join-message", {
+                        user: {
+                            _id: user,
+                            username: addedUser.userData.username
+                        },
+                        online,
+                        site,
+                        group
+                    })
+                }
+            }
+            // console.log(addedUser);
         })
 
         socket.on("request-join", async ({ site }, callback) => {
