@@ -67,6 +67,15 @@ export default function MessagesContextProvider(props) {
         return () => socket.off('create-site')
     }, [socket])
 
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('create-group', ({site, groupData}) => {
+            dispatchUserData({type: 'create-group', payload: { site, groupData }})
+        })
+        return () => socket.off('create-group')
+    }, [socket])
+
     
     useEffect(() => {
         if (!socket) return

@@ -210,7 +210,7 @@ module.exports = io => {
                 groupToSiteCache[groupID] = request.siteID
                 socket.join(groupID)
                 const siteData = {
-                    [request.siteID] : {
+                    [request.siteID]: {
                         name: site,
                         creator: userData._id,
                         groups: {
@@ -225,7 +225,8 @@ module.exports = io => {
                         }
                     }
                 }
-
+                // active connection callback
+                callback(true, siteData)
                 // multiply devices connection check
                 if (userIDToSocketIDCache[userData._id].length > 1) {
                     let myConnections = userIDToSocketIDCache[userData._id].filter(s => s !== socket.id)
@@ -233,7 +234,6 @@ module.exports = io => {
                         io.to(socketID).emit("create-site", siteData)
                     })
                 }
-                callback(true, siteData)
             } else {
                 callback(false, request.message)
             }
@@ -258,16 +258,24 @@ module.exports = io => {
                 let groupID = request._id.toString()
                 socket.join(groupID)
                 const groupData = {
-                    // _id,
-                    name: group,
-                    members: [{
-                        _id: userData._id,
-                        username: userData.username,
-                    }],
-                    messages: []
+                    [groupID]: {
+                        name: group,
+                        members: [{
+                            _id: userData._id,
+                            username: userData.username,
+                        }],
+                        messages: []
+                    }
                 }
-                callback(true, { groupID, groupData })
+                // active connection callback
+                callback(true, groupData)
                 // multiply devices connection check
+                if (userIDToSocketIDCache[userData._id].length > 1) {
+                    let myConnections = userIDToSocketIDCache[userData._id].filter(s => s !== socket.id)
+                    myConnections.forEach(socketID => {
+                        io.to(socketID).emit("create-group", { site, groupData })
+                    })
+                }
             } else {
                 callback(false, request.message)
             }

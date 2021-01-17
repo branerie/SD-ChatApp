@@ -42,8 +42,9 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "join-group": { // create and join group
-            let { site, groupID, groupData } = action.payload
+        case "create-group": { // create group
+            let { site, groupData, activeConnection } = action.payload
+            let activeGroup = Object.keys(groupData)[0]
             return {
                 ...userData,
                 sites: {
@@ -52,14 +53,12 @@ export default function UserDataReducer(userData, action) {
                         ...userData.sites[site],
                         groups: {
                             ...userData.sites[site].groups,
-                            [groupID]: {
-                                ...groupData
-                            }
+                            ...groupData
                         }
                     }
                 },
-                activeGroup: groupID,
-                activeChat: false
+                ...(activeConnection) && { activeGroup },
+                ...(activeConnection) && { activeChat: false }
             }
         }
 
