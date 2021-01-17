@@ -186,7 +186,7 @@ const inviteUser = async (username, siteID, siteCreator) => {
 
         await Site.findByIdAndUpdate(siteID, { $addToSet: { invitations: [user._id] } })
         await User.findByIdAndUpdate(user._id, { $addToSet: { invitations: [site._id] } })
-        return { success: true, userID: user._id, siteData: { _id: site._id, name: site.name } }
+        return { success: true, userData: {_id: user._id, username }, siteData: { _id: site._id, name: site.name } }
 
     } catch (error) {
         return error.message

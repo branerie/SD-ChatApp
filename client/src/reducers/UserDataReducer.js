@@ -221,7 +221,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "invite-user": {
-            let { site, username, _id } = action.payload
+            let { user, site } = action.payload
             return {
                 ...userData,
                 sites: {
@@ -230,10 +230,7 @@ export default function UserDataReducer(userData, action) {
                         ...userData.sites[site],
                         invitations: [
                             ...userData.sites[site].invitations || [],
-                            {
-                                _id,
-                                username
-                            }
+                            user
                         ]
                     }
                 },

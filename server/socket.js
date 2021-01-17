@@ -23,7 +23,13 @@ module.exports = io => {
         }
 
         let userData = await db.getUserData(data.userID)
+        if (!userData) {  // overkill
+            sysLog(`Connect @ ${socket.id}. Connection refused (Unknown username: ${data.username})`)
+            socket.disconnect()
+            return
+        }
         // console.log(JSON.stringify(userData, null, 4))
+
         const reactUserData = {
             sites: {},
             chats: {},
@@ -36,17 +42,6 @@ module.exports = io => {
         if (userData.requests) reactUserData.requests = userData.requests
         const allMembers = new Set([userData._id])
 
-        if (!userData) {  // overkill
-            sysLog(`Connect @ ${socket.id}. Connection refused (Unknown username: ${data.username})`)
-            socket.disconnect()
-            return
-        }
-        // if (userIDToSocketIDCache[userData._id]) { // temporary dublicate connection fix
-        //     sysLog(`Connect @ ${socket.id}. Connection refused (Username already connected: ${data.username})`)
-        //     socket.disconnect()
-        //     return
-        // }
-
         userIDToSocketIDCache[userData._id] = [...userIDToSocketIDCache[userData._id] || [], socket.id]
         if (userIDToSocketIDCache[userData._id].length === 1) clientsCount++
         socketsCount++
@@ -54,7 +49,6 @@ module.exports = io => {
 
         socket.username = userData.username // save username for a later use
 
-        // let groupToSiteCache = {}
         userData.groups.forEach(({ _id, name, site, members }) => {
             members.map(m => allMembers.add(m._id))
             groupToSiteCache[_id] = site._id
@@ -116,7 +110,7 @@ module.exports = io => {
             if (userIDToSocketIDCache[userData._id].length === 1) {
                 socket.to(_id).emit("online-message", {
                     user: {
-                        _id: userData._id.toString(),
+                        _id: userData._id,
                         username: userData.username
                     },
                     site: site._id,
@@ -141,7 +135,7 @@ module.exports = io => {
                 socket.rooms.forEach(group => {
                     socket.to(group).emit("quit-message", {
                         user: {
-                            _id: userData._id.toString(),
+                            _id: userData._id,
                             username: userData.username
                         },
                         reason,
@@ -176,7 +170,7 @@ module.exports = io => {
                 userIDToSocketIDCache[recipient].forEach(socketID => {
                     io.to(socketID).emit("single-chat-message", {
                         user: userData.username,
-                        chat: userData._id.toString(),
+                        chat: userData._id,
                         msg
                     })
                 })
@@ -184,18 +178,7 @@ module.exports = io => {
                 // send offline msg to DB if not in blacklist
                 sysLog(`Message (offline): ${userData.username} >> ${recipient}`)
             }
-
-            // self-send message to rest of your sockets
-            if (userIDToSocketIDCache[userData._id].length > 1) {
-                let myConnections = userIDToSocketIDCache[userData._id].filter(s => s !== socket.id)
-                myConnections.forEach(socketID => {
-                    io.to(socketID).emit("single-chat-message", {
-                        user: userData.username,
-                        chat: recipient,
-                        msg
-                    })
-                })
-            }
+            restSocketsUpdate(userData._id, socket.id, "single-chat-message", { user: userData.username, chat: recipient, msg })
             callback()
         })
 
@@ -225,15 +208,8 @@ module.exports = io => {
                         }
                     }
                 }
-                // active connection callback
                 callback(true, siteData)
-                // multiply devices connection check
-                if (userIDToSocketIDCache[userData._id].length > 1) {
-                    let myConnections = userIDToSocketIDCache[userData._id].filter(s => s !== socket.id)
-                    myConnections.forEach(socketID => {
-                        io.to(socketID).emit("create-site", siteData)
-                    })
-                }
+                restSocketsUpdate(userData._id, socket.id, "create-site", siteData)
             } else {
                 callback(false, request.message)
             }
@@ -267,15 +243,8 @@ module.exports = io => {
                         messages: []
                     }
                 }
-                // active connection callback
                 callback(true, groupData)
-                // multiply devices connection check
-                if (userIDToSocketIDCache[userData._id].length > 1) {
-                    let myConnections = userIDToSocketIDCache[userData._id].filter(s => s !== socket.id)
-                    myConnections.forEach(socketID => {
-                        io.to(socketID).emit("create-group", { site, groupData })
-                    })
-                }
+                restSocketsUpdate(userData._id, socket.id, "create-group", { site, groupData })
             } else {
                 callback(false, request.message)
             }
@@ -284,11 +253,14 @@ module.exports = io => {
         socket.on("invite-user", async ({ user, site }, callback) => {
             const inviteData = await db.inviteUser(user, site, userData._id)
             if (inviteData.success) {
-                if (userIDToSocketIDCache[inviteData.userID]) {
-                    io.to(userIDToSocketIDCache[inviteData.userID]).emit('invite-message', inviteData.siteData)
+                if (userIDToSocketIDCache[inviteData.userData._id]) {
+                    userIDToSocketIDCache[inviteData.userData._id].forEach(socketID => {
+                        io.to(socketID).emit('invite-message', inviteData.siteData)
+                    })
                 }
                 sysLog(`${userData.username} invited ${user} to join ${site}`)
-                callback(true, inviteData.userID.toString())
+                callback(true, inviteData.userData)
+                restSocketsUpdate(userData._id, socket.id, "invite-user", { site, user: inviteData.userData })
             } else {
                 sysLog(`Invitation from ${userData.username} to ${user} for ${site} failed: ${inviteData}`)
             }
@@ -497,7 +469,16 @@ module.exports = io => {
 
     function getOnlineMembers(allMembers) {
         return allMembers.filter(m => userIDToSocketIDCache[m])
+    }
 
+    function restSocketsUpdate(uid, sid, event, data) {
+        // update rest connections when connected from multiply devices
+        if (userIDToSocketIDCache[uid].length > 1) {
+            let restSockets = userIDToSocketIDCache[uid].filter(socket => socket !== sid)
+            restSockets.forEach(socket => {
+                io.to(socket).emit(event, data)
+            })
+        }
     }
 }
 

@@ -8,14 +8,15 @@ const ChatGroupAddMember = () => {
     const [member, setMember] = useState('')
 
     function inviteMember() {
-        socket.emit("invite-user", {user: member, site: userData.activeSite}, (success, userID) => {
-            if (success) dispatchUserData({type: 'invite-user', payload: {site: userData.activeSite, username: member, _id: userID}})
+        let site = userData.activeSite
+        socket.emit("invite-user", { user: member, site }, (success, user) => {
+            if (success) dispatchUserData({ type: 'invite-user', payload: { user, site } })
         })
     }
 
     function addMember() { //todo
         console.log(member)
-        socket.emit("add-user", {user: member, site: userData.activeSite, group: userData.activeGroup}, (success, userID) => {
+        socket.emit("add-user", { user: member, site: userData.activeSite, group: userData.activeGroup }, (success, userID) => {
             // if (success) dispatchUserData({type: 'add-user', payload: {site: userData.activeSite, username: memberName, _id: userID}})
         })
     }
@@ -32,7 +33,7 @@ const ChatGroupAddMember = () => {
                     <button className="join-btn" onClick={inviteMember}>Invite</button>
                 </>
                 : <>
-                    <select onChange={e => {setMember(e.target.options[e.target.selectedIndex].getAttribute('uid'))}}>
+                    <select onChange={e => { setMember(e.target.options[e.target.selectedIndex].getAttribute('uid')) }}>
                         <option hidden value=""></option>
                         {restMembers.map(member => {
                             return (

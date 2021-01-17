@@ -33,7 +33,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('welcome-message', ({ userData }) => {
-            dispatchUserData({ type: "welcome-message", payload: { userData }})
+            dispatchUserData({ type: "welcome-message", payload: { userData } })
         })
         return () => socket.off('welcome-message')
     }, [socket])
@@ -42,7 +42,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('group-chat-message', ({ user, msg, group, site }) => {
-            dispatchUserData({type: 'group-chat-message', payload: { user, msg, site, group }})
+            dispatchUserData({ type: 'group-chat-message', payload: { user, msg, site, group } })
             // updateNewMessages(group, group !== activeWindow)
         })
         return () => socket.off('group-chat-message')
@@ -52,7 +52,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('single-chat-message', ({ user, chat, msg }) => {
-            dispatchUserData({type: 'single-chat-message', payload: { user, chat, msg }})
+            dispatchUserData({ type: 'single-chat-message', payload: { user, chat, msg } })
             // updateNewMessages(user, user !== activeWindow)
         })
         return () => socket.off('single-chat-message')
@@ -62,7 +62,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('create-site', siteData => {
-            dispatchUserData({type: 'create-site', payload: { siteData }})
+            dispatchUserData({ type: 'create-site', payload: { siteData } })
         })
         return () => socket.off('create-site')
     }, [socket])
@@ -70,17 +70,26 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('create-group', ({site, groupData}) => {
-            dispatchUserData({type: 'create-group', payload: { site, groupData }})
+        socket.on('create-group', ({ site, groupData }) => {
+            dispatchUserData({ type: 'create-group', payload: { site, groupData } })
         })
         return () => socket.off('create-group')
     }, [socket])
 
-    
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('invite-user', ({ site, user }) => {
+            dispatchUserData({ type: 'invite-user', payload: { site, user } })
+        })
+        return () => socket.off('invite-user')
+    }, [socket])
+
+
     useEffect(() => {
         if (!socket) return
         socket.on('invite-message', siteData => {
-            dispatchUserData({type: 'invite-message', payload: { siteData }})
+            dispatchUserData({ type: 'invite-message', payload: { siteData } })
         })
         return () => socket.off('invite-message')
     }, [socket])
@@ -89,7 +98,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('request-message', ({ site, username, _id }) => {
-            dispatchUserData({type: 'request-message', payload: { site, username, _id }})
+            dispatchUserData({ type: 'request-message', payload: { site, username, _id } })
         })
         return () => socket.off('request-message')
     }, [socket])
@@ -98,7 +107,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('request-accepted', ({ site, onlineMembers }) => {
-            dispatchUserData({type: 'request-accepted', payload: { site, onlineMembers }})
+            dispatchUserData({ type: 'request-accepted', payload: { site, onlineMembers } })
         })
         return () => socket.off('request-accepted')
     }, [socket])
@@ -108,16 +117,16 @@ export default function MessagesContextProvider(props) {
         if (!socket) return
         socket.on('added-to-group', ({ site, group }) => {
             console.log(group);
-            dispatchUserData({type: 'added-to-group', payload: { site, group }})
+            dispatchUserData({ type: 'added-to-group', payload: { site, group } })
         })
         return () => socket.off('added-to-group')
     }, [socket])
 
-    
+
     useEffect(() => {
         if (!socket) return
         socket.on('join-message', ({ user, online, site, group }) => {
-            dispatchUserData({type: 'join-message', payload: { user, online, site, group }})
+            dispatchUserData({ type: 'join-message', payload: { user, online, site, group } })
         })
         return () => socket.off('join-message')
     }, [socket])
@@ -126,7 +135,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('online-message', ({ user, site, group }) => {
-            dispatchUserData({type: 'online-message', payload: { user, site, group }})
+            dispatchUserData({ type: 'online-message', payload: { user, site, group } })
         })
         return () => socket.off('online-message')
     }, [socket])
@@ -135,7 +144,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('quit-message', ({ user, site, group, reason }) => {
-            dispatchUserData({type: 'quit-message', payload: { user, site, group, reason }})
+            dispatchUserData({ type: 'quit-message', payload: { user, site, group, reason } })
         })
         return () => socket.off('quit-message')
     }, [socket])
@@ -144,7 +153,7 @@ export default function MessagesContextProvider(props) {
     useEffect(() => {
         if (!socket) return
         socket.on('disconnect', (reason) => {
-            dispatchUserData({ type: "disconnect-message"})
+            dispatchUserData({ type: "disconnect-message" })
             // dispatchMessages({ type: "disconnect-message", payload: { reason } })
         })
         return () => socket.off('disconnect')
