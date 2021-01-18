@@ -19,19 +19,18 @@ const ProjectTreads = () => {
     })
 
     return (
-        <div className={styles['project-treads']}>
-            {/* <Tread title='Ship Design' />
-            <Tread title='Power Plant' />
-            <Tread title='3D Laser Scanning' /> */}
+        <ul className={styles['project-treads']}>
+
             {groups.map(([gid, group]) => {
                     let classList = []
                     if (gid === userData.activeGroup) classList.push("selected")
-                    // if (newMessages[gid] && gid !== userData.activeGroup) classList.push('new-messages')
                     return (
-                        <Tread title={group.name} />
+                        <li key={gid} className={styles['list']}>
+                            <Tread title={group.name} />
+                        </li>
                     )
                 })}
-        </div>
+        </ul>
     )
 }
 
