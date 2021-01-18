@@ -16,9 +16,10 @@ const ChatProjectPendingMembers = () => {
         console.log(invitation)
     }
 
-    function acceptRequest(request) {
-        socket.emit('accept-request', { request, site: userData.activeSite }, () => {
-            dispatchUserData({ type: 'accept-request', payload: { request, site: userData.activeSite } })
+    function acceptRequest(user) {
+        let site = userData.activeSite
+        socket.emit('accept-request', { user, site }, () => {
+            // dispatchUserData({ type: 'accept-request', payload: { request, site } })
         })
     }
 
@@ -53,14 +54,14 @@ const ChatProjectPendingMembers = () => {
 
             {userData.sites[userData.activeSite].requests && userData.sites[userData.activeSite].requests.length > 0 && (
                 <ul><span className='header'>Requests</span>
-                    {userData.sites[userData.activeSite].requests.map(request => {
+                    {userData.sites[userData.activeSite].requests.map(user => {
                         return (
-                            <li key={request._id}>
-                                <span>{request.username}</span>
+                            <li key={user._id}>
+                                <span>{user.username}</span>
                                 <div>
-                                    <button onClick={() => acceptRequest(request)}>Accept</button>
-                                    <button onClick={() => rejectRequest(request)}>Reject</button>
-                                    <span className="arrow down" onClick={() => showRequestInfo(request)}></span>
+                                    <button onClick={() => acceptRequest(user)}>Accept</button>
+                                    <button onClick={() => rejectRequest(user)}>Reject</button>
+                                    <span className="arrow down" onClick={() => showRequestInfo(user)}></span>
                                 </div>
                             </li>
                         )

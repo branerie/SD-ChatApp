@@ -422,34 +422,30 @@ module.exports = io => {
         })
 
 
-        socket.on('accept-request', async ({ request, site }, callback) => {
-            const requestData = await db.acceptRequest(site, request._id)
+        socket.on('accept-request', async ({ user, site }, callback) => {
+            const requestData = await db.acceptRequest(site, user._id, userData._id)
             if (requestData.success) {
-                let groupID = requestData.generalGroup._id.toString()
-                groupToSiteCache[groupID] = site
-                // if user is online send data
-                if (userIDToSocketIDCache[request._id]) {
-                    let userSocket = io.sockets.sockets.get(userIDToSocketIDCache[request._id])
-                    userSocket.join(groupID)
-                    userSocket.to(groupID).emit("join-message", {
-                        user: {
-                            _id: request._id.toString(),
-                            username: request.username,
-                        },
-                        online: true,
-                        site,
-                        group: groupID
-                    })
+                let group = requestData.generalGroup._id.toString()
+                groupToSiteCache[group] = site
+                let online = userIDToSocketIDCache[user._id] ? true : false
+                io.to(group).emit("join-message", {
+                    user,
+                    online,
+                    site,
+                    group
+                })
+                // if user is online send him data
+                if (online) {
                     let siteData = {
-                        [requestData.site._id]: {
+                        [site]: {
                             name: requestData.site.name,
                             creator: requestData.site.creator,
                             groups: {
-                                [requestData.generalGroup._id]: {
+                                [group]: {
                                     name: requestData.generalGroup.name,
                                     members: [
                                         ...requestData.generalGroup.members,
-                                        request
+                                        user
                                     ],
                                     messages: []
                                 }
@@ -459,20 +455,14 @@ module.exports = io => {
                     let memberIDs = requestData.generalGroup.members.map(m => m._id)
                     let onlineMembers = getOnlineMembers(memberIDs)
 
-                    userSocket.emit('request-accepted', { site: siteData, onlineMembers })
-                } else {
-                    io.to(groupID).emit("join-message", {
-                        user: {
-                            _id: request._id.toString(),
-                            username: request.username
-                        },
-                        online: false,
-                        site,
-                        group: groupID
+                    userIDToSocketIDCache[user._id].forEach(socket => {
+                        io.sockets.sockets.get(socket).join(group)
+                        io.sockets.sockets.get(socket).emit('request-accepted', { site: siteData, onlineMembers })
                     })
+
                 }
                 callback()
-                sysLog(`Join request from ${request.username} to join ${site} accepted by admin.`)
+                sysLog(`Join request from ${user.username} to join ${site} accepted by admin.`)
             }
         })
 

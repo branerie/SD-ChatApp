@@ -251,13 +251,13 @@ const acceptInvitation = async (siteID, userID) => {
     }
 }
 
-const acceptRequest = async (siteID, userID) => {
+const acceptRequest = async (siteID, userID, adminID) => {
     try {
-        const site = await Site.findById(siteID)
-        if (site === null) throw new Error(`${siteID} doesn't exist.`)
+        const site = await Site.findOne({ _id: siteID, creator: adminID })
+        if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${siteID}. Admin: ${adminID}`)
         if (!site.requests.includes(userID)) throw new Error(`User ${userID} didn't requested to join project ${siteID}`)
         const generalGroup = await Group.findOne({ site: siteID, name: "General" }).populate({ path: 'members', select: 'username' })
-        if (generalGroup.members.includes(userID)) throw new Error(`User is already a member.`)
+        if (generalGroup.members.map(m => m._id).includes(userID)) throw new Error(`You are already a member.`)
         await syncUserAndProjectData(userID, generalGroup._id, siteID)
         return { success: true, site, generalGroup } //? return data (group id,name and members)
     } catch (error) {

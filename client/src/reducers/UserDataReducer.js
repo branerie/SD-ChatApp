@@ -167,6 +167,7 @@ export default function UserDataReducer(userData, action) {
                     [site]: {
                         ...userData.sites[site],
                         ...(userData.sites[site].invitations) && { invitations: userData.sites[site].invitations.filter(i => i._id !== user._id) },
+                        ...(userData.sites[site].requests) && { requests: userData.sites[site].requests.filter(i => i._id !== user._id) },
                         groups: {
                             ...userData.sites[site].groups,
                             [group]: {
