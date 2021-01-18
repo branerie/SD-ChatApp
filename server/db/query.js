@@ -218,7 +218,7 @@ const addUserToGroup = async (userID, siteID, groupID, adminID) => {
     }
 }
 
-const requestJoin = async (siteName, userID) => {
+const sendRequest = async (siteName, userID) => {
     try {
         const site = await Site.findOne({ name: siteName })
         if (site === null) throw new Error(`${siteName} doesn't exist.`)
@@ -296,7 +296,7 @@ module.exports = {
     createGroup,
     inviteUser,
     addUserToGroup,
-    requestJoin,
+    sendRequest,
     acceptInvitation,
     cancelRequest,
     rejectInvitation,

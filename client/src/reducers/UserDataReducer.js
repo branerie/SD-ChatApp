@@ -311,12 +311,12 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "request-join": {
+        case "send-request": {
             return {
                 ...userData,
                 requests: [
                     ...userData.requests || [],
-                    action.payload.data
+                    action.payload.siteData
                 ]
             }
         }
@@ -336,7 +336,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "request-message": {
-            let { site, username, _id } = action.payload
+            let { site, user } = action.payload
             return {
                 ...userData,
                 sites: {
@@ -345,10 +345,7 @@ export default function UserDataReducer(userData, action) {
                         ...userData.sites[site],
                         requests: [
                             ...userData.sites[site].requests || [],
-                            {
-                                _id,
-                                username
-                            }
+                            user
                         ]
                     }
                 },

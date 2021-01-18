@@ -15,10 +15,10 @@ const ChatProjectsList = () => {
         dispatchUserData({ type: "load-site", payload: { site } })
     }
 
-    function requestJoin() {
-        socket.emit("request-join", { site: joinSite }, (success, data) => {
+    function sendRequest() {
+        socket.emit("send-request", joinSite , (success, siteData) => {
             if (success) {
-                dispatchUserData({ type: 'request-join', payload: { data } })
+                dispatchUserData({ type: 'send-request', payload: { siteData } })
             } else {
                 // if (data === "Already there") context.changeWindow(groupName, true)
                 // else console.log(data)
@@ -27,7 +27,7 @@ const ChatProjectsList = () => {
     }
 
     function createSite() {
-        socket.emit("create-site", { site: newSite }, (success, siteData) => {
+        socket.emit("create-site", newSite, (success, siteData) => {
             if (success) {
                 dispatchUserData({ type: 'create-site', payload: { siteData, activeConnection: true } })
             } else {
@@ -47,7 +47,7 @@ const ChatProjectsList = () => {
         <div>
             <div>
                 <input onChange={e => setJoinSite(e.target.value)} />
-                <button className="join-btn" onClick={requestJoin}>Join</button>
+                <button className="join-btn" onClick={sendRequest}>Join</button>
             </div>
             <h2>SITES</h2>
             <div>

@@ -186,7 +186,7 @@ module.exports = io => {
             await db.removeChat(userData._id, recipient)
         })
 
-        socket.on('create-site', async ({ site }, callback) => {
+        socket.on('create-site', async (site, callback) => {
             const request = await db.createSite(site, userData._id)
             if (request.success) {
                 let groupID = request.groupID.toString()
@@ -277,7 +277,7 @@ module.exports = io => {
             }
         })
 
-        socket.on('add-user', async ({ user, site, group }) => {
+        socket.on('add-member', async ({ user, site, group }) => {
             if (user === '') return // stop this on client side also
             const addedUser = await db.addUserToGroup(user, site, group, userData._id)
             if (addedUser.success) {
@@ -325,15 +325,21 @@ module.exports = io => {
             // console.log(addedUser);
         })
 
-        socket.on("request-join", async ({ site }, callback) => {
-            const request = await db.requestJoin(site, userData._id)
+        socket.on("send-request", async (site, callback) => {
+            const request = await db.sendRequest(site, userData._id)
+            let user = {
+                username: userData.username,
+                _id: userData._id
+            }
             if (request.success) {
                 if (userIDToSocketIDCache[request.site.creator]) {
-                    io.to(userIDToSocketIDCache[request.site.creator])
-                        .emit('request-message', { site: request.site._id, username: userData.username, _id: userData._id })
+                    userIDToSocketIDCache[request.site.creator].forEach(socket => {
+                        io.to(socket).emit('request-message', { site: request.site._id, user })
+                    })
                 }
                 sysLog(`${userData.username} request to join ${site}`)
                 callback(true, { _id: request.site._id, name: request.site.name })
+                restSocketsUpdate(userData._id, socket.id, 'send-request', { _id: request.site._id, name: request.site.name })
             } else {
                 sysLog(`Join request from ${userData.username} to ${site} failed: ${request}`)
             }
