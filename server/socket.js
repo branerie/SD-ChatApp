@@ -203,12 +203,17 @@ module.exports = io => {
                                     _id: userData._id,
                                     username: userData.username,
                                 }],
-                                messages: []
+                                messages: [{
+                                    user: 'SERVER',
+                                    timestamp: getTime(),
+                                    msg: `Hello ${userData.username}. Welcome to your new project: ${site}. You can invite members in General group or start creating groups now.`
+                                }]
                             }
                         }
                     }
                 }
                 callback(true, siteData)
+                restSocketsJoin(userData._id, socket.id, groupID)
                 restSocketsUpdate(userData._id, socket.id, "create-site", siteData)
             } else {
                 callback(false, request.message)
@@ -232,6 +237,7 @@ module.exports = io => {
             const request = await db.createGroup(site, group, userData._id)
             if (request.success) {
                 let groupID = request._id.toString()
+                groupToSiteCache[groupID] = site
                 socket.join(groupID)
                 const groupData = {
                     [groupID]: {
@@ -240,10 +246,15 @@ module.exports = io => {
                             _id: userData._id,
                             username: userData.username,
                         }],
-                        messages: []
+                        messages: [{
+                            user: 'SERVER',
+                            timestamp: getTime(),
+                            msg: `You have just created new group ${group} in your project. You can now start adding project members.`
+                        }]
                     }
                 }
                 callback(true, groupData)
+                restSocketsJoin(userData._id, socket.id, groupID)
                 restSocketsUpdate(userData._id, socket.id, "create-group", { site, groupData })
             } else {
                 callback(false, request.message)
@@ -329,31 +340,32 @@ module.exports = io => {
 
         })
 
-        socket.on('accept-invitation', async ({ _id, name }, callback) => {
-            const invitation = await db.acceptInvitation(_id, userData._id)
+        socket.on('accept-invitation', async (site, callback) => {
+            const invitation = await db.acceptInvitation(site, userData._id)
             if (invitation.success) {
-                let groupID = invitation.generalGroup._id.toString()
-                groupToSiteCache[groupID] = _id
-                socket.join(groupID)
-                socket.to(groupID).emit("join-message", {
-                    user: {
-                        _id: userData._id.toString(),
-                        username: userData.username
-                    },
+                let user = {
+                    _id: userData._id,
+                    username: userData.username
+                }
+                let group = invitation.generalGroup._id.toString()
+                groupToSiteCache[group] = site
+                socket.join(group)
+                socket.to(group).emit("join-message", {
+                    user,
                     online: true,
-                    site: _id,
-                    group: groupID
+                    site,
+                    group
                 })
                 let siteData = {
-                    [invitation.site._id]: {
+                    [site]: {
                         name: invitation.site.name,
                         creator: invitation.site.creator,
                         groups: {
-                            [invitation.generalGroup._id]: {
-                                name: invitation.generalGroup.name,
+                            [group]: {
+                                name: 'General',
                                 members: [
                                     ...invitation.generalGroup.members,
-                                    { _id: userData._id, username: userData.username }
+                                    user
                                 ],
                                 messages: []
                             }
@@ -365,9 +377,11 @@ module.exports = io => {
 
                 sysLog(`${userData.username} accepted invitation and joined ${invitation.site.name}`)
                 callback(true, { siteData, onlineMembers })
+                restSocketsJoin(userData._id, socket.id, group)
+                restSocketsUpdate(userData._id, socket.id, "accept-invitation", { siteData, onlineMembers })
             }
             else {
-                sysLog(`Join attempt from ${userData.username} to ${_id} failed: ${invitation}`)
+                sysLog(`Join attempt from ${userData.username} to ${site} failed: ${invitation}`)
             }
         })
 
@@ -477,6 +491,16 @@ module.exports = io => {
             let restSockets = userIDToSocketIDCache[uid].filter(socket => socket !== sid)
             restSockets.forEach(socket => {
                 io.to(socket).emit(event, data)
+            })
+        }
+    }
+
+    function restSocketsJoin(uid, sid, gid) {
+        // join rest connections when connected from multiply devices
+        if (userIDToSocketIDCache[uid].length > 1) {
+            let restSockets = userIDToSocketIDCache[uid].filter(socket => socket !== sid)
+            restSockets.forEach(socket => {
+                io.sockets.sockets.get(socket).join(gid)
             })
         }
     }

@@ -357,14 +357,20 @@ export default function UserDataReducer(userData, action) {
 
 
         case "accept-invitation": {
+            let { siteData, onlineMembers, activeConnection } = action.payload
+            let activeSite = Object.keys(siteData)[0]
+            let activeGroup = Object.keys(siteData[activeSite].groups)[0]
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
-                    ...action.payload.siteData
+                    ...siteData
                 },
-                invitations: userData.invitations.filter(i => i._id !== Object.keys(action.payload.siteData)[0]) || [],
-                onlineMembers: [...new Set([...userData.onlineMembers, ...action.payload.onlineMembers])]
+                invitations: userData.invitations.filter(i => i._id !== Object.keys(siteData)[0]) || [],
+                onlineMembers: [...new Set([...userData.onlineMembers, ...onlineMembers])],
+                ...(activeConnection) && { activeSite },
+                ...(activeConnection) && { activeGroup },
+                ...(activeConnection) && { activeChat: false }
             }
         }
 

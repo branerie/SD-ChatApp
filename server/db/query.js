@@ -243,7 +243,7 @@ const acceptInvitation = async (siteID, userID) => {
         if (site === null) throw new Error(`${siteID} doesn't exist.`)
         if (!site.invitations.includes(userID)) throw new Error(`User ${userID} doesn't have invitation for project ${siteID}`)
         const generalGroup = await Group.findOne({ site: siteID, name: "General" }).populate({ path: 'members', select: 'username' })
-        if (generalGroup.members.includes(userID)) throw new Error(`You are already a member.`)
+        if (generalGroup.members.map(m => m._id).includes(userID)) throw new Error(`You are already a member.`)
         await syncUserAndProjectData(userID, generalGroup._id, siteID)
         return { success: true, site, generalGroup } //? return data (group id,name and members)
     } catch (error) {

@@ -10,7 +10,7 @@ const ChatProjectsPendingList = () => {
     function acceptInvitation(invitation) {
         socket.emit('accept-invitation', invitation, (success, { siteData, onlineMembers }) => {
             if (success) {
-                dispatchUserData({ type: 'accept-invitation', payload: { siteData, onlineMembers } })
+                dispatchUserData({ type: 'accept-invitation', payload: { siteData, onlineMembers, activeConnection: true } })
             }
         })
     }
@@ -45,7 +45,7 @@ const ChatProjectsPendingList = () => {
                             <li key={invitation._id}>
                                 <span>{invitation.name}</span>
                                 <div>
-                                    <button onClick={() => acceptInvitation(invitation)}>Accept</button>
+                                    <button onClick={() => acceptInvitation(invitation._id)}>Accept</button>
                                     <button onClick={() => rejectInvitation(invitation)}>Reject</button>
                                     <span className="arrow down" onClick={() => showInvitationInfo(invitation)}></span>
                                 </div>

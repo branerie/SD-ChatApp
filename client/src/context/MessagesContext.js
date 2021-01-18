@@ -97,6 +97,15 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
+        socket.on('accept-invitation', ({ siteData, onlineMembers }) => {
+            dispatchUserData({ type: 'accept-invitation', payload: { siteData, onlineMembers } })
+        })
+        return () => socket.off('accept-invitation')
+    }, [socket])
+
+
+    useEffect(() => {
+        if (!socket) return
         socket.on('request-message', ({ site, username, _id }) => {
             dispatchUserData({ type: 'request-message', payload: { site, username, _id } })
         })
