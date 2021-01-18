@@ -26,18 +26,6 @@ export default function AuthenticationProvider(props) {
         })
     }
 
-    const newDesign = () => {
-        setUser({
-            newDesign: true
-        })
-    }
-
-    const oldDesign = () => {
-        setUser({
-            newDesign: false
-        })
-    }
-
     useEffect(() => {
         const token = getCookie('x-auth-token')
         const url = process.env.NODE_ENV === 'production' ? 'https://smartdesignchatapp.herokuapp.com/verify' : 'http://localhost:5000/verify'
@@ -78,7 +66,7 @@ export default function AuthenticationProvider(props) {
     }, [])
 
     return (
-        <AuthenticationContext.Provider value={{ user, logIn, logOut, newDesign, oldDesign }}>
+        <AuthenticationContext.Provider value={{ user, logIn, logOut}}>
             {props.children}
         </AuthenticationContext.Provider>
     )
