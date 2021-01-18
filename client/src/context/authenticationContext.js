@@ -14,7 +14,8 @@ export default function AuthenticationProvider(props) {
     const logIn = (user) => {
         setUser({
             ...user,
-            loggedIn: true
+            loggedIn: true,
+            newDesign: false
         })
     }
 
@@ -65,7 +66,7 @@ export default function AuthenticationProvider(props) {
     }, [])
 
     return (
-        <AuthenticationContext.Provider value={{ user, logIn, logOut }}>
+        <AuthenticationContext.Provider value={{ user, logIn, logOut}}>
             {props.children}
         </AuthenticationContext.Provider>
     )

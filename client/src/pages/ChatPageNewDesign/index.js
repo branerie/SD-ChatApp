@@ -6,7 +6,7 @@ import SocketContextProvider from '../../context/SocketContext'
 import MessagesContextProvider from '../../context/MessagesContext'
 import ProjectsList from '../../components/NewDesignComponents/ProjectsListBox/ProjectsList'
 import SelectedProject from '../../components/NewDesignComponents/SelectedProjectBox/SelectedProject'
-import ChatPage from '../../components/NewDesignComponents/ChatBox/'
+import ChatBox from '../../components/NewDesignComponents/ChatBox/'
 import ProfileInfoBox from '../../components/NewDesignComponents/ProfileInfoBox'
 import IsOpenedContext from '../../context/isOpened'
 
@@ -18,7 +18,7 @@ const ChatPageNewDesign = () => {
                     <div className={styles['chat-page-new-design']}>
                         <ProjectsList />
                         <SelectedProject />
-                        <ChatPage />
+                        <ChatBox />
                         <ProfileInfoBox />
                     </div>
                 </IsOpenedContext>

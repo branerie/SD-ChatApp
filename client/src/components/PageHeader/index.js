@@ -11,7 +11,7 @@ const PageHeader = () => {
     }
     return (
         <header className={styles['login-header']}>
-            <img src={logo} alt="Smart chat logo" onClick={goToHomePage}/>
+            <img src={logo} alt="Smart chat logo" onClick={()=>{goToHomePage()}}/>
             <HomePageNavigation />
         </header>
     )
