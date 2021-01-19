@@ -28,7 +28,7 @@ const ChatMessageInput = () => {
     }
 
     function attachMsg(recipientType, recipient, site) {
-        context.dispatchUserData({type: recipientType, payload: { user: ME, msg, site, group: recipient }})
+        context.dispatchUserData({type: recipientType, payload: { user: ME, msg, site, group: recipient, chat: recipient }})
         setMsg('')
     }
 

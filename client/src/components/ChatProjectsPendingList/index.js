@@ -7,32 +7,32 @@ const ChatProjectsPendingList = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
 
-    function acceptInvitation(invitation) {
-        socket.emit('accept-invitation', invitation, (success, { siteData, onlineMembers }) => {
+    function acceptInvitation(site) {
+        socket.emit('accept-invitation', site, (success, { siteData, onlineMembers }) => {
             if (success) {
-                dispatchUserData({ type: 'accept-invitation', payload: { siteData, onlineMembers } })
+                dispatchUserData({ type: 'invitation-accepted', payload: { siteData, onlineMembers, activeConnection: true } })
             }
         })
     }
 
-    function rejectInvitation(invitation) {
-        socket.emit('reject-invitation', invitation, () => {
-            dispatchUserData({ type: 'reject-invitation', payload: { invitation } })
+    function rejectInvitation(site) {
+        socket.emit('reject-invitation', site, () => {
+            // dispatchUserData({ type: 'reject-invitation', payload: { invitation } })
         })
     }
 
-    function showInvitationInfo(invitation) {
-        console.log(invitation)
+    function showInvitationInfo(site) {
+        console.log(site)
     }
 
-    function cancelRequest(request) {
-        socket.emit('cancel-request', request, () => {
-            dispatchUserData({ type: 'cancel-request', payload: { request } })
+    function cancelRequest(site) {
+        socket.emit('cancel-request', site, () => {
+            // dispatchUserData({ type: 'cancel-request', payload: { request } })
         })
     }
 
-    function showRequestInfo(request) {
-        console.log(request)
+    function showRequestInfo(site) {
+        console.log(site)
     }
 
     return (
@@ -40,14 +40,14 @@ const ChatProjectsPendingList = () => {
             <h2>pending</h2>
             {userData.invitations && userData.invitations.length > 0 && (
                 <ul><span className='header'>Invitations</span>
-                    {userData.invitations.map(invitation => {
+                    {userData.invitations.map(site => {
                         return (
-                            <li key={invitation._id}>
-                                <span>{invitation.name}</span>
+                            <li key={site._id}>
+                                <span>{site.name}</span>
                                 <div>
-                                    <button onClick={() => acceptInvitation(invitation)}>Accept</button>
-                                    <button onClick={() => rejectInvitation(invitation)}>Reject</button>
-                                    <span className="arrow down" onClick={() => showInvitationInfo(invitation)}></span>
+                                    <button onClick={() => acceptInvitation(site._id)}>Accept</button>
+                                    <button onClick={() => rejectInvitation(site._id)}>Reject</button>
+                                    <span className="arrow down" onClick={() => showInvitationInfo(site._id)}></span>
                                 </div>
                             </li>
                         )
@@ -57,13 +57,13 @@ const ChatProjectsPendingList = () => {
 
             {userData.requests && userData.requests.length > 0 && (
                 <ul><span className='header'>Requests</span>
-                    {userData.requests.map(request => {
+                    {userData.requests.map(site => {
                         return (
-                            <li key={request._id}>
-                                <span>{request.name}</span>
+                            <li key={site._id}>
+                                <span>{site.name}</span>
                                 <div>
-                                    <button onClick={() => cancelRequest(request)}>Cancel</button>
-                                    <span className="arrow down" onClick={() => showRequestInfo(request)}></span>
+                                    <button onClick={() => cancelRequest(site._id)}>Cancel</button>
+                                    <span className="arrow down" onClick={() => showRequestInfo(site._id)}></span>
                                 </div>
                             </li>
                         )

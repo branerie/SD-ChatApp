@@ -15,10 +15,10 @@ const ChatProjectsList = () => {
         dispatchUserData({ type: "load-site", payload: { site } })
     }
 
-    function requestJoin() {
-        socket.emit("request-join", { site: joinSite }, (success, data) => {
+    function sendRequest() {
+        socket.emit("send-request", joinSite , (success, siteData) => {
             if (success) {
-                dispatchUserData({ type: 'request-join', payload: { data } })
+                dispatchUserData({ type: 'add-site-to-requests', payload: { siteData } })
             } else {
                 // if (data === "Already there") context.changeWindow(groupName, true)
                 // else console.log(data)
@@ -27,9 +27,10 @@ const ChatProjectsList = () => {
     }
 
     function createSite() {
-        socket.emit("create-site", { site: newSite }, (success, data) => {
+        socket.emit("create-site", newSite, (success, siteData) => {
+
             if (success) {
-                dispatchUserData({ type: 'create-site', payload: { ...data } })
+                dispatchUserData({ type: 'create-site', payload: { siteData, activeConnection: true } })
             } else {
                 // if (data === "You are already there.") context.dispatchUserData({type: "load-site", payload: {site}})
                 // else console.log(data)
@@ -42,12 +43,12 @@ const ChatProjectsList = () => {
         // default sort: user sites first, then alphabetically
         return (B[1].creator === userData.personal._id) - (A[1].creator === userData.personal._id) || A[1].name.localeCompare(B[1].name)
     })
-
+    console.log(sites);
     return (
         <div>
             <div>
                 <input onChange={e => setJoinSite(e.target.value)} />
-                <button className="join-btn" onClick={requestJoin}>Join</button>
+                <button className="join-btn" onClick={sendRequest}>Join</button>
             </div>
             <h2>SITES</h2>
             <div>

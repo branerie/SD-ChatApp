@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import './index.css'
 import { MessagesContext } from '../../context/MessagesContext'
 import { AuthenticateUser } from '../../context/authenticationContext'
-import { useThemeContext }  from '../../context/ThemeContext'
 import {useHistory} from 'react-router-dom'
 
 const ChatHeader = () => {

@@ -1,13 +1,12 @@
 import React from 'react'
-import {ConfigProvider} from 'react-avatar'
+import { ConfigProvider } from 'react-avatar'
 
-const AvatarColors = (props) => {
+export default function AvatarColors(props) {
     const colors = [
         'lightblue',
         'lightgreen',
         'lightcyan'
     ]
-    
     return (
         <ConfigProvider colors={colors}>
             {props.children}
@@ -15,4 +14,3 @@ const AvatarColors = (props) => {
     )
 }
 
-export default AvatarColors
