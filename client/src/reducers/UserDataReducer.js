@@ -238,16 +238,15 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-
-        case "cancel-invitation": {
-            let { invitation, site } = action.payload
+        case "remove-user-from-site-invitations": {
+            let { user, site } = action.payload
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        invitations: userData.sites[site].invitations.filter(i => i._id !== invitation._id)
+                        invitations: userData.sites[site].invitations.filter(i => i._id !== user)
                     }
                 },
             }
@@ -286,7 +285,6 @@ export default function UserDataReducer(userData, action) {
 
         case 'added-to-group': {
             let { site, group } = action.payload
-            console.log(group);
             return {
                 ...userData,
                 sites: {
@@ -329,10 +327,10 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "reject-invitation": {
+        case "remove-site-from-invitations": {
             return {
                 ...userData,
-                invitations: userData.invitations.filter(i => i._id !== action.payload.invitation._id)
+                invitations: userData.invitations.filter(i => i._id !== action.payload.site)
             }
         }
 

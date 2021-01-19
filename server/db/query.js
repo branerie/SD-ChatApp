@@ -211,7 +211,7 @@ const addUserToGroup = async (userID, siteID, groupID, adminID) => {
 
         await User.findByIdAndUpdate(userID, { $addToSet: { groups: [groupID] } })
         await Group.findByIdAndUpdate(groupID, { $addToSet: { members: [userID] } })
-        return { success: true, siteData, generalGroup, userData, groupData }
+        return { success: true, userData, groupData }
     } catch (error) {
         if (error.name === "CastError") return `CastError: ${error.message}`
         return error.message
@@ -276,13 +276,29 @@ const cancelRequest = async (sid, uid) => {
 }
 
 const rejectInvitation = async (sid, uid) => {
-    await Site.findByIdAndUpdate(sid, { $pull: { invitations: uid } })
-    await User.findByIdAndUpdate(uid, { $pull: { invitations: sid } })
+    try {
+        const site = await Site.findById(sid)
+        if (site === null) throw new Error(`Site not found.`)
+        if (!site.invitations.includes(uid)) throw new Error(`User ${uid} doesn't have invitation for project ${sid}`)
+        await Site.findByIdAndUpdate(sid, { $pull: { invitations: uid } })
+        await User.findByIdAndUpdate(uid, { $pull: { invitations: sid } })
+        return {success: true, site }
+    } catch (error) {
+        return error.message
+    }
 }
 
-const cancelInvitation = async (sid, uid) => {
-    await Site.findByIdAndUpdate(sid, { $pull: { invitations: uid } })
-    await User.findByIdAndUpdate(uid, { $pull: { invitations: sid } })
+const cancelInvitation = async (sid, uid, aid) => {
+    try {
+        const site = await Site.findOne({ _id: sid, creator: aid })
+        if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${siteID}. Admin: ${adminID}`)
+        if (!site.invitations.includes(uid)) throw new Error(`User ${uid} doesn't have invitation for project ${sid}`)
+        await Site.findByIdAndUpdate(sid, { $pull: { invitations: uid } })
+        await User.findByIdAndUpdate(uid, { $pull: { invitations: sid } })
+        return { success: true, site }
+    } catch (error) {
+        return error.message
+    }
 }
 
 

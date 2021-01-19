@@ -1,6 +1,7 @@
 const jwt = require('./utils/jwt')
 const db = require('./db/query')
 const cookie = require("cookie")
+const site = require('./models/site')
 
 module.exports = io => {
     // cache keeps track of connected users by id and their assigned socket id
@@ -277,52 +278,39 @@ module.exports = io => {
             }
         })
 
-        socket.on('add-member', async ({ user, site, group }) => {
-            if (user === '') return // stop this on client side also
-            const addedUser = await db.addUserToGroup(user, site, group, userData._id)
-            if (addedUser.success) {
-                let online = true
-                if (userIDToSocketIDCache[user]) {
-                    // user is online
-                    let userSocket = io.sockets.sockets.get(userIDToSocketIDCache[user])
-                    userSocket.join(group)
-                    userSocket.to(group).emit("join-message", {
-                        user: {
-                            _id: user,
-                            username: addedUser.userData.username,
-                        },
-                        online,
-                        site,
-                        group
-                    })
+        socket.on('add-member', async ({ member, site, group }) => {
+            if (member === '') return // stop this on client side also
+            const memberData = await db.addUserToGroup(member, site, group, userData._id)
+            if (memberData.success) {
+                let online = userIDToSocketIDCache[member] ? true : false
+                let user = {
+                    _id: memberData.userData._id,
+                    username: memberData.userData.username
+                }
+                io.to(group).emit("join-message", {
+                    user,
+                    online,
+                    site,
+                    group
+                })
+
+                if (online) {
                     let groupData = {
-                        [addedUser.groupData._id]: {
-                            name: addedUser.groupData.name,
+                        [group]: {
+                            name: memberData.groupData.name,
                             members: [
-                                ...addedUser.groupData.members,
-                                {
-                                    _id: user,
-                                    username: addedUser.userData.username,
-                                },
+                                ...memberData.groupData.members,
+                                user
                             ],
                             messages: []
                         }
                     }
-                    userSocket.emit('added-to-group', { site, group: groupData })
-                } else {
-                    online = false
-                    io.to(group).emit("join-message", {
-                        user: {
-                            _id: user,
-                            username: addedUser.userData.username
-                        },
-                        online,
-                        site,
-                        group
+                    userIDToSocketIDCache[member].forEach(socket => {
+                        io.sockets.sockets.get(socket).join(group)
+                        io.sockets.sockets.get(socket).emit('added-to-group', { site, group: groupData })
                     })
                 }
             }
-            // console.log(addedUser);
         })
 
         socket.on("send-request", async (site, callback) => {
@@ -391,11 +379,22 @@ module.exports = io => {
             }
         })
 
-        socket.on('reject-invitation', async (invitation, callback) => {
-            await db.rejectInvitation(invitation._id, userData._id)
-            sysLog(`Invitation for ${userData.username} to join ${invitation.name} rejected by user.`)
-            // emit msg to admin to update project pending members list?
-            callback()
+        socket.on('reject-invitation', async (site, callback) => {
+            const data = await db.rejectInvitation(site, userData._id)
+            if (data.success) {
+                userIDToSocketIDCache[userData._id].forEach(socket => {
+                    io.to(socket).emit('remove-site-from-invitations', site)
+                })
+
+                // emit msg to admin to update project pending members list
+                if (userIDToSocketIDCache[data.site.creator]) {
+                    userIDToSocketIDCache[data.site.creator].forEach(socket => {
+                        io.to(socket).emit('remove-user-from-site-invitations', { user: userData._id, site })
+                    })
+                }
+            }
+            sysLog(`Invitation for ${userData._id} to join ${site} rejected by user.`)
+            // callback()
         })
 
         socket.on('cancel-request', async (request, callback) => {
@@ -406,12 +405,23 @@ module.exports = io => {
         })
 
 
-        socket.on('cancel-invitation', async ({ invitation, site }, callback) => {
+        socket.on('cancel-invitation', async ({ user, site }, callback) => {
             // check site creator and user id from socket
-            await db.cancelInvitation(site, invitation._id)
-            sysLog(`Invitation for ${invitation.username} to join ${site} canceled by admin.`)
-            // emit msg to user to update his pending projects list?
-            callback()
+            const data = await db.cancelInvitation(site, user, userData._id)
+            if (data.success) {
+                userIDToSocketIDCache[userData._id].forEach(socket => {
+                    io.to(socket).emit('remove-user-from-site-invitations', { user, site })
+                })
+
+                // emit msg to user to update his pending projects list
+                if (userIDToSocketIDCache[user]) {
+                    userIDToSocketIDCache[user].forEach(socket => {
+                        io.to(socket).emit('remove-site-from-invitations', site)
+                    })
+                }
+            }
+            sysLog(`Invitation for ${user} to join ${site} canceled by admin.`)
+            // callback()
         })
 
         socket.on('reject-request', async ({ site, request }, callback) => {
@@ -425,9 +435,9 @@ module.exports = io => {
         socket.on('accept-request', async ({ user, site }, callback) => {
             const requestData = await db.acceptRequest(site, user._id, userData._id)
             if (requestData.success) {
+                let online = userIDToSocketIDCache[user._id] ? true : false
                 let group = requestData.generalGroup._id.toString()
                 groupToSiteCache[group] = site
-                let online = userIDToSocketIDCache[user._id] ? true : false
                 io.to(group).emit("join-message", {
                     user,
                     online,

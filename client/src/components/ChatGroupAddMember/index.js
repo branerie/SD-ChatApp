@@ -14,9 +14,8 @@ const ChatGroupAddMember = () => {
         })
     }
 
-    function addMember() { //todo
-        console.log(member)
-        socket.emit("add-member", { user: member, site: userData.activeSite, group: userData.activeGroup }, (success, userID) => {
+    function addMember() {
+        socket.emit("add-member", { member, site: userData.activeSite, group: userData.activeGroup }, (success, userID) => {
             // if (success) dispatchUserData({type: 'add-member', payload: {site: userData.activeSite, username: memberName, _id: userID}})
         })
     }

@@ -6,9 +6,9 @@ const ChatProjectPendingMembers = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
 
-    function cancelInvitation(invitation) {
-        socket.emit('cancel-invitation', { invitation, site: userData.activeSite }, () => {
-            dispatchUserData({ type: 'cancel-invitation', payload: { invitation, site: userData.activeSite } })
+    function cancelInvitation(user) {
+        socket.emit('cancel-invitation', { user, site: userData.activeSite }, () => {
+            // dispatchUserData({ type: 'cancel-invitation', payload: { invitation, site: userData.activeSite } })
         })
     }
 
@@ -38,13 +38,13 @@ const ChatProjectPendingMembers = () => {
             <h2>Pending</h2>
             {userData.sites[userData.activeSite].invitations && userData.sites[userData.activeSite].invitations.length > 0 && (
                 <ul><span className='header'>Invitations</span>
-                    {userData.sites[userData.activeSite].invitations.map(invitation => {
+                    {userData.sites[userData.activeSite].invitations.map(user => {
                         return (
-                            <li key={invitation._id}>
-                                <span>{invitation.username}</span>
+                            <li key={user._id}>
+                                <span>{user.username}</span>
                                 <div>
-                                    <button onClick={() => cancelInvitation(invitation)}>Cancel</button>
-                                    <span className="arrow down" onClick={() => showInvitationInfo(invitation)}></span>
+                                    <button onClick={() => cancelInvitation(user._id)}>Cancel</button>
+                                    <span className="arrow down" onClick={() => showInvitationInfo(user._id)}></span>
                                 </div>
                             </li>
                         )

@@ -15,9 +15,9 @@ const ChatProjectsPendingList = () => {
         })
     }
 
-    function rejectInvitation(invitation) {
-        socket.emit('reject-invitation', invitation, () => {
-            dispatchUserData({ type: 'reject-invitation', payload: { invitation } })
+    function rejectInvitation(site) {
+        socket.emit('reject-invitation', site, () => {
+            // dispatchUserData({ type: 'reject-invitation', payload: { invitation } })
         })
     }
 
@@ -40,14 +40,14 @@ const ChatProjectsPendingList = () => {
             <h2>pending</h2>
             {userData.invitations && userData.invitations.length > 0 && (
                 <ul><span className='header'>Invitations</span>
-                    {userData.invitations.map(invitation => {
+                    {userData.invitations.map(site => {
                         return (
-                            <li key={invitation._id}>
-                                <span>{invitation.name}</span>
+                            <li key={site._id}>
+                                <span>{site.name}</span>
                                 <div>
-                                    <button onClick={() => acceptInvitation(invitation._id)}>Accept</button>
-                                    <button onClick={() => rejectInvitation(invitation)}>Reject</button>
-                                    <span className="arrow down" onClick={() => showInvitationInfo(invitation)}></span>
+                                    <button onClick={() => acceptInvitation(site._id)}>Accept</button>
+                                    <button onClick={() => rejectInvitation(site._id)}>Reject</button>
+                                    <span className="arrow down" onClick={() => showInvitationInfo(site._id)}></span>
                                 </div>
                             </li>
                         )
