@@ -3,9 +3,7 @@ import styles from './index.module.css'
 
 const TransparentBackground = (props) => {
     return (
-        <div className={styles['window']} onClick={()=>props.setBackgroundShown(false)}>
-            
-        </div>
+        <div className={styles['window']} onClick={()=>props.setBackgroundShown(false)} />
     )
 }
 
