@@ -397,14 +397,6 @@ module.exports = io => {
             // callback()
         })
 
-        socket.on('cancel-request', async (request, callback) => {
-            await db.cancelRequest(request._id, userData._id)
-            sysLog(`Join request from ${userData.username} to ${request.name} canceled by user.`)
-            // emit msg to admin to update project pending members list?
-            callback()
-        })
-
-
         socket.on('cancel-invitation', async ({ user, site }, callback) => {
             // check site creator and user id from socket
             const data = await db.cancelInvitation(site, user, userData._id)
@@ -424,15 +416,43 @@ module.exports = io => {
             // callback()
         })
 
-        socket.on('reject-request', async ({ site, request }, callback) => {
-            await db.rejectRequest(site, request._id)
-            sysLog(`Join request from ${request.username} to join ${site} rejected by admin.`)
-            // emit msg to user to update his pending projects list?
-            callback()
+        socket.on('reject-request', async ({ user, site }, callback) => { // admin
+            const data = await db.rejectRequest(site, user, userData._id)
+            if (data.success) {
+                userIDToSocketIDCache[userData._id].forEach(socket => {
+                    io.to(socket).emit('remove-user-from-site-requests', { user, site })
+                })
+
+                // emit msg to user to update his pending projects list
+                if (userIDToSocketIDCache[user]) {
+                    userIDToSocketIDCache[user].forEach(socket => {
+                        io.to(socket).emit('remove-site-from-requests', site)
+                    })
+                }
+            }
+            sysLog(`Join request from ${user} to join ${site} rejected by admin.`)
+            // callback()
         })
 
+        socket.on('cancel-request', async (site, callback) => { // user
+            const data = await db.cancelRequest(site, userData._id)
+            if (data.success) {
+                userIDToSocketIDCache[userData._id].forEach(socket => {
+                    io.to(socket).emit('remove-site-from-requests', site)
+                })
 
-        socket.on('accept-request', async ({ user, site }, callback) => {
+                // emit msg to admin to update project pending members list
+                if (userIDToSocketIDCache[data.site.creator]) {
+                    userIDToSocketIDCache[data.site.creator].forEach(socket => {
+                        io.to(socket).emit('remove-user-from-site-requests', { user: userData._id, site })
+                    })
+                }
+            }
+            sysLog(`Join request from ${userData._id} to ${site} canceled by user.`)
+            // callback()
+        })
+
+        socket.on('accept-request', async ({ user, site }, callback) => { // admin
             const requestData = await db.acceptRequest(site, user._id, userData._id)
             if (requestData.success) {
                 let online = userIDToSocketIDCache[user._id] ? true : false

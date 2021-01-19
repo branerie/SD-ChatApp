@@ -23,9 +23,9 @@ const ChatProjectPendingMembers = () => {
         })
     }
 
-    function rejectRequest(request) {
-        socket.emit('reject-request', { request, site: userData.activeSite }, () => {
-            dispatchUserData({ type: 'reject-request', payload: { request, site: userData.activeSite } })
+    function rejectRequest(user) {
+        socket.emit('reject-request', { user, site: userData.activeSite }, () => {
+            // dispatchUserData({ type: 'reject-request', payload: { request, site: userData.activeSite } })
         })
     }
 
@@ -60,8 +60,8 @@ const ChatProjectPendingMembers = () => {
                                 <span>{user.username}</span>
                                 <div>
                                     <button onClick={() => acceptRequest(user)}>Accept</button>
-                                    <button onClick={() => rejectRequest(user)}>Reject</button>
-                                    <span className="arrow down" onClick={() => showRequestInfo(user)}></span>
+                                    <button onClick={() => rejectRequest(user._id)}>Reject</button>
+                                    <span className="arrow down" onClick={() => showRequestInfo(user._id)}></span>
                                 </div>
                             </li>
                         )

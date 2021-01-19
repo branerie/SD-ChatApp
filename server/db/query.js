@@ -265,14 +265,31 @@ const acceptRequest = async (siteID, userID, adminID) => {
     }
 }
 
-const rejectRequest = async (sid, uid) => {
-    await Site.findByIdAndUpdate(sid, { $pull: { requests: uid } })
-    await User.findByIdAndUpdate(uid, { $pull: { requests: sid } })
+const rejectRequest = async (sid, uid, aid) => {
+    try {
+        const site = await Site.findOne({ _id: sid, creator: aid })
+        if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
+        if (!site.requests.includes(uid)) throw new Error(`User ${uid} didn't requested to join project ${sid}`)
+        await Site.findByIdAndUpdate(sid, { $pull: { requests: uid } })
+        await User.findByIdAndUpdate(uid, { $pull: { requests: sid } })
+        return { success: true }
+    } catch (error) {
+        return error.message
+    }
 }
 
 const cancelRequest = async (sid, uid) => {
-    await Site.findByIdAndUpdate(sid, { $pull: { requests: uid } })
-    await User.findByIdAndUpdate(uid, { $pull: { requests: sid } })
+    try {
+        const site = await Site.findById(sid)
+        if (site === null) throw new Error(`Site not found.`)
+        if (!site.requests.includes(uid)) throw new Error(`User ${uid} didn't requested to join project ${sid}`)
+        await Site.findByIdAndUpdate(sid, { $pull: { requests: uid } })
+        await User.findByIdAndUpdate(uid, { $pull: { requests: sid } })
+        return {success: true, site }
+    } catch (error) {
+        return error.message
+    }
+
 }
 
 const rejectInvitation = async (sid, uid) => {

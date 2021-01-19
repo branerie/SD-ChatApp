@@ -25,9 +25,9 @@ const ChatProjectsPendingList = () => {
         console.log(invitation)
     }
 
-    function cancelRequest(request) {
-        socket.emit('cancel-request', request, () => {
-            dispatchUserData({ type: 'cancel-request', payload: { request } })
+    function cancelRequest(site) {
+        socket.emit('cancel-request', site, () => {
+            // dispatchUserData({ type: 'cancel-request', payload: { request } })
         })
     }
 
@@ -57,13 +57,13 @@ const ChatProjectsPendingList = () => {
 
             {userData.requests && userData.requests.length > 0 && (
                 <ul><span className='header'>Requests</span>
-                    {userData.requests.map(request => {
+                    {userData.requests.map(site => {
                         return (
-                            <li key={request._id}>
-                                <span>{request.name}</span>
+                            <li key={site._id}>
+                                <span>{site.name}</span>
                                 <div>
-                                    <button onClick={() => cancelRequest(request)}>Cancel</button>
-                                    <span className="arrow down" onClick={() => showRequestInfo(request)}></span>
+                                    <button onClick={() => cancelRequest(site._id)}>Cancel</button>
+                                    <span className="arrow down" onClick={() => showRequestInfo(site._id)}></span>
                                 </div>
                             </li>
                         )

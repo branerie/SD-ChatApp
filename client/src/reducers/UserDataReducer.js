@@ -253,8 +253,7 @@ export default function UserDataReducer(userData, action) {
         }
 
 
-        case "accept-request":
-        case "reject-request": {
+        case "accept-request": {
             let { request, site } = action.payload
             return {
                 ...userData,
@@ -263,6 +262,20 @@ export default function UserDataReducer(userData, action) {
                     [site]: {
                         ...userData.sites[site],
                         requests: userData.sites[site].requests.filter(r => r._id !== request._id)
+                    }
+                },
+            }
+        }
+
+        case "remove-user-from-site-requests": {
+            let { user, site } = action.payload
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        requests: userData.sites[site].requests.filter(r => r._id !== user)
                     }
                 },
             }
@@ -320,10 +333,10 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "cancel-request": {
+        case "remove-site-from-requests": {
             return {
                 ...userData,
-                requests: userData.requests.filter(r => r._id !== action.payload.request._id)
+                requests: userData.requests.filter(r => r._id !== action.payload.site)
             }
         }
 

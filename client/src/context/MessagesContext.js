@@ -124,6 +124,24 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
+        socket.on('remove-site-from-requests', site => {
+            dispatchUserData({ type: 'remove-site-from-requests', payload: { site } })
+        })
+        return () => socket.off('remove-site-from-requests')
+    }, [socket])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('remove-user-from-site-requests', ({ user, site }) => {
+            dispatchUserData({ type: 'remove-user-from-site-requests', payload: { user, site } })
+        })
+        return () => socket.off('remove-user-from-site-requests')
+    }, [socket])
+
+
+    useEffect(() => {
+        if (!socket) return
         socket.on('send-request', siteData => {
             dispatchUserData({ type: 'send-request', payload: { siteData } })
         })
