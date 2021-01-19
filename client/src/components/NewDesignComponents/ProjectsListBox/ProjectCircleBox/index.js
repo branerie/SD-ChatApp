@@ -9,7 +9,6 @@ const ProjectCircleBox = () => {
     const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const [joinSite, setJoinSite] = useState()
-    const [newSite, setNewSite] = useState()
 
     function handleClick(e, site) {
         if (e.target.nodeName === 'BUTTON') return

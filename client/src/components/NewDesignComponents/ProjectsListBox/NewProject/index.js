@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect } from 'react'
-
 import styles from './index.module.css'
 import newProjectButton from '../../../../images/newProjectButton.svg'
 import settingsIconBig from '../../../../images/settingsIconBig.svg'

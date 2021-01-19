@@ -1,17 +1,33 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import styles from './index.module.css'
-
+import { MessagesContext } from '../../../../../context/MessagesContext'
+import { SocketContext } from '../../../../../context/SocketContext'
 
 const AddProject = () => {
-    const [projectName, setProjectName] = useState('')
+    const { userData, dispatchUserData } = useContext(MessagesContext)
+    const { socket } = useContext(SocketContext)
+    const [newSite, setNewSite] = useState()
+
+    function createSite() {
+        socket.emit("create-site", newSite, (success, siteData) => {
+
+            if (success) {
+                dispatchUserData({ type: 'create-site', payload: { siteData, activeConnection: true } })
+            } else {
+                // if (data === "You are already there.") context.dispatchUserData({type: "load-site", payload: {site}})
+                // else console.log(data)
+            }
+        })
+    }
+
     return (
         <div className={styles['window']}>
-            <form type="text" className={styles['form']} onSubmit={() => { }}>
+            <form type="text" className={styles['form']} onSubmit={createSite}>
                 <input
                     className={styles['input']}
                     placeholder="Enter project name..."
-                    value={projectName}
-                    onChange={e => setProjectName(e.target.value)}
+                    value={newSite}
+                    onChange={e => setNewSite(e.target.value)}
                 /> <br/>
                 <button className={styles['button']}>Create Project</button>
             </form>
