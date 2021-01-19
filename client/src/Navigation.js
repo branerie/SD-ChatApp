@@ -23,7 +23,9 @@ const Navigation = () => {
                 <Route exact path='/try' component={TryPage} />
                 <Route exact path='/login' component={LoginPage} />
                 <Route exact path='/register' component={RegisterPage} />
-                <Route exact path='/chat' component={ChatPage} />
+                <Route exact path='/chat' >
+                    {authContextObj.user.loggedIn ? (<ChatPage />) : (<Redirect to='/' />)}
+                </Route>
                 <Route exact path='/newchat' component={ChatPageNewDesign} />
             </Switch>
         </BrowserRouter>
