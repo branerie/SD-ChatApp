@@ -26,19 +26,11 @@ const ChatBox = () => {
                     }
                 })
             }
-            {
+            {/* {
                 treads.forEach(tread => {
-                    // if(context.openedTreads[tread]){
-                    //     console.log(context.openedTreads);
-                    //     flag= !flag
-                    //     return <CurrentChatWindow title={tread} />
-                    // }
-
                     context.openedTreads[tread] ? <CurrentChatWindow title={tread} /> : <div> </div>
-
-                    // return <CurrentChatWindow title={'tread'} />
                 })
-            }
+            } */}
 
         </div>
     )
