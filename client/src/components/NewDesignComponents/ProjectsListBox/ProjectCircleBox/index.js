@@ -27,24 +27,11 @@ const ProjectCircleBox = () => {
         })
     }
 
-    function createSite() {
-        socket.emit("create-site", { site: newSite }, (success, data) => {
-            if (success) {
-                dispatchUserData({ type: 'create-site', payload: { ...data } })
-            } else {
-                // if (data === "You are already there.") context.dispatchUserData({type: "load-site", payload: {site}})
-                // else console.log(data)
-            }
-        })
-    }
-
     if (!userData) return null //<div>Loading...</div>
     const sites = Object.entries(userData.sites).sort((A, B) => {
         // default sort: user sites first, then alphabetically
         return (B[1].creator === userData.personal._id) - (A[1].creator === userData.personal._id) || A[1].name.localeCompare(B[1].name)
     })
-
-
 
     return (
         <AvatarColors >
