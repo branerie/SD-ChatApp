@@ -4,7 +4,7 @@ import settingIcon from '../../../../images/settings.svg'
 
 
 const ProjectList = () => {
- 
+    
     return (
         <div className={styles['project-lsit']}>
             Project List
