@@ -10,7 +10,7 @@ const ChatProjectsPendingList = () => {
     function acceptInvitation(site) {
         socket.emit('accept-invitation', site, (success, { siteData, onlineMembers }) => {
             if (success) {
-                dispatchUserData({ type: 'accept-invitation', payload: { siteData, onlineMembers, activeConnection: true } })
+                dispatchUserData({ type: 'invitation-accepted', payload: { siteData, onlineMembers, activeConnection: true } })
             }
         })
     }
