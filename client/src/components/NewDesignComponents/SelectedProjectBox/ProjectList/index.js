@@ -6,6 +6,7 @@ import { MessagesContext } from '../../../../context/MessagesContext'
 const ProjectList = () => {
     const { userData } = useContext(MessagesContext)
     const site = userData.activeSite ? userData.sites[userData.activeSite].name : false
+
     return (
         <div className={styles['project-list']}>
             {site} 
