@@ -1,0 +1,12 @@
+.window {
+    width: 300px;
+    height: 150px;
+    background-color: lightgray;
+    border-radius: 15px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+  /* bring your own prefixes */
+    transform: translate(-50%, -50%);
+
+}

@@ -4,3 +4,7 @@
     overflow: auto;
     flex-grow: 1;
 }
+
+.list {
+    padding: 0px;
+}
