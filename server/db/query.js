@@ -291,11 +291,11 @@ const rejectInvitation = async (sid, uid) => {
 const cancelInvitation = async (sid, uid, aid) => {
     try {
         const site = await Site.findOne({ _id: sid, creator: aid })
-        if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${siteID}. Admin: ${adminID}`)
+        if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
         if (!site.invitations.includes(uid)) throw new Error(`User ${uid} doesn't have invitation for project ${sid}`)
         await Site.findByIdAndUpdate(sid, { $pull: { invitations: uid } })
         await User.findByIdAndUpdate(uid, { $pull: { invitations: sid } })
-        return { success: true, site }
+        return { success: true }
     } catch (error) {
         return error.message
     }
