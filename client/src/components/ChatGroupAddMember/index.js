@@ -9,8 +9,8 @@ const ChatGroupAddMember = () => {
 
     function inviteMember() {
         let site = userData.activeSite
-        socket.emit("invite-user", { user: member, site }, (success, user) => {
-            if (success) dispatchUserData({ type: 'invite-user', payload: { user, site } })
+        socket.emit("send-invitation", { user: member, site }, (success, user) => {
+            if (success) dispatchUserData({ type: 'add-user-to-site-invitations', payload: { user, site } })
         })
     }
 

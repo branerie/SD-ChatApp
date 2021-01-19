@@ -79,28 +79,28 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('invite-user', ({ site, user }) => {
-            dispatchUserData({ type: 'invite-user', payload: { site, user } })
+        socket.on('add-user-to-site-invitations', ({ site, user }) => {
+            dispatchUserData({ type: 'add-user-to-site-invitations', payload: { site, user } })
         })
-        return () => socket.off('invite-user')
+        return () => socket.off('add-user-to-site-invitations')
     }, [socket])
 
 
     useEffect(() => {
         if (!socket) return
-        socket.on('invite-message', siteData => {
-            dispatchUserData({ type: 'invite-message', payload: { siteData } })
+        socket.on('add-site-to-invitations', siteData => {
+            dispatchUserData({ type: 'add-site-to-invitations', payload: { siteData } })
         })
-        return () => socket.off('invite-message')
+        return () => socket.off('add-site-to-invitations')
     }, [socket])
 
 
     useEffect(() => {
         if (!socket) return
-        socket.on('accept-invitation', ({ siteData, onlineMembers }) => {
-            dispatchUserData({ type: 'accept-invitation', payload: { siteData, onlineMembers } })
+        socket.on('invitation-accepted', ({ siteData, onlineMembers }) => {
+            dispatchUserData({ type: 'invitation-accepted', payload: { siteData, onlineMembers } })
         })
-        return () => socket.off('accept-invitation')
+        return () => socket.off('invitation-accepted')
     }, [socket])
 
 
@@ -142,19 +142,19 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('send-request', siteData => {
-            dispatchUserData({ type: 'send-request', payload: { siteData } })
+        socket.on('add-site-to-requests', siteData => {
+            dispatchUserData({ type: 'add-site-to-requests', payload: { siteData } })
         })
-        return () => socket.off('send-request')
+        return () => socket.off('add-site-to-requests')
     }, [socket])
 
 
     useEffect(() => {
         if (!socket) return
-        socket.on('request-message', ({ site, user }) => {
-            dispatchUserData({ type: 'request-message', payload: { site, user } })
+        socket.on('add-user-to-site-requests', ({ site, user }) => {
+            dispatchUserData({ type: 'add-user-to-site-requests', payload: { site, user } })
         })
-        return () => socket.off('request-message')
+        return () => socket.off('add-user-to-site-requests')
     }, [socket])
 
 

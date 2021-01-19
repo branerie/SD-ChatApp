@@ -187,14 +187,14 @@ module.exports = io => {
             await db.removeChat(userData._id, recipient)
         })
 
-        socket.on('create-site', async (site, callback) => {
-            const request = await db.createSite(site, userData._id)
-            if (request.success) {
-                let groupID = request.groupID.toString()
-                groupToSiteCache[groupID] = request.siteID
+        socket.on('create-site', async (site, callback) => { //admin
+            const data = await db.createSite(site, userData._id)
+            if (data.success) {
+                let groupID = data.groupID.toString()
+                groupToSiteCache[groupID] = data.siteID
                 socket.join(groupID)
                 const siteData = {
-                    [request.siteID]: {
+                    [data.siteID]: {
                         name: site,
                         creator: userData._id,
                         groups: {
@@ -217,11 +217,11 @@ module.exports = io => {
                 restSocketsJoin(userData._id, socket.id, groupID)
                 restSocketsUpdate(userData._id, socket.id, "create-site", siteData)
             } else {
-                callback(false, request.message)
+                callback(false, data.message)
             }
         })
 
-        socket.on('create-group', async ({ site, group }, callback) => {
+        socket.on('create-group', async ({ site, group }, callback) => { //admin
             if (group === undefined) {
                 // Avoid db query but validate it in the schema with required flag. Also set this check on Client Side.
                 sysLog(`${userData._id} @ ${socket.id} attempt to create group with no name in ${site}`)
@@ -235,9 +235,9 @@ module.exports = io => {
                 callback(false, 'General is reserved name')
                 return
             }
-            const request = await db.createGroup(site, group, userData._id)
-            if (request.success) {
-                let groupID = request._id.toString()
+            const data = await db.createGroup(site, group, userData._id)
+            if (data.success) {
+                let groupID = data._id.toString()
                 groupToSiteCache[groupID] = site
                 socket.join(groupID)
                 const groupData = {
@@ -258,34 +258,144 @@ module.exports = io => {
                 restSocketsJoin(userData._id, socket.id, groupID)
                 restSocketsUpdate(userData._id, socket.id, "create-group", { site, groupData })
             } else {
-                callback(false, request.message)
+                callback(false, data.message)
             }
         })
 
-        socket.on("invite-user", async ({ user, site }, callback) => {
-            const inviteData = await db.inviteUser(user, site, userData._id)
-            if (inviteData.success) {
-                if (userIDToSocketIDCache[inviteData.userData._id]) {
-                    userIDToSocketIDCache[inviteData.userData._id].forEach(socketID => {
-                        io.to(socketID).emit('invite-message', inviteData.siteData)
+        socket.on("send-invitation", async ({ user, site }, callback) => { //admin
+            const data = await db.inviteUser(user, site, userData._id)
+            if (data.success) {
+                if (userIDToSocketIDCache[data.userData._id]) {
+                    userIDToSocketIDCache[data.userData._id].forEach(socketID => {
+                        io.to(socketID).emit('add-site-to-invitations', data.siteData)
                     })
                 }
                 sysLog(`${userData.username} invited ${user} to join ${site}`)
-                callback(true, inviteData.userData)
-                restSocketsUpdate(userData._id, socket.id, "invite-user", { site, user: inviteData.userData })
+                callback(true, data.userData)
+                restSocketsUpdate(userData._id, socket.id, "add-user-to-site-invitations", { site, user: data.userData })
             } else {
-                sysLog(`Invitation from ${userData.username} to ${user} for ${site} failed: ${inviteData}`)
+                sysLog(`Invitation from ${userData.username} to ${user} for ${site} failed: ${data}`)
+            }
+        })
+
+        socket.on("send-request", async (site, callback) => { // user
+            const data = await db.sendRequest(site, userData._id)
+            let user = {
+                username: userData.username,
+                _id: userData._id
+            }
+            if (data.success) {
+                if (userIDToSocketIDCache[data.site.creator]) {
+                    userIDToSocketIDCache[data.site.creator].forEach(socket => {
+                        io.to(socket).emit('add-user-to-site-requests', { site: data.site._id, user })
+                    })
+                }
+                sysLog(`${userData.username} request to join ${site}`)
+                callback(true, { _id: data.site._id, name: data.site.name })
+                restSocketsUpdate(userData._id, socket.id, 'add-site-to-requests', { _id: data.site._id, name: data.site.name })
+            } else {
+                sysLog(`Join request from ${userData.username} to ${site} failed: ${data}`)
+            }
+
+        })
+
+        socket.on('accept-invitation', async (site, callback) => {
+            const data = await db.acceptInvitation(site, userData._id)
+            if (data.success) {
+                let user = {
+                    _id: userData._id,
+                    username: userData.username
+                }
+                let group = data.generalGroup._id.toString()
+                groupToSiteCache[group] = site
+                socket.join(group)
+                socket.to(group).emit("join-message", {
+                    user,
+                    online: true,
+                    site,
+                    group
+                })
+                let siteData = {
+                    [site]: {
+                        name: data.site.name,
+                        creator: data.site.creator,
+                        groups: {
+                            [group]: {
+                                name: 'General',
+                                members: [
+                                    ...data.generalGroup.members,
+                                    user
+                                ],
+                                messages: []
+                            }
+                        }
+                    }
+                }
+                let memberIDs = data.generalGroup.members.map(m => m._id)
+                let onlineMembers = getOnlineMembers(memberIDs)
+
+                sysLog(`${userData.username} accepted invitation and joined ${data.site.name}`)
+                callback(true, { siteData, onlineMembers })
+                restSocketsJoin(userData._id, socket.id, group)
+                restSocketsUpdate(userData._id, socket.id, "invitation-accepted", { siteData, onlineMembers })
+            }
+            else {
+                sysLog(`Join attempt from ${userData.username} to ${site} failed: ${data}`)
+            }
+        })
+
+        socket.on('accept-request', async ({ user, site }, callback) => { // admin
+            const data = await db.acceptRequest(site, user._id, userData._id)
+            if (data.success) {
+                let online = userIDToSocketIDCache[user._id] ? true : false
+                let group = data.generalGroup._id.toString()
+                groupToSiteCache[group] = site
+                io.to(group).emit("join-message", {
+                    user,
+                    online,
+                    site,
+                    group
+                })
+                // if user is online send him data
+                if (online) {
+                    let siteData = {
+                        [site]: {
+                            name: data.site.name,
+                            creator: data.site.creator,
+                            groups: {
+                                [group]: {
+                                    name: data.generalGroup.name,
+                                    members: [
+                                        ...data.generalGroup.members,
+                                        user
+                                    ],
+                                    messages: []
+                                }
+                            }
+                        }
+                    }
+                    let memberIDs = data.generalGroup.members.map(m => m._id)
+                    let onlineMembers = getOnlineMembers(memberIDs)
+
+                    userIDToSocketIDCache[user._id].forEach(socket => {
+                        io.sockets.sockets.get(socket).join(group)
+                        io.sockets.sockets.get(socket).emit('request-accepted', { site: siteData, onlineMembers })
+                    })
+
+                }
+                // callback()
+                sysLog(`Join request from ${user.username} to join ${site} accepted by admin.`)
             }
         })
 
         socket.on('add-member', async ({ member, site, group }) => {
             if (member === '') return // stop this on client side also
-            const memberData = await db.addUserToGroup(member, site, group, userData._id)
-            if (memberData.success) {
+            const data = await db.addUserToGroup(member, site, group, userData._id)
+            if (data.success) {
                 let online = userIDToSocketIDCache[member] ? true : false
                 let user = {
-                    _id: memberData.userData._id,
-                    username: memberData.userData.username
+                    _id: data.userData._id,
+                    username: data.userData.username
                 }
                 io.to(group).emit("join-message", {
                     user,
@@ -297,9 +407,9 @@ module.exports = io => {
                 if (online) {
                     let groupData = {
                         [group]: {
-                            name: memberData.groupData.name,
+                            name: data.groupData.name,
                             members: [
-                                ...memberData.groupData.members,
+                                ...data.groupData.members,
                                 user
                             ],
                             messages: []
@@ -310,72 +420,6 @@ module.exports = io => {
                         io.sockets.sockets.get(socket).emit('added-to-group', { site, group: groupData })
                     })
                 }
-            }
-        })
-
-        socket.on("send-request", async (site, callback) => {
-            const request = await db.sendRequest(site, userData._id)
-            let user = {
-                username: userData.username,
-                _id: userData._id
-            }
-            if (request.success) {
-                if (userIDToSocketIDCache[request.site.creator]) {
-                    userIDToSocketIDCache[request.site.creator].forEach(socket => {
-                        io.to(socket).emit('request-message', { site: request.site._id, user })
-                    })
-                }
-                sysLog(`${userData.username} request to join ${site}`)
-                callback(true, { _id: request.site._id, name: request.site.name })
-                restSocketsUpdate(userData._id, socket.id, 'send-request', { _id: request.site._id, name: request.site.name })
-            } else {
-                sysLog(`Join request from ${userData.username} to ${site} failed: ${request}`)
-            }
-
-        })
-
-        socket.on('accept-invitation', async (site, callback) => {
-            const invitation = await db.acceptInvitation(site, userData._id)
-            if (invitation.success) {
-                let user = {
-                    _id: userData._id,
-                    username: userData.username
-                }
-                let group = invitation.generalGroup._id.toString()
-                groupToSiteCache[group] = site
-                socket.join(group)
-                socket.to(group).emit("join-message", {
-                    user,
-                    online: true,
-                    site,
-                    group
-                })
-                let siteData = {
-                    [site]: {
-                        name: invitation.site.name,
-                        creator: invitation.site.creator,
-                        groups: {
-                            [group]: {
-                                name: 'General',
-                                members: [
-                                    ...invitation.generalGroup.members,
-                                    user
-                                ],
-                                messages: []
-                            }
-                        }
-                    }
-                }
-                let memberIDs = invitation.generalGroup.members.map(m => m._id)
-                let onlineMembers = getOnlineMembers(memberIDs)
-
-                sysLog(`${userData.username} accepted invitation and joined ${invitation.site.name}`)
-                callback(true, { siteData, onlineMembers })
-                restSocketsJoin(userData._id, socket.id, group)
-                restSocketsUpdate(userData._id, socket.id, "accept-invitation", { siteData, onlineMembers })
-            }
-            else {
-                sysLog(`Join attempt from ${userData.username} to ${site} failed: ${invitation}`)
             }
         })
 
@@ -451,52 +495,6 @@ module.exports = io => {
             sysLog(`Join request from ${userData._id} to ${site} canceled by user.`)
             // callback()
         })
-
-        socket.on('accept-request', async ({ user, site }, callback) => { // admin
-            const requestData = await db.acceptRequest(site, user._id, userData._id)
-            if (requestData.success) {
-                let online = userIDToSocketIDCache[user._id] ? true : false
-                let group = requestData.generalGroup._id.toString()
-                groupToSiteCache[group] = site
-                io.to(group).emit("join-message", {
-                    user,
-                    online,
-                    site,
-                    group
-                })
-                // if user is online send him data
-                if (online) {
-                    let siteData = {
-                        [site]: {
-                            name: requestData.site.name,
-                            creator: requestData.site.creator,
-                            groups: {
-                                [group]: {
-                                    name: requestData.generalGroup.name,
-                                    members: [
-                                        ...requestData.generalGroup.members,
-                                        user
-                                    ],
-                                    messages: []
-                                }
-                            }
-                        }
-                    }
-                    let memberIDs = requestData.generalGroup.members.map(m => m._id)
-                    let onlineMembers = getOnlineMembers(memberIDs)
-
-                    userIDToSocketIDCache[user._id].forEach(socket => {
-                        io.sockets.sockets.get(socket).join(group)
-                        io.sockets.sockets.get(socket).emit('request-accepted', { site: siteData, onlineMembers })
-                    })
-
-                }
-                callback()
-                sysLog(`Join request from ${user.username} to join ${site} accepted by admin.`)
-            }
-        })
-
-
     })
 
     // function getGroupMembers(group, members) {

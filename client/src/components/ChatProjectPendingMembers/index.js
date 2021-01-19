@@ -12,13 +12,12 @@ const ChatProjectPendingMembers = () => {
         })
     }
 
-    function showInvitationInfo(invitation) {
-        console.log(invitation)
+    function showInvitationInfo(user) {
+        console.log(user)
     }
 
     function acceptRequest(user) {
-        let site = userData.activeSite
-        socket.emit('accept-request', { user, site }, () => {
+        socket.emit('accept-request', { user, site: userData.activeSite }, () => {
             // dispatchUserData({ type: 'accept-request', payload: { request, site } })
         })
     }
@@ -29,8 +28,8 @@ const ChatProjectPendingMembers = () => {
         })
     }
 
-    function showRequestInfo(request) {
-        console.log(request)
+    function showRequestInfo(user) {
+        console.log(user)
     }
 
     return (

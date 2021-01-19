@@ -18,7 +18,7 @@ const ChatProjectsList = () => {
     function sendRequest() {
         socket.emit("send-request", joinSite , (success, siteData) => {
             if (success) {
-                dispatchUserData({ type: 'send-request', payload: { siteData } })
+                dispatchUserData({ type: 'add-site-to-requests', payload: { siteData } })
             } else {
                 // if (data === "Already there") context.changeWindow(groupName, true)
                 // else console.log(data)

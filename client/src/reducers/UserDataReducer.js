@@ -221,7 +221,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "invite-user": {
+        case "add-user-to-site-invitations": {
             let { user, site } = action.payload
             return {
                 ...userData,
@@ -252,20 +252,6 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-
-        case "accept-request": {
-            let { request, site } = action.payload
-            return {
-                ...userData,
-                sites: {
-                    ...userData.sites,
-                    [site]: {
-                        ...userData.sites[site],
-                        requests: userData.sites[site].requests.filter(r => r._id !== request._id)
-                    }
-                },
-            }
-        }
 
         case "remove-user-from-site-requests": {
             let { user, site } = action.payload
@@ -313,7 +299,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "invite-message": {
+        case "add-site-to-invitations": {
             return {
                 ...userData,
                 invitations: [
@@ -323,7 +309,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "send-request": {
+        case "add-site-to-requests": {
             return {
                 ...userData,
                 requests: [
@@ -347,7 +333,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "request-message": {
+        case "add-user-to-site-requests": {
             let { site, user } = action.payload
             return {
                 ...userData,
@@ -365,7 +351,7 @@ export default function UserDataReducer(userData, action) {
         }
 
 
-        case "accept-invitation": {
+        case "invitation-accepted": {
             let { siteData, onlineMembers, activeConnection } = action.payload
             let activeSite = Object.keys(siteData)[0]
             let activeGroup = Object.keys(siteData[activeSite].groups)[0]

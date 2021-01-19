@@ -7,8 +7,8 @@ const ChatProjectsPendingList = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
 
-    function acceptInvitation(invitation) {
-        socket.emit('accept-invitation', invitation, (success, { siteData, onlineMembers }) => {
+    function acceptInvitation(site) {
+        socket.emit('accept-invitation', site, (success, { siteData, onlineMembers }) => {
             if (success) {
                 dispatchUserData({ type: 'accept-invitation', payload: { siteData, onlineMembers, activeConnection: true } })
             }
@@ -21,8 +21,8 @@ const ChatProjectsPendingList = () => {
         })
     }
 
-    function showInvitationInfo(invitation) {
-        console.log(invitation)
+    function showInvitationInfo(site) {
+        console.log(site)
     }
 
     function cancelRequest(site) {
@@ -31,8 +31,8 @@ const ChatProjectsPendingList = () => {
         })
     }
 
-    function showRequestInfo(request) {
-        console.log(request)
+    function showRequestInfo(site) {
+        console.log(site)
     }
 
     return (
