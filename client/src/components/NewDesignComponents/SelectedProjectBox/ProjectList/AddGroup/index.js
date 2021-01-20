@@ -3,7 +3,7 @@ import styles from './index.module.css'
 import { MessagesContext } from '../../../../../context/MessagesContext'
 import { SocketContext } from '../../../../../context/SocketContext'
 
-const AddProject = () => {
+const AddGroup = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
     const [groupName, setGroupName] = useState()
@@ -35,4 +35,4 @@ const AddProject = () => {
     )
 }
 
-export default AddProject
+export default AddGroup
