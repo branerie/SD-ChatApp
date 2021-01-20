@@ -59,9 +59,12 @@ const createPublicMessage = async (sender, recipient, msg) => {
     }
 }
 
-const removeChat = async (id, recipient) => {
-    let chat = await User.findOne({ username: recipient }, '_id')
-    await User.findByIdAndUpdate(id, { $pullAll: { chats: [chat._id] } })
+const removeChat = async (id, chat) => {
+    try {
+        await User.findByIdAndUpdate(id, { $pullAll: { chats: [chat] } })        
+    } catch (error) {
+        console.error(error.message);
+    }
 }
 
 const createPrivateMessage = async (sender, recipient, msg) => {

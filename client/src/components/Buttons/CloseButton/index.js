@@ -3,19 +3,16 @@ import './index.css'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 
-const CloseButton = ({ name, type, item }) => {
-    const { updateChats, changeWindow } = useContext(MessagesContext)
+const CloseButton = ({ chat, lastActive }) => {
+    const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
+
     function handleClick() {
-        if (type === 'chat') {
-            changeWindow("STATUS", false)
-            updateChats(item, 'close')
-            socket.emit('close-chat', item)
-        }
-        // else >>> group : Leave group logic
+            socket.emit('close-chat', chat)
+            dispatchUserData({ type: 'close-chat', payload: { chat, lastActive } })
     }
     return (
-        <button className='close-btn' onClick={handleClick}>{name}</button>
+        <button className='close-btn' onClick={handleClick}>X</button>
     )
 }
 
