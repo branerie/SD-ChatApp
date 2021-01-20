@@ -5,7 +5,7 @@ import { SocketContext } from '../../context/SocketContext'
 
 const ChatMessageInput = () => {
     const [msg, setMsg] = useState('')
-    const context = useContext(MessagesContext)
+    const { userData, dispatchUserData} = useContext(MessagesContext)
     const { socket, ME } = useContext(SocketContext)
     const messageRef = useRef()
 
@@ -13,24 +13,28 @@ const ChatMessageInput = () => {
         e.preventDefault()
 
         let recipientType, recipient, site
-        if (context.userData.activeChat) {
+        if (userData.activeChat) {
             recipientType = 'single-chat-message'
-            recipient = context.userData.activeChat
+            recipient = userData.activeChat
             site = null
         } else {
             recipientType = 'group-chat-message'
-            recipient = context.userData.activeGroup
-            site = context.userData.activeSite
+            recipient = userData.activeGroup
+            site = userData.activeSite
         }
 
-        socket.emit(recipientType, { site, recipient, msg }, () => attachMsg(recipientType, recipient, site))
+        socket.emit(recipientType, { site, recipient, msg }, () => {
+            setMsg('')
+            if (recipient === userData.personal._id) return
+            dispatchUserData({type: recipientType, payload: { user: ME, msg, site, group: recipient, chat: recipient }})
+        })
         return
     }
 
-    function attachMsg(recipientType, recipient, site) {
-        context.dispatchUserData({type: recipientType, payload: { user: ME, msg, site, group: recipient, chat: recipient }})
-        setMsg('')
-    }
+    // function attachMsg(recipientType, recipient, site) {
+    //     dispatchUserData({type: recipientType, payload: { user: ME, msg, site, group: recipient, chat: recipient }})
+    //     setMsg('')
+    // }
 
     useEffect(() => messageRef.current.focus())
 

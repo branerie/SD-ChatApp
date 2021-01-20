@@ -179,12 +179,12 @@ module.exports = io => {
                 // send offline msg to DB if not in blacklist
                 sysLog(`Message (offline): ${userData.username} >> ${recipient}`)
             }
-            restSocketsUpdate(userData._id, socket.id, "single-chat-message", { user: userData.username, chat: recipient, msg })
+            if (recipient !== userData._id.toString()) restSocketsUpdate(userData._id, socket.id, "single-chat-message", { user: userData.username, chat: recipient, msg })
             callback()
         })
 
-        socket.on("close-chat", async (recipient) => {
-            await db.removeChat(userData._id, recipient)
+        socket.on("close-chat", async chat => {
+            await db.removeChat(userData._id, chat)
         })
 
         socket.on('create-site', async (site, callback) => { //admin

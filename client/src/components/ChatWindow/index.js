@@ -23,8 +23,8 @@ const ChatWindow = () => {
         messages = [{ 
             user: "SERVER", 
             msg: `Welcome to SmartChat Network ${context.userData.personal.username}.
-            It seems like you don't have any membership yet.\n
-            Add or join a project from left menu.`, 
+            If you don't have any membership yet,
+            you can create your own projects or join an existing project from the menu on the left.`, 
             timestamp: new Date().toLocaleTimeString()
         }]
     }
