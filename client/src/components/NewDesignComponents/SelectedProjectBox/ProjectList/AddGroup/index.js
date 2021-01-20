@@ -25,7 +25,7 @@ const AddProject = () => {
             <form type="text" className={styles['form']} onSubmit={createGroup}>
                 <input
                     className={styles['input']}
-                    placeholder="Enter project name..."
+                    placeholder="Enter group name..."
                     value={groupName}
                     onChange={e => setGroupName(e.target.value)}
                 /> <br/>
