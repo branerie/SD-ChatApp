@@ -30,6 +30,7 @@ const ChatsPrivateList = () => {
                             className={`
                                     ${chat === userData.activeChat ? "selected" : ""}
                                     ${chats[chat].unread && chat !== userData.activeChat ? 'new-messages' : ''}
+                                    ${userData.onlineMembers.includes(chat) ? "online" : "offline"}
                                     `}
                             onClick={(e) => handleClick(e, chat)}>
                             <span>{chats[chat].username}</span>
