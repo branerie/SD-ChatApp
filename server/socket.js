@@ -41,7 +41,7 @@ module.exports = io => {
         }
         if (userData.invitations) reactUserData.invitations = userData.invitations
         if (userData.requests) reactUserData.requests = userData.requests
-        const allMembers = new Set([userData._id])
+        const allMembers = new Set([userData._id.toString()])
 
         userIDToSocketIDCache[userData._id] = [...userIDToSocketIDCache[userData._id] || [], socket.id]
         if (userIDToSocketIDCache[userData._id].length === 1) clientsCount++
@@ -51,7 +51,7 @@ module.exports = io => {
         socket.username = userData.username // save username for a later use
 
         userData.groups.forEach(({ _id, name, site, members }) => {
-            members.map(m => allMembers.add(m._id))
+            members.map(m => allMembers.add(m._id.toString()))
             groupToSiteCache[_id] = site._id
             if (!reactUserData.sites[site._id]) {
                 reactUserData.sites[site._id] = {
