@@ -13,14 +13,14 @@ const ProjectList = () => {
 
     return (
         <div className={styles['project-list']}>
-            {site} 
+            {site}
             <img src={smallPlus} alt="Create Group" className={styles['plus-icon']} onClick={() => setBackgroundShown(true)} />
-            <img src={settingIcon} alt="Settings Icon" className={styles['settings-icon']}   />
+            <img src={settingIcon} alt="Settings Icon" className={styles['settings-icon']} />
             <div>
                 {backgroundShown ? <AddGroup /> : <div />}
             </div>
             <div>
-                {backgroundShown ? <TransparentBackground setBackgroundShown={setBackgroundShown}/> : <div />}
+                {backgroundShown ? <TransparentBackground setBackgroundShown={setBackgroundShown} /> : <div />}
             </div>
         </div>
     )
