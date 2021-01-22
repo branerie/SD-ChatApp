@@ -26,7 +26,9 @@ const Navigation = () => {
                 <Route exact path='/chat' >
                     {authContextObj.user.loggedIn ? (<ChatPage />) : (<Redirect to='/' />)}
                 </Route>
-                <Route exact path='/newchat' component={ChatPageNewDesign} />
+                <Route exact path='/newchat' >
+                    {authContextObj.user.loggedIn ? (<ChatPageNewDesign />) : (<Redirect to='/' />)}
+                </Route>
             </Switch>
         </BrowserRouter>
     )
