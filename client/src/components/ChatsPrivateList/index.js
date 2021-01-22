@@ -1,18 +1,24 @@
-import React, { useContext } from 'react'
+import React, { useContext, useRef, useEffect } from 'react'
 // import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
 import CloseButton from '../Buttons/CloseButton'
 
 const ChatsPrivateList = () => {
-    const context = useContext(MessagesContext)
+    const { userData, dispatchUserData } = useContext(MessagesContext)
+
+    const prevActive = useRef()
+    useEffect(() => {
+        let { activeSite, activeGroup , activeChat } = userData
+        prevActive.current = { activeSite, activeGroup , activeChat }
+    })
 
     function handleClick(e, chat) {
         if (e.target.nodeName === 'BUTTON') return
-        context.dispatchUserData({type: "load-chat", payload: {chat}})
+        dispatchUserData({type: "load-chat", payload: {chat}})
     }
 
-    if (!context.userData) return null //<div>Loading...</div>
-    const chats = context.userData.chats
+    if (!userData) return null //<div>Loading...</div>
+    const chats = userData.chats
     
     return (
         <div>
@@ -22,12 +28,12 @@ const ChatsPrivateList = () => {
                     return (
                         <li key={chat}
                             className={`
-                                    ${chat === context.userData.activeChat ? "selected" : ""}
-                                    ${context.newMessages[chat] && chat !== context.activeWindow ? 'new-messages' : ''}
+                                    ${chat === userData.activeChat ? "selected" : ""}
+                                    ${chats[chat].unread && chat !== userData.activeChat ? 'new-messages' : ''}
                                     `}
                             onClick={(e) => handleClick(e, chat)}>
                             <span>{chats[chat].username}</span>
-                            <CloseButton name="X" type="chat" chat={chat} />
+                            <CloseButton chat={chat} lastActive={prevActive.current}/>
                         </li>
                     )
                 })}

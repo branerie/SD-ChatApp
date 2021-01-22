@@ -36,9 +36,43 @@ export default function UserDataReducer(userData, action) {
         case "load-chat": { // load selected chat data
             return {
                 ...userData,
+                chats: {
+                    ...userData.chats,
+                    [action.payload.chat]: {
+                        ...userData.chats[action.payload.chat],
+                        unread: false
+                    }
+                },
                 activeSite: false,
                 activeGroup: false,
                 activeChat: action.payload.chat
+            }
+        }
+
+        case "open-chat": {
+            let { user } = action.payload
+            return {
+                ...userData,
+                chats: {
+                    ...userData.chats,
+                    [user._id]: {
+                        username: user.username,
+                        messages: userData.chats[user._id] ? userData.chats[user._id].messages : [],
+                        unread: false
+                    }
+                },
+                activeSite: false,
+                activeGroup: false,
+                activeChat: user._id
+            }
+        }
+
+        case 'close-chat': {
+            const { [action.payload.chat]: _, ...chats } = userData.chats
+            return {
+                ...userData,
+                chats,
+                ...(action.payload.chat === userData.activeChat) && { activeChat: false }
             }
         }
 
@@ -114,15 +148,22 @@ export default function UserDataReducer(userData, action) {
                 chats: {
                     ...userData.chats,
                     [chat]: {
-                        ...userData.chats[chat],
-                        messages: [
-                            ...userData.chats[chat].messages,
-                            {
-                                user,
-                                msg,
-                                timestamp
+                        ...(userData.chats[chat])
+                            ? {
+                                ...userData.chats[chat],
+                                messages: [
+                                    ...userData.chats[chat].messages || [],
+                                    { user, msg, timestamp }
+                                ],
+                                unread: (chat !== userData.activeChat && user !== userData.personal.username) ? true : false
                             }
-                        ]
+                            : {
+                                username: user,
+                                messages: [
+                                    { user, msg, timestamp }
+                                ],
+                                unread: true
+                            }
                     }
                 }
             }

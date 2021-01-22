@@ -22,6 +22,8 @@ const FriendsList = () => {
         return userData.onlineMembers.includes(B._id) - userData.onlineMembers.includes(A._id) || A.username.localeCompare(B.username)
     })
 
+    const group = userData.sites[userData.activeSite].groups[userData.activeGroup]
+    console.log(group.name);
     return (
         <div className={styles['friends-list']}>
             <ul>
@@ -35,7 +37,13 @@ const FriendsList = () => {
                     </li>
                 })}
             </ul>
-            <button onClick={()=>setBackgroundShown(true)}>Invite Member</button>
+            {
+                userData.sites[userData.activeSite].creator === userData.personal._id ?
+                    <button onClick={() => setBackgroundShown(true)}>
+                        {group.name === 'General' ? 'Invite Member' : 'Add Member'}
+                        </button> :
+                    <div></div>
+            }
             <div>
                 {backgroundShown ? <AddMember /> : <div />}
             </div>

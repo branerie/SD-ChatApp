@@ -1,15 +1,17 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import styles from './index.module.css'
-import Tread from './Tread'
+import Thread from './Thread'
 import { MessagesContext } from '../../../../context/MessagesContext'
 
 const ProjectTreads = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
-    console.log(userData)
-    function handleClick(e, group) {
-        if (e.target.nodeName === 'BUTTON') return
-        dispatchUserData({ type: "load-group", payload: { group } })
-    }
+
+    useEffect(() => {
+        
+        return () => {
+            
+        }
+    }, [userData])
 
     if (!userData || !userData.activeSite) return null //<div>Loading...</div>
 
@@ -17,6 +19,8 @@ const ProjectTreads = () => {
         // default sort: Group "General" on top and the rest alphabetical
         return (B[1].name === 'General') - (A[1].name === 'General') || A[1].name.localeCompare(B[1].name)
     })
+
+    
 
     return (
         <ul className={styles['project-treads']}>
@@ -26,7 +30,7 @@ const ProjectTreads = () => {
                     if (gid === userData.activeGroup) classList.push("selected")
                     return (
                         <li key={gid} className={styles['list']}>
-                            <Tread title={group.name} />
+                            <Thread title={group.name} gid={gid} />
                         </li>
                     )
                 })}

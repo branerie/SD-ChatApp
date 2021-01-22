@@ -43,7 +43,7 @@ const ChatProjectsList = () => {
         // default sort: user sites first, then alphabetically
         return (B[1].creator === userData.personal._id) - (A[1].creator === userData.personal._id) || A[1].name.localeCompare(B[1].name)
     })
-    console.log(sites);
+    
     return (
         <div>
             <div>
