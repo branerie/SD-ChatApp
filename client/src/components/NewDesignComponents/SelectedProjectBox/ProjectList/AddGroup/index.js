@@ -8,7 +8,8 @@ const AddGroup = () => {
     const { socket } = useContext(SocketContext)
     const [groupName, setGroupName] = useState()
 
-    function createGroup() {
+    function createGroup(e) {
+        e.preventDefault()
         let site = userData.activeSite
         socket.emit("create-group", { site, group: groupName }, (success, groupData) => {
             if (success) {
@@ -22,7 +23,7 @@ const AddGroup = () => {
 
     return (
         <div className={styles['window']}>
-            <form type="text" className={styles['form']} onSubmit={createGroup}>
+            <form type="text" className={styles['form']} onSubmit={(e)=>createGroup(e)}>
                 <input
                     className={styles['input']}
                     placeholder="Enter group name..."

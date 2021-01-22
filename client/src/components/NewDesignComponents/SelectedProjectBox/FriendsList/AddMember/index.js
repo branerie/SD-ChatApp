@@ -13,14 +13,16 @@ const AddMember = () => {
     const siteMembers = Object.values(userData.sites[userData.activeSite].groups).find(({ name }) => name === "General").members
     const restMembers = siteMembers.filter(member => !groupMemberIds.includes(member._id))
 
-    function inviteMember() {
+    function inviteMember(e) {
+        e.preventDefault()
         let site = userData.activeSite
         socket.emit("send-invitation", { user: member, site }, (success, user) => {
             if (success) dispatchUserData({ type: 'add-user-to-site-invitations', payload: { user, site } })
         })
     }
 
-    function addMember() {
+    function addMember(e) {
+        e.preventDefault()
         socket.emit("add-member", { member, site: userData.activeSite, group: userData.activeGroup }, (success, userID) => {
             // if (success) dispatchUserData({type: 'add-member', payload: {site: userData.activeSite, username: memberName, _id: userID}})
         })
@@ -31,7 +33,7 @@ const AddMember = () => {
             {
                 group.name === "General" ?
                     <div className={styles['window']}>
-                        <form type="text" className={styles['form']} onSubmit={() => inviteMember()}>
+                        <form type="text" className={styles['form']} onSubmit={(e) => inviteMember(e)}>
                             <input
                                 className={styles['input']}
                                 placeholder="Enter member name..."
@@ -45,7 +47,7 @@ const AddMember = () => {
                     </div>
                     :
                     <div className={styles['window']}>
-                        <form type="text" className={styles['form']} onSubmit={() => addMember()}>
+                        <form type="text" className={styles['form']} onSubmit={(e) => addMember(e)}>
                             <select
                                 className={styles['input']}
                                 onChange={e => { setMember(e.target.options[e.target.selectedIndex].getAttribute('uid')) }}

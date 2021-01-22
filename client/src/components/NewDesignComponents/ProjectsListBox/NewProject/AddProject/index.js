@@ -8,7 +8,8 @@ const AddProject = () => {
     const { socket } = useContext(SocketContext)
     const [newSite, setNewSite] = useState()
 
-    function createSite() {
+    function createSite(e) {
+        e.preventDefault()
         socket.emit("create-site", newSite, (success, siteData) => {
 
             if (success) {
@@ -22,7 +23,7 @@ const AddProject = () => {
 
     return (
         <div className={styles['window']}>
-            <form type="text" className={styles['form']} onSubmit={createSite}>
+            <form type="text" className={styles['form']} onSubmit={(e)=>createSite(e)}>
                 <input
                     className={styles['input']}
                     placeholder="Enter project name..."

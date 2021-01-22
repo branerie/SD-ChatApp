@@ -6,13 +6,6 @@ import { MessagesContext } from '../../../../context/MessagesContext'
 const ProjectTreads = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
-    useEffect(() => {
-        
-        return () => {
-            
-        }
-    }, [userData])
-
     if (!userData || !userData.activeSite) return null //<div>Loading...</div>
 
     let groups = Object.entries(userData.sites[userData.activeSite].groups).sort((A, B) => {
