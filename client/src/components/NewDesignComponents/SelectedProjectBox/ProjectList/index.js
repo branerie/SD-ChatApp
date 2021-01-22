@@ -22,7 +22,7 @@ const ProjectList = () => {
                 <img src={settingIcon} alt="Settings Icon" className={styles['settings-icon']} />
             </div>
             <div>
-                {backgroundShown ? <AddGroup /> : <div />}
+                {backgroundShown ? <AddGroup setBackgroundShown={setBackgroundShown}/> : <div />}
             </div>
             <div>
                 {backgroundShown ? <TransparentBackground setBackgroundShown={setBackgroundShown} /> : <div />}

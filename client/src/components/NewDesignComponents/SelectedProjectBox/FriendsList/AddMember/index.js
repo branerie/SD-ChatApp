@@ -3,7 +3,7 @@ import styles from './index.module.css'
 import { MessagesContext } from '../../../../../context/MessagesContext'
 import { SocketContext } from '../../../../../context/SocketContext'
 
-const AddMember = () => {
+const AddMember = (props) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
     const [member, setMember] = useState('')
@@ -19,6 +19,7 @@ const AddMember = () => {
         socket.emit("send-invitation", { user: member, site }, (success, user) => {
             if (success) dispatchUserData({ type: 'add-user-to-site-invitations', payload: { user, site } })
         })
+        props.setBackgroundShown(false)
     }
 
     function addMember(e) {
@@ -26,6 +27,7 @@ const AddMember = () => {
         socket.emit("add-member", { member, site: userData.activeSite, group: userData.activeGroup }, (success, userID) => {
             // if (success) dispatchUserData({type: 'add-member', payload: {site: userData.activeSite, username: memberName, _id: userID}})
         })
+        props.setBackgroundShown(false)
     }
 
     return (
