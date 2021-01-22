@@ -26,9 +26,23 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "load-group": { // load selected group data
+            const { activeGroup } = action.payload
             return {
                 ...userData,
-                activeGroup: action.payload.group,
+                sites: {
+                    ...userData.sites,
+                    [userData.activeSite]: {
+                        ...userData.sites[userData.activeSite],
+                        groups: {
+                            ...userData.sites[userData.activeSite].groups,
+                            [activeGroup]: {
+                                ...userData.sites[userData.activeSite].groups[activeGroup],
+                                unread: false
+                            }
+                        }
+                    },
+                },
+                activeGroup,
                 activeChat: false
             }
         }
@@ -125,6 +139,7 @@ export default function UserDataReducer(userData, action) {
                             ...userData.sites[site].groups,
                             [group]: {
                                 ...userData.sites[site].groups[group],
+                                unread: (group !== userData.activeGroup && user !== userData.personal.username) ? true : false,
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {

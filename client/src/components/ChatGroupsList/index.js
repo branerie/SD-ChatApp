@@ -6,9 +6,9 @@ import ChatGroupsAddGroup from '../ChatGroupsAddGroup'
 const ChatGroupsList = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
-    function handleClick(e, group) {
+    function handleClick(e, activeGroup) {
         if (e.target.nodeName === 'BUTTON') return
-        dispatchUserData({ type: "load-group", payload: { group } })
+        dispatchUserData({ type: "load-group", payload: { activeGroup } })
     }
 
     if (!userData || !userData.activeSite) return null //<div>Loading...</div>
@@ -24,7 +24,7 @@ const ChatGroupsList = () => {
                 {groups.map(([gid, group]) => {
                     let classList = []
                     if (gid === userData.activeGroup) classList.push("selected")
-                    // if (newMessages[gid] && gid !== userData.activeGroup) classList.push('new-messages')
+                    if (group.unread && gid !== userData.activeGroup) classList.push('new-messages')
                     return (
                         <li key={gid}
                             className={classList.join(" ")}
