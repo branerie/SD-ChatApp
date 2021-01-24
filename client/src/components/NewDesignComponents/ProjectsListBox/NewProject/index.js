@@ -5,6 +5,7 @@ import settingsIconBig from '../../../../images/settingsIconBig.svg'
 import { useHistory } from 'react-router-dom'
 import AddProject from './AddProject'
 import TransparentBackground from '../../CommonComponents/TransparentBackground'
+import SettingsPage from '../../../../pages/SettingsPage'
 
 const NewProject = () => {
     const history = useHistory()
@@ -19,7 +20,7 @@ const NewProject = () => {
                     }}>
                     <img src={newProjectButton} className={styles['img']}  />
                 </div>
-                <div className={styles['button']}>
+                <div className={styles['button']} onClick={()=>{}}>
                     <img src={settingsIconBig} className={styles['img']} />
                 </div>
                 <div>
@@ -33,6 +34,9 @@ const NewProject = () => {
             </div>
             <div>
                 {backgroundShown ? <TransparentBackground setBackgroundShown={setBackgroundShown}/> : <div />}
+            </div>
+            <div>
+                <SettingsPage />
             </div>
         </div>
     )

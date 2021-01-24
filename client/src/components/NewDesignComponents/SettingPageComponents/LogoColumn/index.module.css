@@ -1,0 +1,11 @@
+.logo-column {
+    display: flex;
+    flex-direction: column;
+    background-color: aquamarine;
+    width: 200px;
+    z-index: 3;
+}
+
+.logo {
+    height: 20px;
+}
