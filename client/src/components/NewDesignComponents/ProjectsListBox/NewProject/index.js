@@ -9,18 +9,33 @@ import SettingsPage from '../../../../pages/SettingsPage'
 
 const NewProject = () => {
     const history = useHistory()
-    const [backgroundShown, setBackgroundShown] = useState(false)
+    const [backgroundOpened, setBackgroundOpened] = useState(false)
+    const [settingPageOpened, setSettingPageOpened] = useState(false)
+    const [addProjectOpened, setAddProjectOpened] = useState(false)
     
+    const openAddProjectWindow = () => {
+        setBackgroundOpened(true)
+        setAddProjectOpened(true)
+    }
+    
+    const openSettingsWindow = () => {
+        setBackgroundOpened(true)
+        setSettingPageOpened(true)
+    }
+    
+    const closeOpenedWindows = () => {
+        setBackgroundOpened(false)
+        setSettingPageOpened(false)
+        setAddProjectOpened(false)
+    }
+
     return (
         <div>
             <div className={styles['box']}>
-
-                <div className={styles['button']} onClick={() => {
-                        setBackgroundShown(true)
-                    }}>
+                <div className={styles['button']} onClick={openAddProjectWindow}>
                     <img src={newProjectButton} className={styles['img']}  />
                 </div>
-                <div className={styles['button']} onClick={()=>{}}>
+                <div className={styles['button']} onClick={openSettingsWindow}>
                     <img src={settingsIconBig} className={styles['img']} />
                 </div>
                 <div>
@@ -30,13 +45,13 @@ const NewProject = () => {
                 </div>
             </div>
             <div>
-                {backgroundShown ? <AddProject /> : <div />}
+                {addProjectOpened ? <AddProject /> : <div />}
             </div>
             <div>
-                {backgroundShown ? <TransparentBackground setBackgroundShown={setBackgroundShown}/> : <div />}
+                {backgroundOpened ? <TransparentBackground closeOpenedWindows={closeOpenedWindows}/> : <div />}
             </div>
-            <div>
-                <SettingsPage />
+            <div >
+                {settingPageOpened ? <SettingsPage /> : <></>}
             </div>
         </div>
     )
