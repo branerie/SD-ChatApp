@@ -1,7 +1,7 @@
 .logo-column {
     display: flex;
     flex-direction: column;
-    width: 200px;
+    width: 25%;
     z-index: 3;
 }
 

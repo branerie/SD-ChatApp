@@ -1,5 +1,8 @@
 .profile-picture {
     background-color: lightcoral;
-    width: 100%;
+    width: 60%;
     height: auto;
+    align-self: center;
+    margin-top: 20px;
+    margin-left: 20px;
 }
