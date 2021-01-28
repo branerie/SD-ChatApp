@@ -15,7 +15,7 @@
     outline: none;
     height: 25px;
     margin-left: 10px;
-    width: 110px;
+    width: 85%;
     border:none;
 }
 
@@ -25,5 +25,4 @@
     border-color: #707070;
     border: 1px solid;
     border-radius: 12px;
-    
 }
