@@ -3,7 +3,7 @@ import styles from './index.module.css'
 import { MessagesContext } from '../../../../../context/MessagesContext'
 import { SocketContext } from '../../../../../context/SocketContext'
 
-const AddProject = () => {
+const AddProject = (props) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
     const [newSite, setNewSite] = useState()
@@ -19,6 +19,7 @@ const AddProject = () => {
                 // else console.log(data)
             }
         })
+        props.setBackgroundShown(false)
     }
 
     return (

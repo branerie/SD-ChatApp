@@ -3,7 +3,7 @@ import styles from './index.module.css'
 import { MessagesContext } from '../../../../../context/MessagesContext'
 import { SocketContext } from '../../../../../context/SocketContext'
 
-const AddGroup = () => {
+const AddGroup = (props) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
     const [groupName, setGroupName] = useState()
@@ -19,6 +19,7 @@ const AddGroup = () => {
                 // else console.log(data)
             }
         })
+        props.setBackgroundShown(false)
     }
 
     return (
