@@ -45,7 +45,7 @@ const FriendsList = () => {
                     <div></div>
             }
             <div>
-                {backgroundShown ? <AddMember /> : <div />}
+                {backgroundShown ? <AddMember setBackgroundShown={setBackgroundShown}/> : <div />}
             </div>
             <div>
                 {backgroundShown ? <TransparentBackground setBackgroundShown={setBackgroundShown} /> : <div />}

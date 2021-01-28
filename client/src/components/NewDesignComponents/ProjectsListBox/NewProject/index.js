@@ -29,7 +29,7 @@ const NewProject = () => {
                 </div>
             </div>
             <div>
-                {backgroundShown ? <AddProject /> : <div />}
+                {backgroundShown ? <AddProject setBackgroundShown={setBackgroundShown}/> : <div />}
             </div>
             <div>
                 {backgroundShown ? <TransparentBackground setBackgroundShown={setBackgroundShown}/> : <div />}
