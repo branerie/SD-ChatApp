@@ -8,7 +8,18 @@ import TransparentBackground from '../../CommonComponents/TransparentBackground'
 
 const FriendsList = () => {
     const { userData } = useContext(MessagesContext)
-    const [backgroundShown, setBackgroundShown] = useState(false)
+    const [backgroundOpened, setBackgroundOpened] = useState(false)
+    const [addMemberOpened, setAddMemberOpened] = useState(false)
+    
+    const openInviteFriendWindow = () => {
+        setBackgroundOpened(true)
+        setAddMemberOpened(true)
+    }
+    
+    const closeOpenedWindows = () => {
+        setBackgroundOpened(false)
+        setAddMemberOpened(false)
+    }
 
     function handleClick(member) {
         // TODO
@@ -39,16 +50,16 @@ const FriendsList = () => {
             </ul>
             {
                 userData.sites[userData.activeSite].creator === userData.personal._id ?
-                    <button onClick={() => setBackgroundShown(true)}>
+                    <button onClick={openInviteFriendWindow}>
                         {group.name === 'General' ? 'Invite Member' : 'Add Member'}
                         </button> :
                     <div></div>
             }
             <div>
-                {backgroundShown ? <AddMember setBackgroundShown={setBackgroundShown}/> : <div />}
+                {addMemberOpened ? <AddMember /> : <div />}
             </div>
             <div>
-                {backgroundShown ? <TransparentBackground setBackgroundShown={setBackgroundShown} /> : <div />}
+                {backgroundOpened ? <TransparentBackground closeOpenedWindows={closeOpenedWindows} /> : <div />}
             </div>
         </div>
     )
