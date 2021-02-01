@@ -7,6 +7,7 @@ import notificationIconFilled from '../../../../images/notificationIconFilled.sv
 import { MessagesContext } from '../../../../context/MessagesContext'
 import TransparentBackground from '../../CommonComponents/TransparentBackground'
 import AddGroup from './AddGroup'
+import AcceptMember from './AcceptMember'
 
 
 const ProjectList = () => {
@@ -15,6 +16,8 @@ const ProjectList = () => {
     console.log(userData);
     const [backgroundShown, setBackgroundShown] = useState(false)
     const [addGroupWindowOpened, setAddGroupWindowOpened] = useState(false)
+    const [acceptMemberWindowOpened, setAcceptMemberWindowOpened] = useState(false)
+
     if (!userData || !userData.sites[userData.activeSite]) return null //<div>Loading...</div>
 
     const openAddProjectWindow = () => {
@@ -22,9 +25,18 @@ const ProjectList = () => {
         setBackgroundShown(true)
     }
 
+    const openAcceptWindow = () => {
+        setAcceptMemberWindowOpened(true)
+        setBackgroundShown(true)
+    }
+
     const closeOpenedWindows = () => {
         setAddGroupWindowOpened(false)
+        setAcceptMemberWindowOpened(false)
         setBackgroundShown(false)
+    }
+
+    const handleNotifications = () => {
     }
 
     return (
@@ -32,14 +44,17 @@ const ProjectList = () => {
             {site}
             <div className={styles['small-icons']}>
                 {userData.sites[userData.activeSite].creator === userData.personal._id ? <img src={smallPlus} alt="Create Group" className={styles['plus-icon']} onClick={openAddProjectWindow} /> : <div></div>}
-                {userData.sites[userData.activeSite].creator === userData.personal._id && userData.requests && userData.requests.length ?
-                    <img src={notificationIconFilled} alt="Notification" className={styles['plus-icon']} onClick={openAddProjectWindow} /> :
+                {userData.sites[userData.activeSite].creator === userData.personal._id && userData.sites[userData.activeSite].requests && userData.sites[userData.activeSite].requests.length ?
+                    <img src={notificationIconFilled} alt="Notification" className={styles['plus-icon']} onClick={openAcceptWindow} /> :
                     <img src={notificationProjectIcon} alt="Notification" className={styles['plus-icon']} onClick={openAddProjectWindow} />
                 }
                 <img src={settingIcon} alt="Settings Icon" className={styles['settings-icon']} />
             </div>
             <div>
                 {addGroupWindowOpened && <AddGroup />}
+            </div>
+            <div>
+                {acceptMemberWindowOpened && <AcceptMember />}
             </div>
             <div>
                 {backgroundShown && <TransparentBackground closeOpenedWindows={closeOpenedWindows} />}
