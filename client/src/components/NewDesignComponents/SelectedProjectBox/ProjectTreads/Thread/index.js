@@ -9,9 +9,9 @@ const ProjectThreads = (props) => {
 
     if (!userData || !userData.activeSite) return null //<div>Loading...</div>
 
-    function handleClick(e, group) {
+    function handleClick(e, activeGroup) {
         if (e.target.nodeName === 'BUTTON') return
-        dispatchUserData({ type: "load-group", payload: { group } })
+        dispatchUserData({ type: "load-group", payload: { activeGroup } })
     }
 
     return (
