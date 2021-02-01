@@ -45,7 +45,7 @@ const NewProject = () => {
                 </div>
             </div>
             <div>
-                {addProjectOpened ? <AddProject /> : <div />}
+                {addProjectOpened ? <AddProject closeOpenedWindows={closeOpenedWindows} /> : <div />}
             </div>
             <div>
                 {backgroundOpened ? <TransparentBackground closeOpenedWindows={closeOpenedWindows}/> : <div />}

@@ -19,7 +19,7 @@ const AddProject = (props) => {
                 // else console.log(data)
             }
         })
-        props.setBackgroundShown(false)
+        props.closeOpenedWindows();
     }
 
     return (
