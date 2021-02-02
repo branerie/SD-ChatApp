@@ -17,7 +17,7 @@ const Navigation = () => {
         <BrowserRouter>
             <Switch>
                 <Route exact path='/'>
-                    {authContextObj.user.loggedIn ? (<Redirect to='/chat' />) : (<HomePage />)}
+                    {authContextObj.user.loggedIn ? (<Redirect to='/newchat' />) : (<HomePage />)}
                 </Route> 
                 <Route exact path='/about' component={AboutPage} />
                 <Route exact path='/try' component={TryPage} />

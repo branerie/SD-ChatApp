@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useContext} from 'react'
 import styles from './index.module.css'
 import searchIcon from '../../../../../images/searchIcon.svg'
 import moreIcon from '../../../../../images/moreIcon.svg'
@@ -9,10 +9,12 @@ import {IsOpenedUseContext} from '../../../../../context/isOpened'
 import FavIcon from './FavIcon'
 import NotificationIcon from './NotificationIcon'
 import CloseButton from './CloseButton'
+import { MessagesContext } from "../../../../../context/MessagesContext";
 
 const ChatTitle = (props) => {
     const [closeButtonSrc, setCloseButtonSrc] = useState(closeButton)
     const context = IsOpenedUseContext()
+    const { userData } = useContext(MessagesContext)
     
     return (
         <div className={styles['chat-title']}>
@@ -32,9 +34,11 @@ const ChatTitle = (props) => {
             <div>
                 <img src={moreIcon} className={styles['more-icon']} />
             </div>
+            { userData.activeChat && 
             <div>
                 <CloseButton title={props.title} />
             </div>
+            }
         </div>
     )
 }

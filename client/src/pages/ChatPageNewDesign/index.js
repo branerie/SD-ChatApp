@@ -14,14 +14,14 @@ const ChatPageNewDesign = () => {
     return (
         <SocketContextProvider>
             <MessagesContextProvider>
-                <IsOpenedContext>
+                {/* <IsOpenedContext> */}
                     <div className={styles['chat-page-new-design']}>
                         <ProjectsList />
                         <SelectedProject />
                         <ChatBox />
                         <ProfileInfoBox />
                     </div>
-                </IsOpenedContext>
+                {/* </IsOpenedContext> */}
             </MessagesContextProvider>
         </SocketContextProvider>
     )
