@@ -24,24 +24,27 @@ const CurrentChatWindow = (props) => {
         </div>
     )
 
-    let messages
+    let messages, title
     if (context.userData.activeChat) {
         messages = context.userData.chats[context.userData.activeChat].messages
+        title = `@${context.userData.chats[context.userData.activeChat].username}`
     } else if (context.userData.activeSite) {
+        let project = context.userData.sites[context.userData.activeSite].name
+        let group = context.userData.sites[context.userData.activeSite].groups[context.userData.activeGroup].name
         messages = context.userData.sites[context.userData.activeSite].groups[context.userData.activeGroup].messages
+        title = `#${group} (${project})`
     } else {
         messages = [{
             user: "SERVER",
-            msg: `Welcome to SmartChat Network ${context.userData.personal.username}.
-            If you don't have any membership yet,
-            you can create your own projects or join an existing project from the menu on the left.`,
-            timestamp: new Date().toLocaleTimeString()
+            msg: `Welcome to SmartChat Network ${context.userData.personal.username}.\nIf you don't have any membership yet, you can create your own projects or join an existing project from the menu on the left.`,
+            timestamp: new Date().toUTCString()
         }]
+        title = `Welcome ${context.userData.personal.username}`
     }
 
     return (
         <div className={styles['current-chat-window']}>
-            <ChatTitle title={context.userData.sites[context.userData.activeSite].groups[context.userData.activeGroup].name} />
+            <ChatTitle title={title}/>
             <div ref={messagesRef} className={styles['message-box']}>
                 {messages.map(({ user, msg, timestamp }, i) => {
                     let thisDate = new Date(timestamp).toDateString()
