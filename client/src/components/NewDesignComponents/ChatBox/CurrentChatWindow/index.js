@@ -11,7 +11,7 @@ const CurrentChatWindow = (props) => {
 
     const context = useContext(MessagesContext)
     const messagesRef = useRef()
-    
+
     useEffect(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight)
 
     if (!context.userData) return (
@@ -45,12 +45,12 @@ const CurrentChatWindow = (props) => {
             <div ref={messagesRef} className={styles['message-box']}>
                 {messages.map(({ user, msg, timestamp }, i) => {
                     let thisDate = new Date(timestamp).toDateString()
-                    let prevDate = i > 0 ? new Date(messages[i-1].timestamp).toDateString() : undefined
+                    let prevDate = i > 0 ? new Date(messages[i - 1].timestamp).toDateString() : undefined
                     return (
-                        <>
-                        {thisDate !== prevDate && <DevLine date={thisDate}/>}
-                        <NewMessage key={i} message={{ user, msg, timestamp }} />
-                        </>
+                        <div key={i} >
+                            {thisDate !== prevDate && <DevLine date={thisDate} />}
+                            <NewMessage message={{ user, msg, timestamp }} />
+                        </div>
                     )
                 })}
             </div>

@@ -20,7 +20,7 @@ const LoginMain = () => {
             user => {
                 // console.log('You are logged in') //UX
                 context.logIn(user)
-                history.push('/chat')
+                history.push('/newchat')
             },
             error => {
                 console.log(error) //UX

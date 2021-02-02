@@ -127,7 +127,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "group-chat-message": {
-            let timestamp = new Date().toLocaleTimeString()
+            let timestamp = new Date().toUTCString()
             let { site, group, msg, user } = action.payload
             return {
                 ...userData,
@@ -156,7 +156,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "single-chat-message": {
-            let timestamp = new Date().toLocaleTimeString()
+            let timestamp = new Date().toUTCString()
             let { user, chat, msg } = action.payload
             return {
                 ...userData,
@@ -185,7 +185,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "online-message": {
-            let timestamp = new Date().toLocaleTimeString()
+            let timestamp = new Date().toUTCString()
             let { user, site, group } = action.payload
             return {
                 ...userData,
@@ -214,7 +214,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "join-message": {
-            let timestamp = new Date().toLocaleTimeString()
+            let timestamp = new Date().toUTCString()
             let { user, online, site, group } = action.payload
             return {
                 ...userData,
@@ -249,7 +249,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "quit-message": {
-            let timestamp = new Date().toLocaleTimeString()
+            let timestamp = new Date().toUTCString()
             let { user, site, group } = action.payload
             return {
                 ...userData,
