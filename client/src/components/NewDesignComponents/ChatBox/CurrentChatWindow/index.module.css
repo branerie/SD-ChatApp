@@ -9,4 +9,5 @@
 
 .message-box {
     margin-bottom: auto;
+    overflow-y: auto;
 }
