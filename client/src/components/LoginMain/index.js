@@ -38,6 +38,7 @@ const LoginMain = () => {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 label='Password'
+                type="password"
             />
             <SubmitButton title='LOGIN' />
         </form>

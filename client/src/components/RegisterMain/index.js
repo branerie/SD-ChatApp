@@ -33,7 +33,7 @@ const RegisterMain = () => {
             console.log(user);
             console.log('Successful registration');
             auth.logIn(user)
-            history.push('/chat')
+            history.push('/newchat')
         }, (error) => {
             console.log('Error', error);
         })

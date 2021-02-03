@@ -3,7 +3,7 @@ import styles from './index.module.css'
 import { MessagesContext } from '../../../../../context/MessagesContext'
 import { SocketContext } from '../../../../../context/SocketContext'
 
-const AddGroup = (props) => {
+const AddGroup = ({closeOpenedWindows}) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
     const [groupName, setGroupName] = useState()
@@ -19,7 +19,7 @@ const AddGroup = (props) => {
                 // else console.log(data)
             }
         })
-        props.setBackgroundShown(false)
+        closeOpenedWindows()
     }
 
     return (
