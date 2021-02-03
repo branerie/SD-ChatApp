@@ -3,7 +3,7 @@ import styles from './index.module.css'
 import { MessagesContext } from '../../../../../context/MessagesContext'
 import { SocketContext } from '../../../../../context/SocketContext'
 
-const AddMember = (props) => {
+const AddMember = ({closeOpenedWindows}) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
     const [member, setMember] = useState('')
@@ -19,7 +19,7 @@ const AddMember = (props) => {
         socket.emit("send-invitation", { user: member, site }, (success, user) => {
             if (success) dispatchUserData({ type: 'add-user-to-site-invitations', payload: { user, site } })
         })
-        props.setBackgroundShown(false)
+        closeOpenedWindows()
     }
 
     function addMember(e) {
@@ -27,7 +27,7 @@ const AddMember = (props) => {
         socket.emit("add-member", { member, site: userData.activeSite, group: userData.activeGroup }, (success, userID) => {
             // if (success) dispatchUserData({type: 'add-member', payload: {site: userData.activeSite, username: memberName, _id: userID}})
         })
-        props.setBackgroundShown(false)
+        closeOpenedWindows()
     }
 
     return (

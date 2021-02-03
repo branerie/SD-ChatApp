@@ -1,6 +1,6 @@
-const mongoose = require ('mongoose')
+const mongoose = require('mongoose')
 
-const SiteSchema = new mongoose.Schema ({
+const SiteSchema = new mongoose.Schema({
     name: {
         type: String,
         unique: true,
@@ -16,7 +16,7 @@ const SiteSchema = new mongoose.Schema ({
     },
     open: {
         type: Boolean,
-        default: true
+        default: false
     },
     invitations: [{
         type: 'ObjectId',
@@ -26,6 +26,10 @@ const SiteSchema = new mongoose.Schema ({
         type: 'ObjectId',
         ref: 'User'
     }]
+}, {
+    timestamps: {
+        updatedAt: false
+    }
 })
 
 module.exports = mongoose.model('Site', SiteSchema)

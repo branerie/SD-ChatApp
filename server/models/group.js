@@ -3,8 +3,10 @@ const mongoose = require ('mongoose')
 const GroupSchema = new mongoose.Schema ({
     name: {
         type: String,
-        // unique: true,
         required: true
+    },
+    description: {
+        type: String
     },
     site: {
         type: 'ObjectId',
@@ -16,14 +18,14 @@ const GroupSchema = new mongoose.Schema ({
         ref: 'User',
         required: true
     },
-    open: {
-        type: Boolean,
-        default: true
-    },
     members: [{
         type: 'ObjectId',
         ref: 'User'
     }]
+}, {
+    timestamps: {
+        updatedAt: false
+    }
 })
 
 module.exports = mongoose.model('Group', GroupSchema)

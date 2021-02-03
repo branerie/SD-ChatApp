@@ -39,7 +39,7 @@ const ProjectList = () => {
                 <img src={settingIcon} alt="Settings Icon" className={styles['settings-icon']} />
             </div>
             <div>
-                {addGroupWindowOpened && <AddGroup />}
+                {addGroupWindowOpened && <AddGroup closeOpenedWindows={closeOpenedWindows}/>}
             </div>
             <div>
                 {backgroundShown && <TransparentBackground closeOpenedWindows={closeOpenedWindows} />}

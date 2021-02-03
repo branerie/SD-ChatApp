@@ -57,7 +57,7 @@ const FriendsList = () => {
                     <div></div>
             }
             <div>
-                {addMemberOpened ? <AddMember /> : <div />}
+                {addMemberOpened ? <AddMember closeOpenedWindows={closeOpenedWindows}/> : <div />}
             </div>
             <div>
                 {backgroundOpened ? <TransparentBackground closeOpenedWindows={closeOpenedWindows} /> : <div />}

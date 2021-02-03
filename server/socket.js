@@ -206,7 +206,7 @@ module.exports = io => {
                                 }],
                                 messages: [{
                                     user: 'SERVER',
-                                    timestamp: getTime(),
+                                    timestamp: utcTime(),
                                     msg: `Hello ${userData.username}. Welcome to your new project: ${site}. You can invite members in General group or start creating groups now.`
                                 }]
                             }
@@ -249,7 +249,7 @@ module.exports = io => {
                         }],
                         messages: [{
                             user: 'SERVER',
-                            timestamp: getTime(),
+                            timestamp: utcTime(),
                             msg: `You have just created new group ${group} in your project. You can now start adding project members.`
                         }]
                     }
@@ -532,6 +532,10 @@ module.exports = io => {
 
 function getTime() {
     return new Date().toLocaleTimeString()
+}
+
+function utcTime() {
+    return new Date().toUTCString()
 }
 
 function sysLog(message) {
