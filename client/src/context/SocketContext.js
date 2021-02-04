@@ -7,10 +7,9 @@ export const SocketContext = React.createContext()
 export default function SocketContextProvider(props) {
     const auth = AuthenticateUser()
     const [socket, setSocket] = useState()
-    const ME = auth.user.username
 
     useEffect(() => {
-        if (!ME) return
+        if (!auth) return
 
         const url = process.env.NODE_ENV === 'production' ? 'https://smartdesignchatapp.herokuapp.com' : 'http://localhost:5000'
         const request = io(url, {
@@ -21,10 +20,10 @@ export default function SocketContextProvider(props) {
         setSocket(request)
 
         return () => request.disconnect()
-    }, [ME])
+    }, [auth])
 
     return (
-        <SocketContext.Provider value={{ socket, ME }}>
+        <SocketContext.Provider value={{ socket }}>
             {props.children}
         </SocketContext.Provider>
     )

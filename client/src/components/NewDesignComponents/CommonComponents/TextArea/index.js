@@ -9,7 +9,7 @@ const TextArea = (props) => {
     const [inputTextSyle, setInputTextSyle] = useState('input')
     const [msg, setMsg] = useState('')
     const { userData, dispatchUserData} = useContext(MessagesContext)
-    const { socket, ME } = useContext(SocketContext)
+    const { socket } = useContext(SocketContext)
 
 
     function getKey(e) {
@@ -33,7 +33,7 @@ const TextArea = (props) => {
         socket.emit(recipientType, { site, recipient, msg }, () => {
             setMsg('')
             if (recipient === userData.personal._id) return
-            dispatchUserData({type: recipientType, payload: { user: ME, msg, site, group: recipient, chat: recipient }})
+            dispatchUserData({type: recipientType, payload: { user: userData.personal.username, msg, site, group: recipient, chat: recipient }})
         })
         return
     }
