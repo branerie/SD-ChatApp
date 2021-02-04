@@ -1,45 +1,50 @@
-import React, { useEffect, useContext, useRef } from 'react'
+import React, { useEffect, useContext, useRef, useState } from 'react'
 import styles from './index.module.css'
 import ChatTitle from './ChatTitle/'
 import NewMessage from './NewMessage/'
 import DevLine from './DevLine/'
 import SendMessageBox from './SendMessageBox'
+import Profile from './Profile'
 
 import { MessagesContext } from '../../../../context/MessagesContext'
 
 const CurrentChatWindow = (props) => {
 
-    const context = useContext(MessagesContext)
+    const { userData } = useContext(MessagesContext)
     const messagesRef = useRef()
 
     useEffect(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight)
 
-    if (!context.userData) return (
+    if (!userData) return (
         <div className={styles['current-chat-window']}>
             <ChatTitle title={props.title} />
             <div ref={messagesRef} className={styles['message-box']}>
                 Loading messages....
             </div>
-            <SendMessageBox />
         </div>
     )
 
-    let messages, title
-    if (context.userData.activeChat) {
-        messages = context.userData.chats[context.userData.activeChat].messages
-        title = `@${context.userData.chats[context.userData.activeChat].username}`
-    } else if (context.userData.activeSite) {
-        let project = context.userData.sites[context.userData.activeSite].name
-        let group = context.userData.sites[context.userData.activeSite].groups[context.userData.activeGroup].name
-        messages = context.userData.sites[context.userData.activeSite].groups[context.userData.activeGroup].messages
+    let messages, title, msgBox = true
+    if (userData.activeChat) {
+        messages = userData.chats[userData.activeChat].messages
+        title = `@${userData.chats[userData.activeChat].username}`
+    } else if (userData.activeSite) {
+        let project = userData.sites[userData.activeSite].name
+        let group = userData.sites[userData.activeSite].groups[userData.activeGroup].name
+        messages = userData.sites[userData.activeSite].groups[userData.activeGroup].messages
         title = `#${group} (${project})`
     } else {
         messages = [{
             user: "SERVER",
-            msg: `Welcome to SmartChat Network ${context.userData.personal.username}.\nIf you don't have any membership yet, you can create your own projects or join an existing project from the menu on the left.`,
+            msg: [`Welcome to SmartChat Network ${userData.personal.username}.`,
+            "If you don't have any membership yet, you can create your own projects or join an existing project.",
+            "By the time, we suggest you complete your profile by adding some info about yourself.",
+            "If skipped now, this can be done later from the settings button."
+        ].join('\n'),
             timestamp: new Date().toUTCString()
         }]
-        title = `Welcome ${context.userData.personal.username}`
+        title = `Welcome ${userData.personal.username}`
+        msgBox = false
     }
 
     return (
@@ -57,7 +62,7 @@ const CurrentChatWindow = (props) => {
                     )
                 })}
             </div>
-            <SendMessageBox />
+            {msgBox ? <SendMessageBox /> : <Profile />}
         </div>
     )
 }
