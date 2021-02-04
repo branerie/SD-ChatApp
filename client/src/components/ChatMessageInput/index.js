@@ -6,7 +6,7 @@ import { SocketContext } from '../../context/SocketContext'
 const ChatMessageInput = () => {
     const [msg, setMsg] = useState('')
     const { userData, dispatchUserData} = useContext(MessagesContext)
-    const { socket, ME } = useContext(SocketContext)
+    const { socket } = useContext(SocketContext)
     const messageRef = useRef()
 
     function sendMessage(e) {
@@ -26,15 +26,10 @@ const ChatMessageInput = () => {
         socket.emit(recipientType, { site, recipient, msg }, () => {
             setMsg('')
             if (recipient === userData.personal._id) return
-            dispatchUserData({type: recipientType, payload: { user: ME, msg, site, group: recipient, chat: recipient }})
+            dispatchUserData({type: recipientType, payload: { user: userData.personal.username, msg, site, group: recipient, chat: recipient }})
         })
         return
     }
-
-    // function attachMsg(recipientType, recipient, site) {
-    //     dispatchUserData({type: recipientType, payload: { user: ME, msg, site, group: recipient, chat: recipient }})
-    //     setMsg('')
-    // }
 
     useEffect(() => messageRef.current.focus())
 
