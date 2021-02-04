@@ -7,6 +7,12 @@ const app = express()
 require('./config/express')(app)
 require('./config/routes')(app)
 
+if (config.NODE_ENV === "production") {
+    app.get("*", (req, res) => {
+        res.sendFile('../../client/build.index.html')
+    })
+}
+
 const connectDB = require ('./config/database')
 connectDB()
 
