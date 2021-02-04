@@ -35,8 +35,11 @@ module.exports = io => {
             sites: {},
             chats: {},
             personal: {
+                _id: userData._id,
+                name: userData.name,
+                email: userData.email,
+                mobile: userData.mobile,
                 username: userData.username,
-                _id: userData._id
             }
         }
         if (userData.invitations) reactUserData.invitations = userData.invitations

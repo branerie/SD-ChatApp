@@ -1,7 +1,7 @@
 const { User, Site, Group, Message } = require('../models')
 
 const getUserData = async (id) => {
-    let data = await User.findById(id, 'username groups chats invitations requests').populate({
+    let data = await User.findById(id, '-password -__v').populate({
         path: 'chats',
         select: 'username'
     }).populate({
@@ -37,7 +37,8 @@ const getMessages = async (userData) => {
             { destination: { $in: chats }, source: userData._id },
             { source: { $in: chats }, destination: userData._id },
         ]
-    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'username' }).populate({ path: 'destination' }).lean()
+    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'username' }).populate({ path: 'destination', select: 'username name' }).lean()
+    console.log(messages);
     return messages
 }
 
