@@ -1,5 +1,6 @@
 require('dotenv').config()
 
+const path = require('path')
 const config = require("./config/config")
 const express = require("express")
 const app = express()
@@ -9,7 +10,7 @@ require('./config/routes')(app)
 
 if (config.NODE_ENV === "production") {
     app.get("*", (req, res) => {
-        res.sendFile('../../client/build.index.html')
+        res.sendFile(path.join(__dirname, '..client/build/index.html')
     })
 }
 
