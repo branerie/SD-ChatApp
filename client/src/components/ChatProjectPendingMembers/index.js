@@ -1,10 +1,12 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { MessagesContext } from '../../context/MessagesContext'
 import { SocketContext } from '../../context/SocketContext'
 
 const ChatProjectPendingMembers = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
+    const [inviteInfo,setInviteInfo] = useState(false)
+    const [requestInfo,setRequestInfo] = useState(false)
 
     function cancelInvitation(user) {
         socket.emit('cancel-invitation', { user, site: userData.activeSite }, () => {
@@ -40,10 +42,11 @@ const ChatProjectPendingMembers = () => {
                     {userData.sites[userData.activeSite].invitations.map(user => {
                         return (
                             <li key={user._id}>
-                                <span>{user.username}</span>
+                                <span>{user.username}</span>                                
+                                {inviteInfo && <span>({user.name || user.username})</span>}                             
                                 <div>
                                     <button onClick={() => cancelInvitation(user._id)}>Cancel</button>
-                                    <span className="arrow down" onClick={() => showInvitationInfo(user._id)}></span>
+                                    <span className="arrow down" onClick={() => setInviteInfo(!inviteInfo)}></span>
                                 </div>
                             </li>
                         )
@@ -57,10 +60,11 @@ const ChatProjectPendingMembers = () => {
                         return (
                             <li key={user._id}>
                                 <span>{user.username}</span>
+                                {requestInfo && <span>({user.name || user.username})</span>}
                                 <div>
                                     <button onClick={() => acceptRequest(user)}>Accept</button>
                                     <button onClick={() => rejectRequest(user._id)}>Reject</button>
-                                    <span className="arrow down" onClick={() => showRequestInfo(user._id)}></span>
+                                    <span className="arrow down" onClick={() => setRequestInfo(!requestInfo)}></span>
                                 </div>
                             </li>
                         )

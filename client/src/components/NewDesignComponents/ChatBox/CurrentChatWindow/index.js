@@ -41,7 +41,8 @@ const CurrentChatWindow = (props) => {
             "By the time, we suggest you complete your profile by adding some info about yourself.",
             "If skipped now, this can be done later from the settings button."
         ].join('\n'),
-            timestamp: new Date().toUTCString()
+            timestamp: new Date().toUTCString(),
+            own: false
         }]
         title = `Welcome ${userData.personal.username}`
         msgBox = false
@@ -51,13 +52,13 @@ const CurrentChatWindow = (props) => {
         <div className={styles['current-chat-window']}>
             <ChatTitle title={title}/>
             <div ref={messagesRef} className={styles['message-box']}>
-                {messages.map(({ user, msg, timestamp }, i) => {
+                {messages.map(({ user, msg, timestamp, own }, i) => {
                     let thisDate = new Date(timestamp).toDateString()
                     let prevDate = i > 0 ? new Date(messages[i - 1].timestamp).toDateString() : undefined
                     return (
                         <div key={i} >
                             {thisDate !== prevDate && <DevLine date={thisDate} />}
-                            <NewMessage message={{ user, msg, timestamp }} />
+                            <NewMessage message={{ user, msg, timestamp, own }} />
                         </div>
                     )
                 })}

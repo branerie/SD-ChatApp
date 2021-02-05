@@ -23,15 +23,16 @@ const ChatWindow = () => {
             msg: `Welcome to SmartChat Network ${context.userData.personal.username}.
             If you don't have any membership yet,
             you can create your own projects or join an existing project from the menu on the left.`, 
-            timestamp: new Date().toLocaleTimeString()
+            timestamp: new Date().toUTCString(),
+            own: false
         }]
     }
 
     return (
         <div className="chat-messages" ref={messagesRef}>
-            {messages.map(({ user, msg, timestamp }, i) => {
+            {messages.map(({ user, msg, timestamp, own }, i) => {
                 let classList = []
-                if (user === context.userData.personal.username ) classList.push('text-self')
+                if (own) classList.push('text-self')
                 else if (user === 'SERVER') {
                     if (msg.endsWith('online.')) classList.push('text-server-online')
                     else if (msg.endsWith('offline.')) classList.push('text-server-offline')

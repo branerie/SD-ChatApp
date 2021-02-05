@@ -139,13 +139,14 @@ export default function UserDataReducer(userData, action) {
                             ...userData.sites[site].groups,
                             [group]: {
                                 ...userData.sites[site].groups[group],
-                                unread: (group !== userData.activeGroup && user !== userData.personal.username) ? true : false,
+                                unread: (group !== userData.activeGroup && user !== userData.personal._id) ? true : false,
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {
-                                        user,
+                                        user: userData.sites[site].groups[group].members.find(m => m._id === user).username,
                                         msg,
-                                        timestamp
+                                        timestamp,
+                                        own: user === userData.personal._id
                                     }
                                 ]
                             }
@@ -157,7 +158,8 @@ export default function UserDataReducer(userData, action) {
 
         case "single-chat-message": {
             let timestamp = new Date().toUTCString()
-            let { user, chat, msg } = action.payload
+            let { user, chat, msg, own } = action.payload
+            if (own) user = userData.personal.name || userData.personal.username
             return {
                 ...userData,
                 chats: {
@@ -168,14 +170,14 @@ export default function UserDataReducer(userData, action) {
                                 ...userData.chats[chat],
                                 messages: [
                                     ...userData.chats[chat].messages || [],
-                                    { user, msg, timestamp }
+                                    { user, msg, timestamp, own }
                                 ],
-                                unread: (chat !== userData.activeChat && user !== userData.personal.username) ? true : false
+                                unread: (chat !== userData.activeChat && !own) ? true : false
                             }
                             : {
                                 username: user,
                                 messages: [
-                                    { user, msg, timestamp }
+                                    { user, msg, timestamp, own }
                                 ],
                                 unread: true
                             }

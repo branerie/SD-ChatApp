@@ -41,8 +41,8 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('single-chat-message', ({ user, chat, msg }) => {
-            dispatchUserData({ type: 'single-chat-message', payload: { user, chat, msg } })
+        socket.on('single-chat-message', ({ user, chat, msg, own }) => {
+            dispatchUserData({ type: 'single-chat-message', payload: { user, chat, msg, own } })
         })
         return () => socket.off('single-chat-message')
     }, [socket])

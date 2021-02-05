@@ -6,6 +6,11 @@
     border-radius: 10px;
 }
 
+.new-message-own {
+    flex-direction: row-reverse;
+    background-color: #e5f1db;
+}
+
 .avatar {
     margin-left: 10px;
 }
@@ -14,6 +19,10 @@
     margin-left: 5px;
     display: flex;
     flex-direction: column;
+}
+
+.text-box-own {
+    align-items: flex-end;
 }
 
 .name {
