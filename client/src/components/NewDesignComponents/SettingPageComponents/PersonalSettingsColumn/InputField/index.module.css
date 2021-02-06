@@ -25,4 +25,5 @@
 .label{
     font-size: 14px;
     color: #707070;
+    text-transform: capitalize;
 }

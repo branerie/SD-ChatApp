@@ -1,18 +1,15 @@
-import { useState } from 'react'
 import styles from './index.module.css'
 
-const InputField = (props) => {
-
-    const [value, setValue] = useState(props.value)
+const InputField = ({ value, input, updateData }) => {
 
     return (
         <div className={styles['input-field']}>
-            <label className={styles['label']}>{props.label}
+            <label className={styles['label']}>{input}
                 <div className={styles['input-container']}>
                     <input
                         className={styles['input']}
                         value={value}
-                        onChange={e => setValue(e.target.value)}
+                        onChange={e => updateData(input, e.target.value)}
                     />
                 </div>
             </label>
