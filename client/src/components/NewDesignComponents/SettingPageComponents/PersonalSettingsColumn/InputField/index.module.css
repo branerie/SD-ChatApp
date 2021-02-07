@@ -1,6 +1,6 @@
 .input {
     outline: none;
-    height: 20px;
+    height: 30px;
     margin-left: 10px;
     width: 85%;
     border:none;
@@ -8,7 +8,7 @@
 
 .input-container{
     width: auto;
-    margin-left: 10px;
+    /* margin-left: 10px; */
     border-color: #707070;
     border: 1px solid;
     border-radius: 12px;
@@ -25,4 +25,5 @@
 .label{
     font-size: 14px;
     color: #707070;
+    text-transform: capitalize;
 }

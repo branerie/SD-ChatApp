@@ -1,13 +1,18 @@
-import React from 'react'
 import styles from './index.module.css'
 
-const InputField = (props) => {
+const InputField = ({ value, input, updateData }) => {
+
     return (
         <div className={styles['input-field']}>
-            <label className={styles['label']}>{props.label}</label>
-            <div className={styles['input-container']}>
-                <input className={styles['input']} />
-            </div>
+            <label className={styles['label']}>{input}
+                <div className={styles['input-container']}>
+                    <input
+                        className={styles['input']}
+                        value={value}
+                        onChange={e => updateData(input, e.target.value)}
+                    />
+                </div>
+            </label>
         </div>
     )
 }

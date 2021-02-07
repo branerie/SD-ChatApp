@@ -35,8 +35,13 @@ module.exports = io => {
             sites: {},
             chats: {},
             personal: {
+                _id: userData._id,
+                name: userData.name,
+                email: userData.email,
+                mobile: userData.mobile,
                 username: userData.username,
-                _id: userData._id
+                company: userData.company,
+                position: userData.position,
             }
         }
         if (userData.invitations) reactUserData.invitations = userData.invitations
@@ -51,7 +56,14 @@ module.exports = io => {
         socket.username = userData.username // save username for a later use
 
         userData.groups.forEach(({ _id, name, site, members }) => {
-            members.map(m => allMembers.add(m._id.toString()))
+            members.map(member => {
+                allMembers.add(member._id.toString())
+                if (member.name) { // or in the UI
+                    member.username = member.name
+                    delete member.name
+                }
+            })
+            // console.log(members);
             groupToSiteCache[_id] = site._id
             if (!reactUserData.sites[site._id]) {
                 reactUserData.sites[site._id] = {
@@ -60,7 +72,22 @@ module.exports = io => {
                     groups: {}
                 }
                 if (site.creator.toString() === userData._id.toString()) {
+                    site.invitations.map(invitation => {
+                        allMembers.add(invitation._id.toString())
+                        if (invitation.name) { // or in the UI
+                            invitation.username = invitation.name
+                            delete invitation.name
+                        }
+                    })
                     reactUserData.sites[site._id].invitations = site.invitations || []
+
+                    site.requests.map(request => {
+                        allMembers.add(request._id.toString())
+                        if (request.name) { // or in the UI
+                            request.username = request.name
+                            delete request.name
+                        }
+                    })
                     reactUserData.sites[site._id].requests = site.requests || []
                 }
             }
@@ -73,11 +100,14 @@ module.exports = io => {
 
         let messagePool = await db.getMessages(userData)
         messagePool.forEach(msg => {
+            let own = msg.source._id.toString() === userData._id.toString() // boolean
             switch (msg.onModel) {
                 case "User":
                     // determine who is the other party in conversation
-                    let partyID = msg.source._id.toString() === userData._id.toString() ? msg.destination._id.toString() : msg.source._id.toString()
-                    let partyName = msg.source.username === userData.username ? msg.destination.username : msg.source.username
+                    let partyID = own ? msg.destination._id.toString() : msg.source._id.toString()
+                    let partyName = own
+                        ? msg.destination.name || msg.destination.username
+                        : msg.source.name || msg.source.username
                     if (!reactUserData.chats[partyID]) {
                         reactUserData.chats[partyID] = {
                             username: partyName,
@@ -85,17 +115,19 @@ module.exports = io => {
                         }
                     }
                     reactUserData.chats[partyID].messages.push({
-                        user: msg.source.username,
+                        user: msg.source.name || msg.source.username,
                         msg: msg.content,
-                        timestamp: msg.createdAt
+                        timestamp: msg.createdAt,
+                        own
                     })
                     break;
 
                 case "Group":
                     reactUserData.sites[groupToSiteCache[msg.destination._id]].groups[msg.destination._id].messages.push({
-                        user: msg.source.username,
+                        user: msg.source.name || msg.source.username,
                         msg: msg.content,
-                        timestamp: msg.createdAt
+                        timestamp: msg.createdAt,
+                        own
                     })
                     break;
 
@@ -112,7 +144,7 @@ module.exports = io => {
                 socket.to(_id).emit("online-message", {
                     user: {
                         _id: userData._id,
-                        username: userData.username
+                        username: userData.name || userData.username
                     },
                     site: site._id,
                     group: _id
@@ -137,7 +169,7 @@ module.exports = io => {
                     socket.to(group).emit("quit-message", {
                         user: {
                             _id: userData._id,
-                            username: userData.username
+                            username: userData.name || userData.username
                         },
                         reason,
                         group,
@@ -157,7 +189,7 @@ module.exports = io => {
             let newMessage = await db.createPublicMessage(userData._id, recipient, msg)
             if (!newMessage) return // validate query
             sysLog(`Message (group): ${userData.username} >> ${recipient}`)
-            socket.to(recipient).emit("group-chat-message", { user: userData.username, msg, group: recipient, site })
+            socket.to(recipient).emit("group-chat-message", { user: userData._id.toString(), msg, group: recipient, site })
             callback()
         })
 
@@ -170,16 +202,17 @@ module.exports = io => {
                 sysLog(`Message (private): ${userData.username} >> ${recipient}`)
                 userIDToSocketIDCache[recipient].forEach(socketID => {
                     io.to(socketID).emit("single-chat-message", {
-                        user: userData.username,
+                        user: userData.name || userData.username,
                         chat: userData._id,
-                        msg
+                        msg,
+                        own: recipient === userData._id.toString()
                     })
                 })
             } else {
                 // send offline msg to DB if not in blacklist
                 sysLog(`Message (offline): ${userData.username} >> ${recipient}`)
             }
-            if (recipient !== userData._id.toString()) restSocketsUpdate(userData._id, socket.id, "single-chat-message", { user: userData.username, chat: recipient, msg })
+            if (recipient !== userData._id.toString()) restSocketsUpdate(userData._id, socket.id, "single-chat-message", { user: userData._id, chat: recipient, msg, own: true })
             callback()
         })
 
@@ -202,12 +235,13 @@ module.exports = io => {
                                 name: 'General',
                                 members: [{
                                     _id: userData._id,
-                                    username: userData.username,
+                                    username: userData.name || userData.username,
                                 }],
                                 messages: [{
                                     user: 'SERVER',
                                     timestamp: utcTime(),
-                                    msg: `Hello ${userData.username}. Welcome to your new project: ${site}. You can invite members in General group or start creating groups now.`
+                                    msg: `Hello ${userData.name || userData.username}. Welcome to your new project: ${site}. You can invite members in General group or start creating groups now.`,
+                                    own: false
                                 }]
                             }
                         }
@@ -245,12 +279,13 @@ module.exports = io => {
                         name: group,
                         members: [{
                             _id: userData._id,
-                            username: userData.username,
+                            username: userData.name || userData.username,
                         }],
                         messages: [{
                             user: 'SERVER',
                             timestamp: utcTime(),
-                            msg: `You have just created new group ${group} in your project. You can now start adding project members.`
+                            msg: `You have just created new group ${group} in your project. You can now start adding project members.`,
+                            own: false
                         }]
                     }
                 }
@@ -282,6 +317,7 @@ module.exports = io => {
             const data = await db.sendRequest(site, userData._id)
             let user = {
                 username: userData.username,
+                name: userData.name || userData.username,
                 _id: userData._id
             }
             if (data.success) {
@@ -304,7 +340,7 @@ module.exports = io => {
             if (data.success) {
                 let user = {
                     _id: userData._id,
-                    username: userData.username
+                    username: userData.name || userData.username
                 }
                 let group = data.generalGroup._id.toString()
                 groupToSiteCache[group] = site
@@ -315,6 +351,14 @@ module.exports = io => {
                     site,
                     group
                 })
+
+                data.generalGroup.members.map(member => {
+                    if (member.name) { // or in the UI
+                        member.username = member.name
+                        delete member.name
+                    }
+                })
+
                 let siteData = {
                     [site]: {
                         name: data.site.name,
@@ -350,6 +394,11 @@ module.exports = io => {
                 let online = userIDToSocketIDCache[user._id] ? true : false
                 let group = data.generalGroup._id.toString()
                 groupToSiteCache[group] = site
+                if (user.name) {
+                    user.username = user.name
+                    delete user.name
+                } // temporary
+
                 io.to(group).emit("join-message", {
                     user,
                     online,
@@ -357,6 +406,12 @@ module.exports = io => {
                     group
                 })
                 // if user is online send him data
+                data.generalGroup.members.map(member => {
+                    if (member.name) { // or in the UI
+                        member.username = member.name
+                        delete member.name
+                    }
+                })
                 if (online) {
                     let siteData = {
                         [site]: {
@@ -395,13 +450,20 @@ module.exports = io => {
                 let online = userIDToSocketIDCache[member] ? true : false
                 let user = {
                     _id: data.userData._id,
-                    username: data.userData.username
+                    username: data.userData.name || data.userData.username
                 }
                 io.to(group).emit("join-message", {
                     user,
                     online,
                     site,
                     group
+                })
+
+                data.groupData.members.map(member => {
+                    if (member.name) { // or in the UI
+                        member.username = member.name
+                        delete member.name
+                    }
                 })
 
                 if (online) {
@@ -494,6 +556,28 @@ module.exports = io => {
             }
             sysLog(`Join request from ${userData._id} to ${site} canceled by user.`)
             // callback()
+        })
+
+        socket.on('update-profile-data', async (data, callback) => {
+            //move this to middleware
+            if (!data || data.constructor.name !== 'Object') {
+                sysLog(`Invalid data from ${userData._id} Expected Object - got ${data.constructor.name}.`)
+                return
+            }
+            const allowedFields = ['name', 'company', 'position', 'email', 'mobile']
+            const ignoredData = {}
+            let invalidData = false
+            for (const field in data) {
+                if (!allowedFields.includes(field)) {
+                    ignoredData[field] = data[field]
+                    invalidData = true
+                    delete data[field]
+                }
+            }
+            invalidData && sysLog(`Unexpected data from ${userData._id}.\nIgnored data: ${JSON.stringify(ignoredData)}.`)
+            const newProfileData = await db.updateProfileData(userData._id, data)
+            callback(data)
+            // if name uis changed send newProfileData.name to connected rooms and users via socket? 
         })
     })
 

@@ -1,7 +1,7 @@
 const { User, Site, Group, Message } = require('../models')
 
 const getUserData = async (id) => {
-    let data = await User.findById(id, 'username groups chats invitations requests').populate({
+    let data = await User.findById(id, '-password -__v').populate({
         path: 'chats',
         select: 'username'
     }).populate({
@@ -15,16 +15,17 @@ const getUserData = async (id) => {
         select: 'name members site',
         populate: [{
             path: 'members',
-            select: 'username',
+            select: 'name username'
         }, {
             path: 'site',
             select: 'name creator invitations requests',
             populate: {
                 path: 'invitations requests',
-                select: 'username'
+                select: 'name username'
             }
         }],
     }).lean()
+    // data.groups.forEach(g => console.log(g.site))
     return data
 }
 
@@ -37,7 +38,8 @@ const getMessages = async (userData) => {
             { destination: { $in: chats }, source: userData._id },
             { source: { $in: chats }, destination: userData._id },
         ]
-    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'username' }).populate({ path: 'destination' }).lean()
+    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username' }).populate({ path: 'destination', select: 'name username' }).lean()
+    // console.log(messages);
     return messages
 }
 
@@ -61,7 +63,7 @@ const createPublicMessage = async (sender, recipient, msg) => {
 
 const removeChat = async (id, chat) => {
     try {
-        await User.findByIdAndUpdate(id, { $pullAll: { chats: [chat] } })        
+        await User.findByIdAndUpdate(id, { $pullAll: { chats: [chat] } })
     } catch (error) {
         console.error(error.message);
     }
@@ -189,7 +191,7 @@ const inviteUser = async (username, siteID, siteCreator) => {
 
         await Site.findByIdAndUpdate(siteID, { $addToSet: { invitations: [user._id] } })
         await User.findByIdAndUpdate(user._id, { $addToSet: { invitations: [site._id] } })
-        return { success: true, userData: {_id: user._id, username }, siteData: { _id: site._id, name: site.name } }
+        return { success: true, userData: { _id: user._id, username, name: user.name }, siteData: { _id: site._id, name: site.name } }
 
     } catch (error) {
         return error.message
@@ -208,7 +210,7 @@ const addUserToGroup = async (userID, siteID, groupID, adminID) => {
         const generalGroup = await Group.findOne({ site: siteID, name: 'General' }, 'members')
         if (!generalGroup.members.includes(userID)) throw new Error(`User ${userID} (${userData.username}) is not a member of project ${siteID} (${siteData.name})`)
         // check if group exists and if user is not already a member of this group
-        const groupData = await Group.findOne({ _id: groupID, site: siteID }).populate({path: 'members', select: 'username'})
+        const groupData = await Group.findOne({ _id: groupID, site: siteID }).populate({ path: 'members', select: 'name username' })
         if (groupData === null) throw new Error(`Group ${groupID} in project ${siteID} not found`)
         if (groupData.members.map(m => m._id).includes(userID)) throw new Error(`User ${userID} (${userData.username}) is already part of group ${groupID} (${groupData.name})`)
 
@@ -245,7 +247,7 @@ const acceptInvitation = async (siteID, userID) => {
         const site = await Site.findById(siteID)
         if (site === null) throw new Error(`${siteID} doesn't exist.`)
         if (!site.invitations.includes(userID)) throw new Error(`User ${userID} doesn't have invitation for project ${siteID}`)
-        const generalGroup = await Group.findOne({ site: siteID, name: "General" }).populate({ path: 'members', select: 'username' })
+        const generalGroup = await Group.findOne({ site: siteID, name: "General" }).populate({ path: 'members', select: 'name username' })
         if (generalGroup.members.map(m => m._id).includes(userID)) throw new Error(`You are already a member.`)
         await syncUserAndProjectData(userID, generalGroup._id, siteID)
         return { success: true, site, generalGroup } //? return data (group id,name and members)
@@ -259,7 +261,7 @@ const acceptRequest = async (siteID, userID, adminID) => {
         const site = await Site.findOne({ _id: siteID, creator: adminID })
         if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${siteID}. Admin: ${adminID}`)
         if (!site.requests.includes(userID)) throw new Error(`User ${userID} didn't requested to join project ${siteID}`)
-        const generalGroup = await Group.findOne({ site: siteID, name: "General" }).populate({ path: 'members', select: 'username' })
+        const generalGroup = await Group.findOne({ site: siteID, name: "General" }).populate({ path: 'members', select: 'name username' })
         if (generalGroup.members.map(m => m._id).includes(userID)) throw new Error(`You are already a member.`)
         await syncUserAndProjectData(userID, generalGroup._id, siteID)
         return { success: true, site, generalGroup } //? return data (group id,name and members)
@@ -288,7 +290,7 @@ const cancelRequest = async (sid, uid) => {
         if (!site.requests.includes(uid)) throw new Error(`User ${uid} didn't requested to join project ${sid}`)
         await Site.findByIdAndUpdate(sid, { $pull: { requests: uid } })
         await User.findByIdAndUpdate(uid, { $pull: { requests: sid } })
-        return {success: true, site }
+        return { success: true, site }
     } catch (error) {
         return error.message
     }
@@ -302,7 +304,7 @@ const rejectInvitation = async (sid, uid) => {
         if (!site.invitations.includes(uid)) throw new Error(`User ${uid} doesn't have invitation for project ${sid}`)
         await Site.findByIdAndUpdate(sid, { $pull: { invitations: uid } })
         await User.findByIdAndUpdate(uid, { $pull: { invitations: sid } })
-        return {success: true, site }
+        return { success: true, site }
     } catch (error) {
         return error.message
     }
@@ -319,6 +321,11 @@ const cancelInvitation = async (sid, uid, aid) => {
     } catch (error) {
         return error.message
     }
+}
+
+const updateProfileData = async (uid, data) => {
+    const newData = await User.findByIdAndUpdate(uid, data, { new: true })
+    return newData
 }
 
 
@@ -338,5 +345,6 @@ module.exports = {
     rejectInvitation,
     cancelInvitation,
     acceptRequest,
-    rejectRequest
+    rejectRequest,
+    updateProfileData
 }

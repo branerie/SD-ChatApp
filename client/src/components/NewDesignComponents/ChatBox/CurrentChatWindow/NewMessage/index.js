@@ -9,13 +9,13 @@ const NewMessage = ({ message }) => {
     }
     
     return (
-        <div className={styles['new-message']}>
+        <div className={`${styles['new-message']} ${message.own && styles['new-message-own']}`}>
             <div className={styles['info']}>
                 <div className={styles['avatar']} >
                     <Avatar size={32} />
                 </div>
             </div>
-            <div className={styles['text-box']}>
+            <div className={`${styles['text-box']} ${message.own && styles['text-box-own']}`}>
                 <div className={styles['name']}>
                     {message.user}
                 </div>

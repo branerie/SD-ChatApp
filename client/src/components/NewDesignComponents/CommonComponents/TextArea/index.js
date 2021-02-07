@@ -33,7 +33,17 @@ const TextArea = (props) => {
         socket.emit(recipientType, { site, recipient, msg }, () => {
             setMsg('')
             if (recipient === userData.personal._id) return
-            dispatchUserData({type: recipientType, payload: { user: userData.personal.username, msg, site, group: recipient, chat: recipient }})
+            dispatchUserData({
+                type: recipientType, 
+                payload: { 
+                    user: userData.personal._id, 
+                    msg, 
+                    site, 
+                    group: recipient, 
+                    chat: recipient,
+                    own: true
+                }
+            })
         })
         return
     }
