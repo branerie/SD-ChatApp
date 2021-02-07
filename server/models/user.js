@@ -15,7 +15,10 @@ const UserSchema = new mongoose.Schema({
         // required: true
     },
     name: {
-        type: String
+        type: String,
+        default: function () {
+            return this.username
+        }
     },
     company: {
         type: String
