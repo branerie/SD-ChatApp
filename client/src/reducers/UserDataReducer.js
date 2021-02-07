@@ -4,12 +4,13 @@ export default function UserDataReducer(userData, action) {
         //     break
 
         case "welcome-message": {
-            let activeSite = Object.keys(action.payload.userData.sites)[0] || false
-            let activeGroup = activeSite ? Object.keys(action.payload.userData.sites[activeSite].groups)[0] : false
+            // let activeSite = Object.keys(action.payload.userData.sites)[0] || false
+            // let activeGroup = activeSite ? Object.keys(action.payload.userData.sites[activeSite].groups)[0] : false
+            // load home page with search for projects and users?
             return {
                 ...action.payload.userData,
-                activeSite,
-                activeGroup,
+                activeSite: false,
+                activeGroup: false,
                 activeChat: false
             }
         }
@@ -70,7 +71,7 @@ export default function UserDataReducer(userData, action) {
                 chats: {
                     ...userData.chats,
                     [user._id]: {
-                        username: user.username,
+                        username: user.name,
                         messages: userData.chats[user._id] ? userData.chats[user._id].messages : [],
                         unread: false
                     }
@@ -129,6 +130,7 @@ export default function UserDataReducer(userData, action) {
         case "group-chat-message": {
             let timestamp = new Date().toUTCString()
             let { site, group, msg, user } = action.payload
+            let own = user === userData.personal._id
             return {
                 ...userData,
                 sites: {
@@ -139,14 +141,14 @@ export default function UserDataReducer(userData, action) {
                             ...userData.sites[site].groups,
                             [group]: {
                                 ...userData.sites[site].groups[group],
-                                unread: (group !== userData.activeGroup && user !== userData.personal._id) ? true : false,
+                                unread: group !== userData.activeGroup && !own,
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {
-                                        user: userData.sites[site].groups[group].members.find(m => m._id === user).username,
+                                        user: userData.sites[site].groups[group].members.find(m => m._id === user).name,
                                         msg,
                                         timestamp,
-                                        own: user === userData.personal._id
+                                        own
                                     }
                                 ]
                             }
@@ -159,7 +161,7 @@ export default function UserDataReducer(userData, action) {
         case "single-chat-message": {
             let timestamp = new Date().toUTCString()
             let { user, chat, msg, own } = action.payload
-            if (own) user = userData.personal.name || userData.personal.username
+            if (own) user = userData.personal.name
             return {
                 ...userData,
                 chats: {
@@ -172,7 +174,7 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.chats[chat].messages || [],
                                     { user, msg, timestamp, own }
                                 ],
-                                unread: (chat !== userData.activeChat && !own) ? true : false
+                                unread: chat !== userData.activeChat && !own
                             }
                             : {
                                 username: user,
@@ -203,7 +205,7 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.sites[site].groups[group].messages,
                                     {
                                         user: "SERVER",
-                                        msg: `${user.username} is online.`,
+                                        msg: `${user.name} is online.`,
                                         timestamp
                                     }
                                 ],
@@ -238,7 +240,7 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.sites[site].groups[group].messages,
                                     {
                                         user: "SERVER",
-                                        msg: `${user.username} has joined.`,
+                                        msg: `${user.name} has joined.`,
                                         timestamp
                                     }
                                 ],
@@ -267,7 +269,7 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.sites[site].groups[group].messages,
                                     {
                                         user: "SERVER",
-                                        msg: `${user.username} is offline.`,
+                                        msg: `${user.name} is offline.`,
                                         timestamp
                                     }
                                 ],
