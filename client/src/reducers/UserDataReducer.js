@@ -427,6 +427,16 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
+        case "update-profile-data": {
+            return {
+                ...userData,
+                personal: {
+                    ...userData.personal,
+                    ...action.payload.newData
+                }
+            }
+        }
+
         case "disconnect-message": {
             return false
         }

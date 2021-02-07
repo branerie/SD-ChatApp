@@ -31,7 +31,6 @@ module.exports = io => {
         }
         // console.log(JSON.stringify(userData, null, 4))
 
-        // if (userData.name) userData.username = userData.name
         const reactUserData = {
             sites: {},
             chats: {},
@@ -41,6 +40,8 @@ module.exports = io => {
                 email: userData.email,
                 mobile: userData.mobile,
                 username: userData.username,
+                company: userData.company,
+                position: userData.position,
             }
         }
         if (userData.invitations) reactUserData.invitations = userData.invitations
@@ -104,9 +105,9 @@ module.exports = io => {
                 case "User":
                     // determine who is the other party in conversation
                     let partyID = own ? msg.destination._id.toString() : msg.source._id.toString()
-                    let partyName = own 
-                    ? msg.destination.name || msg.destination.username
-                    : msg.source.name || msg.source.username
+                    let partyName = own
+                        ? msg.destination.name || msg.destination.username
+                        : msg.source.name || msg.source.username
                     if (!reactUserData.chats[partyID]) {
                         reactUserData.chats[partyID] = {
                             username: partyName,
@@ -555,6 +556,28 @@ module.exports = io => {
             }
             sysLog(`Join request from ${userData._id} to ${site} canceled by user.`)
             // callback()
+        })
+
+        socket.on('update-profile-data', async (data, callback) => {
+            //move this to middleware
+            if (!data || data.constructor.name !== 'Object') {
+                sysLog(`Invalid data from ${userData._id} Expected Object - got ${data.constructor.name}.`)
+                return
+            }
+            const allowedFields = ['name', 'company', 'position', 'email', 'mobile']
+            const ignoredData = {}
+            let invalidData = false
+            for (const field in data) {
+                if (!allowedFields.includes(field)) {
+                    ignoredData[field] = data[field]
+                    invalidData = true
+                    delete data[field]
+                }
+            }
+            invalidData && sysLog(`Unexpected data from ${userData._id}.\nIgnored data: ${JSON.stringify(ignoredData)}.`)
+            const newProfileData = await db.updateProfileData(userData._id, data)
+            callback(data)
+            // if name uis changed send newProfileData.name to connected rooms and users via socket? 
         })
     })
 
