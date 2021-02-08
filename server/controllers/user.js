@@ -4,6 +4,24 @@ const router = express.Router()
 const bcrypt = require('bcrypt');
 const models = require('../models');
 
+router.get('/details/:userId', async (request, response) => {
+    const { userId } = request.params
+
+    const user = await models.User.findById(userId)
+    if (!user) {
+        return response.status(400).send({ error: `User with id ${userId} does not exist.` })
+    }
+
+    return response.send({
+        userId: userId,
+        username: user.username,
+        name: user.name,
+        ...(user.email) && { email: user.email },
+        ...(user.position) && { position: user.position },
+        ...(user.company) && { company: user.company },
+    })
+})
+
 router.post('/login', async (request, response, next) => {
     const {
         username,
