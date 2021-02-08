@@ -11,7 +11,7 @@ export default function SocketContextProvider(props) {
     useEffect(() => {
         if (!auth) return
 
-        const url = process.env.NODE_ENV === 'production' ? 'https://smartdesignchatapp.herokuapp.com' : 'http://localhost:5000'
+        const url = process.env.REACT_APP_HOST
         const request = io(url, {
             reconnectionAttempts: 10,
             transports: ['websocket']

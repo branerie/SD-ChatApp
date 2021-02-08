@@ -7,7 +7,7 @@ import authenticate from '../../utils/authenticate'
 import { AuthenticateUser } from '../../context/authenticationContext'
 
 const LoginMain = () => {
-    const url = process.env.NODE_ENV === 'production' ? 'https://smartdesignchatapp.herokuapp.com/login' : 'http://localhost:5000/login'
+    const url = `${process.env.REACT_APP_HOST}/login`
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const context = AuthenticateUser()

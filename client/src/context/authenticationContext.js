@@ -28,7 +28,7 @@ export default function AuthenticationProvider(props) {
 
     useEffect(() => {
         const token = getCookie('x-auth-token')
-        const url = process.env.NODE_ENV === 'production' ? 'https://smartdesignchatapp.herokuapp.com/verify' : 'http://localhost:5000/verify'
+        const url = `${process.env.REACT_APP_HOST}/verify`
         if (!token) {
             logOut()
             return
