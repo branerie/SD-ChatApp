@@ -9,7 +9,7 @@ import inputValidation from '../../utils/inputValidation'
 import { useHistory } from "react-router-dom"
 
 const RegisterMain = () => {
-    const url = process.env.NODE_ENV === 'production' ? 'https://smartdesignchatapp.herokuapp.com/register' : 'http://localhost:5000/register'
+    const url = `${process.env.REACT_APP_HOST}/register`
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [rePassword, setRePassword] = useState('')
