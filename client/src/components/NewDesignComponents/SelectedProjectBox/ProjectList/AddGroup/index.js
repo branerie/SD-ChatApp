@@ -19,7 +19,7 @@ const AddGroup = (props) => {
                 // else console.log(data)
             }
         })
-        props.setBackgroundShown(false)
+        props.closeOpenedWindows(false)
     }
 
     return (

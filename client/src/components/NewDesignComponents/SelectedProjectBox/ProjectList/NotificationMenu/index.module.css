@@ -1,0 +1,16 @@
+.menu {
+    background-color: lightgrey;
+    border-radius: 10px;
+    width: 250px;
+    /* height: 20px; */
+    position: absolute;
+    top: 25px;
+    right: 30px;
+    z-index: 2;
+}
+
+.header {
+    margin: 10px;
+    color: black;
+}
+

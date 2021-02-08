@@ -8,6 +8,8 @@ import { MessagesContext } from '../../../../context/MessagesContext'
 import TransparentBackground from '../../CommonComponents/TransparentBackground'
 import AddGroup from './AddGroup'
 import AcceptMember from './AcceptMember'
+import NotificationMenu from './NotificationMenu'
+import FullyTransparentBackground from './FullyTransparentBackground'
 
 
 const ProjectList = () => {
@@ -15,8 +17,9 @@ const ProjectList = () => {
     const site = userData.activeSite ? userData.sites[userData.activeSite].name : false
     console.log(userData);
     const [backgroundShown, setBackgroundShown] = useState(false)
+    const [fullyTransparetnBackgroundOpened, setFullyTransparetnBackgroundOpened] = useState(false)
     const [addGroupWindowOpened, setAddGroupWindowOpened] = useState(false)
-    const [acceptMemberWindowOpened, setAcceptMemberWindowOpened] = useState(false)
+    const [notificationMenuOpened, setNotificationMenuOpened] = useState(false)
 
     if (!userData || !userData.sites[userData.activeSite]) return null //<div>Loading...</div>
 
@@ -25,18 +28,17 @@ const ProjectList = () => {
         setBackgroundShown(true)
     }
 
-    const openAcceptWindow = () => {
-        setAcceptMemberWindowOpened(true)
-        setBackgroundShown(true)
+    const openNotificationMenu = () => {
+        
+        setNotificationMenuOpened(true)
+        setFullyTransparetnBackgroundOpened(true)
     }
 
     const closeOpenedWindows = () => {
         setAddGroupWindowOpened(false)
-        setAcceptMemberWindowOpened(false)
+        setNotificationMenuOpened(false)
         setBackgroundShown(false)
-    }
-
-    const handleNotifications = () => {
+        setFullyTransparetnBackgroundOpened(false)
     }
 
     return (
@@ -45,19 +47,22 @@ const ProjectList = () => {
             <div className={styles['small-icons']}>
                 {userData.sites[userData.activeSite].creator === userData.personal._id ? <img src={smallPlus} alt="Create Group" className={styles['plus-icon']} onClick={openAddProjectWindow} /> : <div></div>}
                 {userData.sites[userData.activeSite].creator === userData.personal._id && userData.sites[userData.activeSite].requests && userData.sites[userData.activeSite].requests.length ?
-                    <img src={notificationIconFilled} alt="Notification" className={styles['plus-icon']} onClick={openAcceptWindow} /> :
-                    <img src={notificationProjectIcon} alt="Notification" className={styles['plus-icon']} onClick={openAddProjectWindow} />
+                    <img src={notificationIconFilled} alt="Notification" className={styles['plus-icon']} onClick={openNotificationMenu} /> :
+                    <img src={notificationProjectIcon} alt="Notification" className={styles['plus-icon']} onClick={openNotificationMenu} />
                 }
                 <img src={settingIcon} alt="Settings Icon" className={styles['settings-icon']} />
             </div>
             <div>
-                {addGroupWindowOpened && <AddGroup />}
+                {addGroupWindowOpened && <AddGroup closeOpenedWindows={closeOpenedWindows}/>}
             </div>
             <div>
-                {acceptMemberWindowOpened && <AcceptMember />}
+                {notificationMenuOpened && <NotificationMenu />}
             </div>
             <div>
                 {backgroundShown && <TransparentBackground closeOpenedWindows={closeOpenedWindows} />}
+            </div>
+            <div>
+                {fullyTransparetnBackgroundOpened && <FullyTransparentBackground closeOpenedWindows={closeOpenedWindows} />}
             </div>
         </div>
     )
