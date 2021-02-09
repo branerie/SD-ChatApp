@@ -9,12 +9,13 @@ import { MessagesContext } from '../../../context/MessagesContext'
 
 import expandArrow from '../../../images/arrowLeft.png'
 import shrinkArrow from '../../../images/arrowRight.png'
-import getCookie from '../../../utils/cookie'
+import { SocketContext } from '../../../context/SocketContext'
 
 const ProfileInfoBox = () => {
     const [isShown, setIsShown] = useState(false)
     const [userInChat, setUserInChat] = useState({})
     const { userData } = useContext(MessagesContext)
+    const { socket } = useContext(SocketContext)
 
     useEffect(() => {
         if (!userData.activeChat || !isShown) return
@@ -22,23 +23,11 @@ const ProfileInfoBox = () => {
         if (userInChat.userId === userData.activeChat) return
 
         const getUserDetails = async (userId) => {
-            try {
-                const response = await fetch(`${process.env.REACT_APP_HOST}/details/${userId}`, {
-                    headers: {
-                        'Authorization': getCookie('x-auth-token')
-                    }
-                })
-
-                const result = await response.json()
-                if (result.error) {
-                    // TODO: Handle invalid user id error
-                    return
+            socket.emit('get-user-details', userId, (success, userDetails) => {
+                if (success) {
+                    setUserInChat(userDetails)
                 }
-
-                setUserInChat(result)
-            } catch (error) {
-                console.log(error)
-            }
+            })
         }
 
         getUserDetails(userData.activeChat)
@@ -53,11 +42,11 @@ const ProfileInfoBox = () => {
             </div>
             { isShown &&
                 <div className={styles['profile-info-box']}>
-                    <ProfilePic />
+                    <ProfilePic picturePath={userInChat.picture} />
                     <div className={styles['text-container']}>
                         <Name name={userInChat.name} position={userInChat.position} />
                         <SocialMediaBox />
-                        <SendMsgButtonsBox />
+                        <SendMsgButtonsBox userId={userInChat.userId} name={userInChat.name} />
                         <PersonalInfoBox
                             username={userInChat.username}
                             email={userInChat.email}

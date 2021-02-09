@@ -1,9 +1,16 @@
-import React from 'react'
-import profilePic from '../../../../images/profPic.svg'
+import React, { useContext } from 'react'
+import styles from './index.module.css'
+import emptyProfilePic from '../../../../images/emptyProfilePic.png'
+import { getFullImageUrl } from '../../../../utils/image'
 
-const ProfilePic = () => {
+const ProfilePic = ({ picturePath }) => {
     return (
-        <img src={profilePic}/>   
+        <div className={styles.container}>
+            <img 
+                src={picturePath ? getFullImageUrl(picturePath) : emptyProfilePic} 
+                className={styles.image} 
+            /> 
+        </div>  
     )
 }
 

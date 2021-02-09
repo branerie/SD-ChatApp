@@ -12,6 +12,7 @@ const createUserData = (userData, messagePool) => {
             username: userData.username,
             company: userData.company,
             position: userData.position,
+            picture: userData.picture
         }
     }
     if (userData.invitations) clientData.invitations = userData.invitations
