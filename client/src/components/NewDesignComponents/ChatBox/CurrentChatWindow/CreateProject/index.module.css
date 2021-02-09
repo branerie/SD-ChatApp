@@ -1,0 +1,27 @@
+.form-control {
+	margin: 10px 0px;
+	width: 100%;
+}
+
+.input {
+	font-size: 16px;
+	padding: 5px;
+	height: 40px;
+	width: 100%;
+	/* border: none; */
+    border-radius: 15px;
+    outline: none;
+}
+
+.menu-field button {
+	float: right;
+}
+
+.errors {
+	color: red;
+	margin-left: 20px;
+}
+
+.errors li {
+	padding: 0;
+}
