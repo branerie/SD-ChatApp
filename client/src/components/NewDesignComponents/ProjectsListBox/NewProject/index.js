@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import styles from './index.module.css'
 import settingsIconBig from '../../../../images/settingsIconBig.svg'
-import { useHistory } from 'react-router-dom'
 import TransparentBackground from '../../CommonComponents/TransparentBackground'
 import SettingsPage from '../../../../pages/SettingsPage'
 
 const NewProject = () => {
-    const history = useHistory()
     const [backgroundOpened, setBackgroundOpened] = useState(false)
     const [settingPageOpened, setSettingPageOpened] = useState(false)
     
@@ -18,8 +16,6 @@ const NewProject = () => {
      const closeOpenedWindows = () => {
         setBackgroundOpened(false)
         setSettingPageOpened(false)
-        setAddProjectOpened(false)
-        setJoinProjectOpened(false)
     }
 
     return (
@@ -27,9 +23,6 @@ const NewProject = () => {
             <div className={styles['box']}>
                 <div className={styles['button']} onClick={openSettingsWindow}>
                     <img src={settingsIconBig} className={styles['img']} />
-                </div>
-                <div>
-                    <button onClick={() => { history.push('/chat') }}>Old Design</button>
                 </div>
                 <div>
                 </div>
