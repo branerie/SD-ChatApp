@@ -454,12 +454,14 @@ module.exports = io => {
             // callback()
         })
 
-        socket.on('search-projects', async ({site}, callback) => {
-            const data = await db.searchProjects(site)
+        socket.on('search-projects', async (socketData, callback) => {
+            if (!isValid(socketData, userData._id)) return
+            const {site = '', page = 0 } = socketData
+            const data = await db.searchProjects(site, page)
             if (data.success) {
                 callback(true, data.projects)
             } else {
-                callback(false, 'No matches found')
+                callback(false)
             }
         })
 

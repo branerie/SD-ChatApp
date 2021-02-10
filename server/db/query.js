@@ -326,19 +326,20 @@ const cancelInvitation = async (sid, uid, aid) => {
         return error.message
     }
 }
-const searchProjects = async(pattern) => {
+const searchProjects = async(pattern, page) => {
+    const limit = 5
+    const skip = page * limit
     const projects = await Site.find({
         name: {
             $regex: pattern, 
             $options: 'i'
         }},
-        'name description creator'
+        'name description creator createdAt'
     ).populate({
         path: 'creator',
         select: 'name'
-    }).limit(5)
+    }).skip(skip).limit(limit)
 
-    // console.log(projects)
     return { success: projects.length > 0, projects}
 }
 

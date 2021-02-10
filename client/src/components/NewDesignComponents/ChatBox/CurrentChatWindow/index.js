@@ -5,7 +5,6 @@ import UserNav from './UserNav/'
 import NewMessage from './NewMessage/'
 import DevLine from './DevLine/'
 import SendMessageBox from './SendMessageBox'
-import Profile from './Profile'
 
 import { MessagesContext } from '../../../../context/MessagesContext'
 
@@ -65,7 +64,6 @@ const CurrentChatWindow = (props) => {
                     )
                 })}
             </div>
-            {/* {msgBox ? <SendMessageBox /> : <Profile />} */}
             {msgBox && <SendMessageBox />}
         </div>
     )
