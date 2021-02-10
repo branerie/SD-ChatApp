@@ -1,10 +1,10 @@
 import React, { useEffect, useContext, useRef, useState } from 'react'
 import styles from './index.module.css'
 import ChatTitle from './ChatTitle/'
+import UserNav from './UserNav/'
 import NewMessage from './NewMessage/'
 import DevLine from './DevLine/'
 import SendMessageBox from './SendMessageBox'
-import Profile from './Profile'
 
 import { MessagesContext } from '../../../../context/MessagesContext'
 
@@ -36,7 +36,7 @@ const CurrentChatWindow = (props) => {
     } else {
         messages = [{
             user: "SERVER",
-            msg: [`Welcome to SmartChat Network ${userData.personal.username}.`,
+            msg: [`Welcome to SmartChat Network ${userData.personal.name}.`,
             "If you don't have any membership yet, you can create your own projects or join an existing project.",
             "By the time, we suggest you complete your profile by adding some info about yourself.",
             "If skipped now, this can be done later from the settings button."
@@ -44,12 +44,13 @@ const CurrentChatWindow = (props) => {
             timestamp: new Date().toUTCString(),
             own: false
         }]
-        title = `Welcome ${userData.personal.username}`
+        title = `Welcome ${userData.personal.name}`
         msgBox = false
     }
 
     return (
         <div className={styles['current-chat-window']}>
+            <UserNav />
             <ChatTitle title={title}/>
             <div ref={messagesRef} className={styles['message-box']}>
                 {messages.map(({ user, msg, timestamp, own }, i) => {
@@ -63,7 +64,7 @@ const CurrentChatWindow = (props) => {
                     )
                 })}
             </div>
-            {msgBox ? <SendMessageBox /> : <Profile />}
+            {msgBox && <SendMessageBox />}
         </div>
     )
 }

@@ -99,12 +99,13 @@ const syncUserAndProjectData = async (uid, gid, sid) => {
     }
 }
 
-const createSite = async (name, creator) => {
+const createSite = async (name, description ,creator) => {
     const siteData = new Site({
         name,
+        description,
         creator
     })
-
+    // return
     try {
         const newSite = await siteData.save()
         // console.log(newSite);
@@ -112,10 +113,13 @@ const createSite = async (name, creator) => {
         return { success: true, groupID: generalGroup._id, siteID: siteData._id }
     } catch (error) {
         if (error.code === 11000) {
-            return { success: false, message: "Site exists" }
+            return { success: false, errors: ['Project already exists.'] }
+        } else if (error.name === 'ValidationError') {
+            const errors = Object.keys(error.errors).map(e => error.errors[e].message)
+            return { success: false, errors }
+        } else {
+            return { success: false, errors: ['Something went wrong.'] }
         }
-        // add validations in model and check for more errors
-        return { success: false, message: error.code }
     }
 }
 
@@ -322,6 +326,22 @@ const cancelInvitation = async (sid, uid, aid) => {
         return error.message
     }
 }
+const searchProjects = async(pattern, page) => {
+    const limit = 5
+    const skip = page * limit
+    const projects = await Site.find({
+        name: {
+            $regex: pattern, 
+            $options: 'i'
+        }},
+        'name description creator createdAt'
+    ).populate({
+        path: 'creator',
+        select: 'name'
+    }).skip(skip).limit(limit)
+
+    return { success: projects.length > 0, projects}
+}
 
 const updateProfileData = async (uid, data) => {
     const newData = await User.findByIdAndUpdate(uid, data, { new: true })
@@ -346,5 +366,6 @@ module.exports = {
     cancelInvitation,
     acceptRequest,
     rejectRequest,
+    searchProjects,
     updateProfileData
 }
