@@ -1,4 +1,5 @@
 const jwt = require('./utils/jwt')
+const vsd = require('./utils/validate-socket-data')
 const db = require('./db/query')
 const cookie = require("cookie")
 const createUserData = require('./utils/createUserData')
@@ -38,8 +39,8 @@ module.exports = io => {
         sysLog(`Connect @ ${socket.id} (${userData.username}). Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
 
 
-        const {clientData, allMembers, siteCache} = createUserData(userData, messagePool)
-        groupToSiteCache = {...groupToSiteCache, ...siteCache }
+        const { clientData, allMembers, siteCache } = createUserData(userData, messagePool)
+        groupToSiteCache = { ...groupToSiteCache, ...siteCache }
 
         userData.groups.forEach(({ _id, site }) => {
             _id = _id.toString()
@@ -129,8 +130,17 @@ module.exports = io => {
             await db.removeChat(userData._id, chat)
         })
 
-        socket.on('create-site', async (site, callback) => { //admin
-            const data = await db.createSite(site, userData._id)
+        socket.on('create-site', async (socketData, callback) => { //admin
+            if (!isValid(socketData, userData._id)) return
+            let { site = '', description = '' } = socketData
+            site = String(site).trim()
+            description = String(description).trim()
+            const check = vsd.siteData(site, description)
+            if (check.failed) {
+                callback(false, check.errors)
+                return
+            }
+            const data = await db.createSite(site, description, userData._id)
             if (data.success) {
                 let groupID = data.groupID.toString()
                 groupToSiteCache[groupID] = data.siteID
@@ -161,7 +171,7 @@ module.exports = io => {
                 restSocketsJoin(userData._id, socket.id, groupID)
                 restSocketsUpdate(userData._id, socket.id, "create-site", siteData)
             } else {
-                callback(false, data.message)
+                callback(false, data.errors)
             }
         })
 
@@ -445,6 +455,17 @@ module.exports = io => {
             // callback()
         })
 
+        socket.on('search-projects', async (socketData, callback) => {
+            if (!isValid(socketData, userData._id)) return
+            const {site = '', page = 0 } = socketData
+            const data = await db.searchProjects(site, page)
+            if (data.success) {
+                callback(true, data.projects)
+            } else {
+                callback(false)
+            }
+        })
+
         socket.on('update-profile-data', async (data, callback) => {
             //move this to middleware
             if (!data || data.constructor.name !== 'Object') {
@@ -504,6 +525,16 @@ module.exports = io => {
             })
         }
     }
+}
+
+function isValid(object, source) {
+    if (object == null || object == undefined) {
+        sysLog(`Invalid data from ${source} Expected Object - got ${object}`)
+        return false
+    } else if (!object || object.constructor.name !== 'Object') {
+        sysLog(`Invalid data from ${source} Expected Object - got ${object.constructor.name}.`)
+        return false
+    } else return true
 }
 
 function getTime() {

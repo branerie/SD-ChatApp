@@ -15,6 +15,14 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
+        case "load-projects": {
+            return {
+                ...userData,
+                activeSite: false,
+                activeGroup: false,
+                activeChat: false
+            }
+        }
         case "load-site": { // load selected site data
             let activeSite = action.payload.site
             let activeGroup = Object.keys(userData.sites[activeSite].groups)[0]
