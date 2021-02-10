@@ -3,6 +3,7 @@ import styles from './index.module.css'
 import StatusLightsBox from '../StatusLightsBox'
 import ProjectCircleBox from '../ProjectCircleBox'
 import NewProject from '../NewProject'
+import PrivateChatList from '../PrivateChatList'
 
 
 
@@ -10,9 +11,10 @@ const ProjectsList = () => {
     
     return (
         <div className={styles['projects-list']}>
-            <StatusLightsBox />
+            {/* <StatusLightsBox /> */}
             <ProjectCircleBox />
-            <NewProject />
+            <PrivateChatList />
+            {/* <NewProject /> */}
         </div>
     )
 }
