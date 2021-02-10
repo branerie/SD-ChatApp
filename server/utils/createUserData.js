@@ -12,6 +12,7 @@ const createUserData = (userData, messagePool) => {
             username: userData.username,
             company: userData.company,
             position: userData.position,
+            picture: userData.picture
         }
     }
     if (userData.invitations) clientData.invitations = userData.invitations
@@ -55,6 +56,9 @@ const createUserData = (userData, messagePool) => {
                 }
                 clientData.chats[partyID].messages.push({
                     user: msg.source.name,
+                    // added because username is unique, could be replaced by id
+                    // purpose is to map profile pics to user who created message
+                    username: msg.source.username,
                     msg: msg.content,
                     timestamp: msg.createdAt,
                     own
@@ -64,6 +68,9 @@ const createUserData = (userData, messagePool) => {
             case "Group":
                 clientData.sites[siteCache[msg.destination._id]].groups[msg.destination._id].messages.push({
                     user: msg.source.name,
+                    // added because username is unique, could be replaced by id
+                    // purpose is to map profile pics to user who created message
+                    username: msg.source.username,
                     msg: msg.content,
                     timestamp: msg.createdAt,
                     own

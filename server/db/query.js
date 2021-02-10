@@ -15,7 +15,7 @@ const getUserData = async (id) => {
         select: 'name members site',
         populate: [{
             path: 'members',
-            select: 'name username'
+            select: 'name username picture'
         }, {
             path: 'site',
             select: 'name creator invitations requests',
@@ -348,6 +348,23 @@ const updateProfileData = async (uid, data) => {
     return newData
 }
 
+const getUserDetails = async (uid) => {
+    const user = await User.findById(uid)
+    if (!user) throw new Error(`User with id ${uid} not found`)
+
+    return {
+        userId: uid,
+        username: user.username,
+        ...(user.name && { name: user.name }),
+        ...(user.email && { email: user.email }),
+        ...(user.company && { company: user.company }),
+        ...(user.mobile && { mobile: user.mobile }),
+        ...(user.position && { position: user.position }),
+        ...(user.picture && { picture: user.picture }),
+        ...(user.social && { social: user.social })
+    }
+}
+
 
 module.exports = {
     getUserData,
@@ -366,6 +383,7 @@ module.exports = {
     cancelInvitation,
     acceptRequest,
     rejectRequest,
+    getUserDetails,
     searchProjects,
     updateProfileData
 }

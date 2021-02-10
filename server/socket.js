@@ -112,6 +112,7 @@ module.exports = io => {
                 userIDToSocketIDCache[recipient].forEach(socketID => {
                     io.to(socketID).emit("single-chat-message", {
                         user: userData.name,
+                        username: userData.username,
                         chat: userData._id,
                         msg,
                         own: recipient === userData._id.toString()
@@ -471,7 +472,7 @@ module.exports = io => {
                 sysLog(`Invalid data from ${userData._id} Expected Object - got ${data.constructor.name}.`)
                 return
             }
-            const allowedFields = ['name', 'company', 'position', 'email', 'mobile']
+            const allowedFields = ['name', 'company', 'position', 'email', 'mobile', 'picture']
             const ignoredData = {}
             let invalidData = false
             for (const field in data) {
@@ -485,6 +486,11 @@ module.exports = io => {
             const newProfileData = await db.updateProfileData(userData._id, data)
             callback(data)
             // if name is changed send newProfileData.name to connected rooms and users via socket? 
+        })
+
+        socket.on('get-user-details', async (userId, callback) => {
+            const userDetails = await db.getUserDetails(userId)
+            callback(true, userDetails)
         })
     })
 

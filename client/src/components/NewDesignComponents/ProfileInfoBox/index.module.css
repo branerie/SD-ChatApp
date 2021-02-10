@@ -1,5 +1,30 @@
+.container {
+    display: flex;
+    max-width: 14rem;
+}
+
 .profile-info-box {
     display: flex;
     flex-direction: column;
     background-color: white;
+}
+
+.info-arrow {
+    min-width: 1.5rem;
+    max-width: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #707070;
+    cursor: pointer;
+    border-right: 3px solid black;
+    border-left: 3px solid black;
+}
+
+.arrow-img {
+    width: 100%;
+}
+
+.text-container {
+    margin: 0 0.8rem;
 }

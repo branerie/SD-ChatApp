@@ -1,14 +1,17 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import { MessagesContext } from '../../../../context/MessagesContext'
 import styles from './index.module.css'
-import { AuthenticateUser } from '../../../../context/authenticationContext'
 
+const StatusLight = ({ userId, size }) => {
+    const { userData } = useContext(MessagesContext)
+    
+    const color = userData.onlineMembers && userData.onlineMembers.includes(userId)
+                    ? 'green'
+                    : 'red'
 
-const StatusLight = (props) => {
-    const { logOut } = AuthenticateUser()
     return (
         <div 
-            className={`${styles.circle} ${styles[props.color]} ${styles[props.size]}`} 
-            onClick={()=>{logOut()}}
+            className={`${styles.circle} ${styles[color]} ${styles[size]}`}
         />
     )
 }

@@ -16,7 +16,7 @@
 }
 
 .text-box {
-    margin-left: 5px;
+    margin: 0 10px;
     display: flex;
     flex-direction: column;
 }

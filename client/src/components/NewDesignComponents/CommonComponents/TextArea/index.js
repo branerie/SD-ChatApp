@@ -1,16 +1,21 @@
 import React, {useState, useEffect, useContext} from 'react'
+import Picker from 'emoji-picker-react'
 import styles from './index.module.css'
 import TextareaAutosize from 'react-textarea-autosize'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import { SocketContext } from '../../../../context/SocketContext'
+import useDetectOutsideClick from '../../../../utils/useDetectOutsideClick'
+import { replaceEmojis } from '../../../../utils/text'
+
+import emotIcon from '../../../../images/emotIcon.svg'
 
 const TextArea = (props) => {
     const [searchWord, setSearchWord] = useState('')
     const [inputTextSyle, setInputTextSyle] = useState('input')
     const [msg, setMsg] = useState('')
+    const { ref, isVisible, setIsVisible } = useDetectOutsideClick()
     const { userData, dispatchUserData} = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
-
 
     function getKey(e) {
         if (e.key !== 'Enter') return 
@@ -36,7 +41,8 @@ const TextArea = (props) => {
             dispatchUserData({
                 type: recipientType, 
                 payload: { 
-                    user: userData.personal._id, 
+                    user: userData.personal._id,
+                    username: userData.personal.username,
                     msg, 
                     site, 
                     group: recipient, 
@@ -47,7 +53,6 @@ const TextArea = (props) => {
         })
         return
     }
-
 
     useEffect(() => {
         if (searchWord) {
@@ -68,16 +73,27 @@ const TextArea = (props) => {
         //     row='1'
         // />
         // <form onSubmit={e => sendMessage(e)}>
+        <>
             <TextareaAutosize 
                 className={styles['text-area']}
                 placeholder={props.placeholder}
                 value={msg}
-                onChange={e => setMsg(e.target.value)}
+                onChange={e => setMsg(replaceEmojis(e.target.value))}
                 onKeyPress={e => getKey(e)}
                 autoFocus
                 maxRows={4}
                 minRows={1}
             />
+            <div onClick={() => setIsVisible(!isVisible)} className={styles['link-emoji']}>
+                <img src={emotIcon} />
+            </div>
+            { isVisible &&
+                <div class={styles.emoji} ref={ref}>
+                    <Picker onEmojiClick={(e, emojiObj) => setMsg(msg + emojiObj.emoji)} />
+                </div>
+            }
+        </>
+
     )
 }
 

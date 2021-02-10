@@ -1,8 +1,18 @@
-.profile-picture {
-    background-color: lightcoral;
+.pic-container {
     width: 60%;
+    margin-left: 20px;
+}
+
+.profile-picture {
+    /* background-color: lightcoral; */
+    width: 100%;
+    background-color: lightgray;
     height: auto;
     align-self: center;
     margin-top: 20px;
-    margin-left: 20px;
+}
+
+.btn-change {
+    width: 100%;
+    height: 2rem;
 }

@@ -1,19 +1,24 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import styles from './index.module.css'
 import StatusLight from '../../CommonComponents/StatusLight'
-import Avatar from 'react-avatar'
+import { MessagesContext } from '../../../../context/MessagesContext'
+import UserAvatar from '../../CommonComponents/UserAvatar'
 
-const Friend = (props) => {
+const Friend = ({ id, name, picturePath, isOnline }) => {
+    const { dispatchUserData } = useContext(MessagesContext)
+
+    const openChatWithFriend = () => {
+        dispatchUserData({ type: 'open-chat', payload: { user: { _id: id, name: name } } })
+    }
+
     return (
-        <div className={styles['friends']}>
+        <div className={styles['friends']} onClick={openChatWithFriend}>
             <div className={styles['status-light']}>
-                <StatusLight color='red' size='small' />
+                    <StatusLight userId={id} size='small' />
             </div>
-            <div className={styles['avatar']}>
-                <Avatar size={32} round='5px'  />
-            </div>
+            <UserAvatar picturePath={picturePath} />
             <div className={styles['name']}>
-                {props.name}
+                {name}
             </div>
 
         </div>
