@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './index.module.css'
 import StatusLight from '../../CommonComponents/StatusLight'
 
-const Name = ({ name, position }) => {
+const Name = ({ userId, name, position }) => {
     return (
         <div className={styles['name-position-box']}>
             <div className={styles['name-box']}>
@@ -11,8 +11,9 @@ const Name = ({ name, position }) => {
                 </div>
                 <div className={styles['status-light']} >
                     <StatusLight
+                        userId={userId}
                         size={'small'}
-                        color={'red'} />
+                    />
                 </div>
             </div>
             <div className={styles['position-box']}>

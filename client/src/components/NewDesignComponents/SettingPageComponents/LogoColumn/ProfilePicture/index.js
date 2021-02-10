@@ -37,8 +37,6 @@ const ProfilePicture = () => {
         widget.open()
     }
 
-    const pic = userData.personal.picture
-
     return (
         <div className={styles['pic-container']}>
             <img 

@@ -146,6 +146,8 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.sites[site].groups[group].messages,
                                     {
                                         user: userData.sites[site].groups[group].members.find(m => m._id === user).name,
+                                        // added in order to fetch user avatar as username is unique (can be replaced with id)
+                                        username: userData.sites[site].groups[group].members.find(m => m._id === user).username,
                                         msg,
                                         timestamp,
                                         own
@@ -160,7 +162,7 @@ export default function UserDataReducer(userData, action) {
 
         case "single-chat-message": {
             let timestamp = new Date().toUTCString()
-            let { user, chat, msg, own } = action.payload
+            let { user, username, chat, msg, own } = action.payload
             if (own) user = userData.personal.name
             return {
                 ...userData,
@@ -172,14 +174,14 @@ export default function UserDataReducer(userData, action) {
                                 ...userData.chats[chat],
                                 messages: [
                                     ...userData.chats[chat].messages || [],
-                                    { user, msg, timestamp, own }
+                                    { user, username, msg, timestamp, own }
                                 ],
                                 unread: chat !== userData.activeChat && !own
                             }
                             : {
                                 username: user,
                                 messages: [
-                                    { user, msg, timestamp, own }
+                                    { user, username, msg, timestamp, own }
                                 ],
                                 unread: true
                             }

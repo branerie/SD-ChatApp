@@ -1,0 +1,15 @@
+.avatar {
+    max-width: 2rem;
+    max-height: 2rem;
+    display: flex;
+    align-items: flex-end;
+}
+
+.profile-pic {
+    width: 100%;
+}
+
+.pic-rounded {
+    background-color: white;
+    border-radius: 50%;
+}

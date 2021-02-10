@@ -45,7 +45,12 @@ const FriendsList = () => {
                         className={userData.onlineMembers.includes(member._id) ? "online" : "offline"}
                         onDoubleClick={() => handleClick(member)}
                     >
-                        <Friend name={member.name} id={member._id} />
+                        <Friend 
+                            name={member.name} 
+                            id={member._id} 
+                            picturePath={member.picture}
+                            isOnline={userData.onlineMembers.includes(member._id)}
+                        />
                     </li>
                 })}
             </ul>

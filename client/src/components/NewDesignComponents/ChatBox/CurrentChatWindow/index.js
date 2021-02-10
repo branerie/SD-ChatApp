@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useRef, useState } from 'react'
+import React, { useEffect, useContext, useRef, useState, useMemo } from 'react'
 import styles from './index.module.css'
 import ChatTitle from './ChatTitle/'
 import NewMessage from './NewMessage/'
@@ -14,6 +14,21 @@ const CurrentChatWindow = (props) => {
     const messagesRef = useRef()
 
     useEffect(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight)
+
+    // TODO: When MessagesContext is changed to hold user data separately, should be removed
+    // and access to users' profile pics should be made directly from there
+    const allUsers = useMemo(() => {
+        if (!userData) return null
+
+        return Object.values(userData.sites).reduce((acc, site) => { 
+            const groups = Object.values(site.groups)
+    
+            const newAcc = { ...acc }
+            groups.forEach(g => g.members.forEach(m => newAcc[[m.username]] = m ))
+    
+            return newAcc
+        }, {})
+    }, [userData])
 
     if (!userData) return (
         <div className={styles['current-chat-window']}>
@@ -52,13 +67,19 @@ const CurrentChatWindow = (props) => {
         <div className={styles['current-chat-window']}>
             <ChatTitle title={title}/>
             <div ref={messagesRef} className={styles['message-box']}>
-                {messages.map(({ user, msg, timestamp, own }, i) => {
+                {messages.map(({ user, username, msg, timestamp, own }, i) => {
                     let thisDate = new Date(timestamp).toDateString()
                     let prevDate = i > 0 ? new Date(messages[i - 1].timestamp).toDateString() : undefined
                     return (
                         <div key={i} >
                             {thisDate !== prevDate && <DevLine date={thisDate} />}
-                            <NewMessage message={{ user, msg, timestamp, own }} />
+                            <NewMessage message={{ 
+                                user, 
+                                msg, 
+                                timestamp, 
+                                own,
+                                avatar: allUsers[[username]] ? allUsers[[username]].picture : null}}
+                            />
                         </div>
                     )
                 })}

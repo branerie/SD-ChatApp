@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './index.module.css'
-import Avatar from 'react-avatar'
+import UserAvatar from '../../../CommonComponents/UserAvatar'
 
 const NewMessage = ({ message }) => {
 
@@ -11,9 +11,7 @@ const NewMessage = ({ message }) => {
     return (
         <div className={`${styles['new-message']} ${message.own && styles['new-message-own']}`}>
             <div className={styles['info']}>
-                <div className={styles['avatar']} >
-                    <Avatar size={32} />
-                </div>
+                <UserAvatar picturePath={message.avatar} />
             </div>
             <div className={`${styles['text-box']} ${message.own && styles['text-box-own']}`}>
                 <div className={styles['name']}>

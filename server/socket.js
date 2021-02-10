@@ -111,6 +111,7 @@ module.exports = io => {
                 userIDToSocketIDCache[recipient].forEach(socketID => {
                     io.to(socketID).emit("single-chat-message", {
                         user: userData.name,
+                        username: userData.username,
                         chat: userData._id,
                         msg,
                         own: recipient === userData._id.toString()

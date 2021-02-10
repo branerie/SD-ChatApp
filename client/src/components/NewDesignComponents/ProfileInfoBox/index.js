@@ -44,7 +44,11 @@ const ProfileInfoBox = () => {
                 <div className={styles['profile-info-box']}>
                     <ProfilePic picturePath={userInChat.picture} />
                     <div className={styles['text-container']}>
-                        <Name name={userInChat.name} position={userInChat.position} />
+                        <Name 
+                            userId={userInChat.userId} 
+                            name={userInChat.name} 
+                            position={userInChat.position} 
+                        />
                         <SocialMediaBox />
                         <SendMsgButtonsBox userId={userInChat.userId} name={userInChat.name} />
                         <PersonalInfoBox

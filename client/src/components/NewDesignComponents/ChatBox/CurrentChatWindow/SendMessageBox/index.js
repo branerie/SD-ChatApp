@@ -2,8 +2,6 @@ import React from 'react'
 import styles from './index.module.css'
 import sendFile from '../../../../../images/sendFile.svg'
 import voiceMsg from '../../../../../images/voiceMsg.svg'
-import emotIcon from '../../../../../images/emotIcon.svg'
-import Input from '../../../CommonComponents/Input'
 import TextArea from '../../../CommonComponents/TextArea'
 
 
@@ -18,9 +16,6 @@ const SendMessageBox = () => {
             </div>
             <div className={styles['text-area-box']}>
                 <TextArea placeholder='Message'/>
-            </div>
-            <div className={styles['emot-icon']}>
-                <img src={emotIcon} />
             </div>
         </div>
     )

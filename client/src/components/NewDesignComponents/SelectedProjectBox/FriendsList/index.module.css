@@ -3,3 +3,7 @@
     flex-direction: column;
     margin-top: 24px;
 }
+
+ul li {
+    padding: 0;
+}

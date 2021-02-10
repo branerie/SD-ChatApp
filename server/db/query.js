@@ -15,7 +15,7 @@ const getUserData = async (id) => {
         select: 'name members site',
         populate: [{
             path: 'members',
-            select: 'name username'
+            select: 'name username picture'
         }, {
             path: 'site',
             select: 'name creator invitations requests',
