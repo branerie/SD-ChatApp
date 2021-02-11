@@ -1,0 +1,26 @@
+.form-control {
+	margin: 10px 0;
+	width: 100%;
+}
+
+.input {
+	font-size: 16px;
+	padding: 5px;
+	height: 40px;
+	width: 100%;
+	/* border: none; */
+    border-radius: 15px;
+    outline: none;
+}
+
+.form-btn {
+	float: right;
+}
+
+.menu-field ul {
+	clear: right;
+}
+
+.menu-field ul li button{
+	margin-left: 5px;
+}
