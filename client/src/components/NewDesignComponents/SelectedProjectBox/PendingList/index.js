@@ -1,20 +1,16 @@
 import React, { useContext, useState } from 'react'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import { SocketContext } from '../../../../context/SocketContext'
+import Friend from '../Friend'
 
 const PendingList = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
-    const [inviteInfo,setInviteInfo] = useState(false)
-    const [requestInfo,setRequestInfo] = useState(false)
+
     function cancelInvitation(user) {
         socket.emit('cancel-invitation', { user, site: userData.activeSite }, () => {
             // dispatchUserData({ type: 'cancel-invitation', payload: { invitation, site: userData.activeSite } })
         })
-    }
-
-    function showInvitationInfo(user) {
-        console.log(user)
     }
 
     function acceptRequest(user) {
@@ -29,8 +25,8 @@ const PendingList = () => {
         })
     }
 
-    function showRequestInfo(user) {
-        console.log(user)
+    function showInfo(user) {
+        dispatchUserData({ type: 'show-info', payload: { user } })
     }
 
     return (
@@ -40,14 +36,21 @@ const PendingList = () => {
                 <ul><span className='header'>Invitations</span>
                     {userData.sites[userData.activeSite].invitations.map(user => {
                         return (
-                            <li key={user}>
-                                <span>{userData.associatedUsers[user].name}</span>                                
-                                {inviteInfo && <span>({userData.associatedUsers[user].username})</span>}                             
-                                <div>
-                                    <button onClick={() => cancelInvitation(user)}>Cancel</button>
-                                    <span className="arrow down" onClick={() => setInviteInfo(!inviteInfo)}></span>
-                                </div>
-                            </li>
+                            <>
+                                <li key={user}>
+                                    <Friend
+                                        name={userData.associatedUsers[user].name}
+                                        id={user}
+                                        picturePath={userData.associatedUsers[user].picture}
+                                        isOnline={userData.onlineMembers.includes(user)}
+                                    />
+                                    <div>
+                                        <button onClick={() => showInfo(user)}>info</button>
+                                        <button onClick={() => cancelInvitation(user)}>X</button>
+                                    </div>
+                                </li>
+                                {userData.associatedUsers[user].info && <span>({userData.associatedUsers[user].username})</span>}
+                            </>
                         )
                     })}
                 </ul>
@@ -57,15 +60,22 @@ const PendingList = () => {
                 <ul><span className='header'>Requests</span>
                     {userData.sites[userData.activeSite].requests.map(user => {
                         return (
-                            <li key={user}>
-                                <span>{userData.associatedUsers[user].name}</span>
-                                {requestInfo && <span>({userData.associatedUsers[user].username})</span>}
-                                <div>
-                                    <button onClick={() => acceptRequest(user)}>Accept</button>
-                                    <button onClick={() => rejectRequest(user)}>Reject</button>
-                                    <span className="arrow down" onClick={() => setRequestInfo(!requestInfo)}></span>
-                                </div>
-                            </li>
+                            <>
+                                <li key={user}>
+                                    <Friend
+                                        name={userData.associatedUsers[user].name}
+                                        id={user}
+                                        picturePath={userData.associatedUsers[user].picture}
+                                        isOnline={userData.onlineMembers.includes(user)}
+                                    />
+                                    <div>
+                                        <button onClick={() => showInfo(user)}> info </button>
+                                        <button onClick={() => acceptRequest(user)}>Add</button>
+                                        <button onClick={() => rejectRequest(user)}>X</button>
+                                    </div>
+                                </li>
+                                {userData.associatedUsers[user].info && <span>({userData.associatedUsers[user].username})</span>}
+                            </>
                         )
                     })}
                 </ul>

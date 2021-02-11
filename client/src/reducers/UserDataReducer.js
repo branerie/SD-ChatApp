@@ -481,6 +481,20 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
+        case "show-info": {
+            const { user } = action.payload
+            return {
+                ...userData,
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user]: {
+                        ...userData.associatedUsers[user],
+                        info: !userData.associatedUsers[user].info
+                    }
+                }
+            }
+        }
+
         case "disconnect-message": {
             return false
         }
