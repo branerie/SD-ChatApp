@@ -10,23 +10,11 @@ const colors = [styles.red, styles.green, styles.blue, styles.orange]
 const ProjectCircleBox = () => {
     const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
-    const [joinSite, setJoinSite] = useState()
     let colorIndex = 0
 
     function handleClick(e, site) {
         if (e.target.nodeName === 'BUTTON') return
         dispatchUserData({ type: "load-site", payload: { site } })
-    }
-
-    function requestJoin() {
-        socket.emit("request-join", { site: joinSite }, (success, data) => {
-            if (success) {
-                dispatchUserData({ type: 'request-join', payload: { data } })
-            } else {
-                // if (data === "Already there") context.changeWindow(groupName, true)
-                // else console.log(data)
-            }
-        })
     }
 
     if (!userData) return null //<div>Loading...</div>
@@ -55,16 +43,19 @@ const ProjectCircleBox = () => {
     return (
         // <AvatarColors >
             <div className={styles['project-circle-box']}>
-                {sites.map(site => {
-                    return (
-                        <div 
-                            key={site[0]}
-                            className={addClasses(site)}
-                            onClick={(e) => handleClick(e, site[0])}>
-                            {site[1].name}
-                        </div>
-                    )
-                })}
+                <div className={styles['project-title']}>Projects List</div>
+                <div className={styles['project-container']}>
+                    {sites.map(site => {
+                        return (
+                            <div 
+                                key={site[0]}
+                                className={addClasses(site)}
+                                onClick={(e) => handleClick(e, site[0])}>
+                                {site[1].name}
+                            </div>
+                        )
+                    })}
+                </div>
             </div>
         // </AvatarColors>
     )
