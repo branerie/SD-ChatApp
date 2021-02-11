@@ -25,6 +25,7 @@ yarn-debug.log*
 yarn-error.log*
 
 #user defined
+.env
 /server/.env
 /client/.env
 /server/mock*.js
