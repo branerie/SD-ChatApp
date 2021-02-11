@@ -239,6 +239,7 @@ module.exports = io => {
         socket.on("send-request", async (site, callback) => { // user
             const data = await db.sendRequest(site, userData._id)
             let user = {
+                picture: userData.picture,
                 username: userData.username,
                 name: userData.name,
                 _id: userData._id
@@ -313,13 +314,19 @@ module.exports = io => {
         })
 
         socket.on('accept-request', async ({ user, site }, callback) => { // admin
-            const data = await db.acceptRequest(site, user._id, userData._id)
+            const data = await db.acceptRequest(site, user, userData._id)
             if (data.success) {
-                let online = userIDToSocketIDCache[user._id] ? true : false
+                let userData = {
+                    _id: data.userData._id,
+                    username: data.userData.username,
+                    name: data.userData.name,
+                    picture: data.userData.picture
+                }
+                let online = userIDToSocketIDCache[user] ? true : false
                 let group = data.generalGroup._id.toString()
                 groupToSiteCache[group] = site
                 io.to(group).emit("join-message", {
-                    user,
+                    user: userData,
                     online,
                     site,
                     group
@@ -340,7 +347,7 @@ module.exports = io => {
                             groups: {
                                 [group]: {
                                     name: data.generalGroup.name,
-                                    members: [...memberIDs, user._id],
+                                    members: [...memberIDs, user],
                                     // members: [
                                     //     ...data.generalGroup.members,
                                     //     user
@@ -352,14 +359,14 @@ module.exports = io => {
                     }
                     let onlineMembers = getOnlineMembers(memberIDs)
 
-                    userIDToSocketIDCache[user._id].forEach(socket => {
+                    userIDToSocketIDCache[user].forEach(socket => {
                         io.sockets.sockets.get(socket).join(group)
                         io.sockets.sockets.get(socket).emit('request-accepted', { site: siteData, associatedUsers, onlineMembers })
                     })
 
                 }
                 // callback()
-                sysLog(`Join request from ${user.username} to join ${site} accepted by admin.`)
+                sysLog(`Join request from ${user} to join ${site} accepted by admin.`)
             }
         })
 

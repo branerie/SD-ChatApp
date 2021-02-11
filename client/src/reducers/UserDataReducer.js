@@ -236,8 +236,8 @@ export default function UserDataReducer(userData, action) {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        ...(userData.sites[site].invitations) && { invitations: userData.sites[site].invitations.filter(i => i._id !== user._id) },
-                        ...(userData.sites[site].requests) && { requests: userData.sites[site].requests.filter(i => i._id !== user._id) },
+                        ...(userData.sites[site].invitations) && { invitations: userData.sites[site].invitations.filter(i => i !== user._id) },
+                        ...(userData.sites[site].requests) && { requests: userData.sites[site].requests.filter(i => i !== user._id) },
                         groups: {
                             ...userData.sites[site].groups,
                             [group]: {
@@ -309,10 +309,18 @@ export default function UserDataReducer(userData, action) {
                         ...userData.sites[site],
                         invitations: [
                             ...userData.sites[site].invitations || [],
-                            user
+                            user._id
                         ]
                     }
-                },
+                },                
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        username: user.username,
+                        name: user.name,
+                        picture: user.picture
+                    }
+                }
             }
         }
 
@@ -324,7 +332,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        invitations: userData.sites[site].invitations.filter(i => i._id !== user)
+                        invitations: userData.sites[site].invitations.filter(i => i !== user)
                     }
                 },
             }
@@ -339,7 +347,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        requests: userData.sites[site].requests.filter(r => r._id !== user)
+                        requests: userData.sites[site].requests.filter(r => r !== user)
                     }
                 },
             }
@@ -425,10 +433,18 @@ export default function UserDataReducer(userData, action) {
                         ...userData.sites[site],
                         requests: [
                             ...userData.sites[site].requests || [],
-                            user
+                            user._id
                         ]
                     }
                 },
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        username: user.username,
+                        name: user.name,
+                        picture: user.picture
+                    }
+                }
             }
         }
 

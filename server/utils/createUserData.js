@@ -60,8 +60,8 @@ const createUserData = (userData, messagePool) => {
                     name: request.name,
                     picture: request.picture
                 })
-                clientData.sites[site._id].invitations = site.invitations || []
-                clientData.sites[site._id].requests = site.requests || []
+                clientData.sites[site._id].invitations = site.invitations.map(invitation => invitation._id) || []
+                clientData.sites[site._id].requests = site.requests.map(request => request._id) || []
             }
         }
         clientData.sites[site._id].groups[_id] = {

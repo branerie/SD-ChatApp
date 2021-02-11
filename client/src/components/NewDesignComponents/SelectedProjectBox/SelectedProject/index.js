@@ -15,7 +15,7 @@ const SelectedProject = () => {
             <ProjectList />
             <ProjectThreads />
             <FriendsBox />
-            <PendingList />
+            {userData.sites[userData.activeSite].creator === userData.personal._id && <PendingList />}
         </div>
     )
 }
