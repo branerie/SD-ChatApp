@@ -86,8 +86,8 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('invitation-accepted', ({ siteData, onlineMembers }) => {
-            dispatchUserData({ type: 'invitation-accepted', payload: { siteData, onlineMembers } })
+        socket.on('invitation-accepted', ({ siteData, associatedUsers, onlineMembers }) => {
+            dispatchUserData({ type: 'invitation-accepted', payload: { siteData, associatedUsers, onlineMembers } })
         })
         return () => socket.off('invitation-accepted')
     }, [socket])
@@ -149,8 +149,8 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('request-accepted', ({ site, onlineMembers }) => {
-            dispatchUserData({ type: 'request-accepted', payload: { site, onlineMembers } })
+        socket.on('request-accepted', ({ site, associatedUsers, onlineMembers }) => {
+            dispatchUserData({ type: 'request-accepted', payload: { site, associatedUsers, onlineMembers } })
         })
         return () => socket.off('request-accepted')
     }, [socket])

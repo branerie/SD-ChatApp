@@ -9,9 +9,9 @@ const AddMember = ({closeOpenedWindows}) => {
     const [member, setMember] = useState('')
 
     const group = userData.sites[userData.activeSite].groups[userData.activeGroup]
-    const groupMemberIds = group.members.map(member => member._id)
+    const groupMemberIds = group.members//.map(member => member._id)
     const siteMembers = Object.values(userData.sites[userData.activeSite].groups).find(({ name }) => name === "General").members
-    const restMembers = siteMembers.filter(member => !groupMemberIds.includes(member._id))
+    const restMembers = siteMembers.filter(member => !groupMemberIds.includes(member))
 
     function inviteMember(e) {
         e.preventDefault()
@@ -57,12 +57,16 @@ const AddMember = ({closeOpenedWindows}) => {
                                 <option hidden value=""></option>
                                 {restMembers.map(member => {
                                     return (
-                                        <option key={member._id} uid={member._id} value={member.username}>{member.username}</option>
+                                        <option 
+                                        key={member} 
+                                        uid={member} 
+                                        value={userData.associatedUsers[member].username}
+                                        >{userData.associatedUsers[member].username}</option>
                                     )
                                 })}
                             </select>
                             <br />
-                            <button className={styles['button']}>                  Add member         </button>
+                            <button className={styles['button']}>Add member</button>
                         </form>
                     </div>
             }

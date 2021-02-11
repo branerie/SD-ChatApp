@@ -66,7 +66,7 @@ const createUserData = (userData, messagePool) => {
         }
         clientData.sites[site._id].groups[_id] = {
             name,
-            members,
+            members: members.map(m => m._id.toString()),
             messages: []
         }
     })
