@@ -3,7 +3,7 @@ const { User, Site, Group, Message } = require('../models')
 const getUserData = async (id) => {
     let data = await User.findById(id, '-password -__v').populate({
         path: 'chats',
-        select: 'username'
+        select: 'name username picture'
     }).populate({
         path: 'invitations',
         select: 'name',
@@ -21,7 +21,7 @@ const getUserData = async (id) => {
             select: 'name creator invitations requests',
             populate: {
                 path: 'invitations requests',
-                select: 'name username'
+                select: 'name username picture'
             }
         }],
     }).lean()

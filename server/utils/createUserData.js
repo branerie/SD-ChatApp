@@ -1,6 +1,6 @@
 const createUserData = (userData, messagePool) => {
     const siteCache = {}
-    const allMembers = new Set([userData._id.toString()])
+    // let allMembers = new Set([userData._id.toString()])
     const clientData = {
         sites: {},
         chats: {},
@@ -13,13 +13,33 @@ const createUserData = (userData, messagePool) => {
             company: userData.company,
             position: userData.position,
             picture: userData.picture
+        },
+        associatedUsers: {
+            [userData._id]: {
+                username: userData.username,
+                name: userData.name,
+                picture: userData.picture
+            }
         }
     }
     if (userData.invitations) clientData.invitations = userData.invitations
     if (userData.requests) clientData.requests = userData.requests
 
+    userData.chats.forEach(chat => {
+        clientData.associatedUsers[chat._id] = {
+            username: chat.username,
+            name: chat.name,
+            picture: chat.picture
+        }
+    })
+
     userData.groups.forEach(({ _id, name, site, members }) => {
-        members.map(member => allMembers.add(member._id.toString()))
+        // members.map(member => allMembers.add(member._id.toString()))
+        members.map(member => clientData.associatedUsers[member._id] = {
+            username: member.username,
+            name: member.name,
+            picture: member.picture
+        })
         siteCache[_id] = site._id
         if (!clientData.sites[site._id]) {
             clientData.sites[site._id] = {
@@ -28,8 +48,18 @@ const createUserData = (userData, messagePool) => {
                 groups: {}
             }
             if (site.creator.toString() === userData._id.toString()) {
-                site.invitations.map(invitation => allMembers.add(invitation._id.toString()))
-                site.requests.map(request => allMembers.add(request._id.toString()))
+                // site.invitations.map(invitation => allMembers.add(invitation._id.toString()))
+                site.invitations.map(invitation => clientData.associatedUsers[invitation._id] = {
+                    username: invitation.username,
+                    name: invitation.name,
+                    picture: invitation.picture
+                })
+                // site.requests.map(request => allMembers.add(request._id.toString()))
+                site.requests.map(request => clientData.associatedUsers[request._id] = {
+                    username: request.username,
+                    name: request.name,
+                    picture: request.picture
+                })
                 clientData.sites[site._id].invitations = site.invitations || []
                 clientData.sites[site._id].requests = site.requests || []
             }
@@ -82,7 +112,9 @@ const createUserData = (userData, messagePool) => {
         }
     })
 
-    return {clientData, allMembers, siteCache}
+    console.log(clientData.associatedUsers)
+    const allMembers = Object.keys(clientData.associatedUsers)
+    return { clientData, allMembers, siteCache }
 }
 
 module.exports = createUserData

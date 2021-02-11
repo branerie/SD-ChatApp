@@ -59,7 +59,7 @@ module.exports = io => {
             }
         })
 
-        clientData.onlineMembers = getOnlineMembers([...allMembers])
+        clientData.onlineMembers = getOnlineMembers(allMembers)
         // console.log(JSON.stringify(clientData, null, 4),"\n","clientData END")
         socket.emit("welcome-message", { userData: clientData })
 
