@@ -5,8 +5,9 @@ import CloseButton from '../../../Buttons/CloseButton'
 import NewMessageLight from '../NewMessageLight'
 import UserAvatar from '../../CommonComponents/UserAvatar'
 import StatusLight from '../../CommonComponents/StatusLight'
+import ProjectCircle from '../ProjectCircle'
 
-const PrivateChatList = () => {
+const PrivateChatList = ({isSmallList}) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const prevActive = useRef()
     
@@ -26,23 +27,34 @@ const PrivateChatList = () => {
     return (
         <div className={styles.container}>
             <div className={styles['chats-title']}>Private Chats</div>
-            <div className={styles['chats-container']}>
-                {Object.keys(chats).map(chat => {
-                    return (
-                        <div className={styles.list} >
-                            <div key={chat}
-                                className={chat === userData.activeChat ? `${styles.selected} ${styles.chat}` : styles.chat}
-                                onClick={(e) => handleClick(e, chat)}>
-                                    <StatusLight userId={chat} size='small'/>
-                                    <UserAvatar picturePath={chats[chat].username.picture} />
-                                    {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null}
-                                    <span className={styles['user-name']}>{chats[chat].username}</span>
-                            </div>
-                            <CloseButton chat={chat} lastActive={prevActive.current}/>
-                        </div>
-                    )
-                })}
-            </div>
+                {isSmallList
+                ?
+                    <div className={styles['chats-container']}>
+                        {Object.keys(chats).map(chat =>{
+                            return (
+                                <ProjectCircle name={chats[chat].username} />
+                            )
+                        })}
+                    </div>
+                :
+                    <div className={styles['chats-container']}>
+                        {Object.keys(chats).map(chat => {
+                            return (
+                                <div className={styles.list} >
+                                    <div key={chat}
+                                        className={chat === userData.activeChat ? `${styles.selected} ${styles.chat}` : styles.chat}
+                                        onClick={(e) => handleClick(e, chat)}>
+                                            <StatusLight userId={chat} size='small'/>
+                                            <UserAvatar picturePath={chats[chat].username.picture} />
+                                            {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null}
+                                            <span className={styles['user-name']}>{chats[chat].username}</span>
+                                    </div>
+                                    <CloseButton chat={chat} lastActive={prevActive.current}/>
+                                </div>
+                            )
+                        })}
+                    </div>
+            }
         </div>
     )
 

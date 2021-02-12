@@ -7,7 +7,7 @@ import { SocketContext } from '../../../../context/SocketContext'
 
 const colors = [styles.red, styles.green, styles.blue, styles.orange]
 
-const ProjectCircleBox = () => {
+const ProjectCircleBox = ({isSmallList}) => {
     const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
     let colorIndex = 0
@@ -41,23 +41,30 @@ const ProjectCircleBox = () => {
     }
 
     return (
-        // <AvatarColors >
-            <div className={styles['project-circle-box']}>
-                <div className={styles['project-title']}>Projects List</div>
-                <div className={styles['project-container']}>
-                    {sites.map(site => {
-                        return (
-                            <div 
-                                key={site[0]}
-                                className={addClasses(site)}
-                                onClick={(e) => handleClick(e, site[0])}>
-                                {site[1].name}
-                            </div>
-                        )
-                    })}
-                </div>
-            </div>
-        // </AvatarColors>
+        <div className={styles['project-circle-box']}>
+            <div className={styles['project-title']}>Projects List</div>
+                { isSmallList 
+                    ?
+                    (<div className={styles['project-container']}>
+                        {sites.map(site => {
+                            return <ProjectCircle name={site[1].name} />
+                        })}
+                    </div>)
+                    :
+                        <div className={styles['project-container']}>
+                            {sites.map(site => {
+                                return (
+                                    <div 
+                                        key={site[0]}
+                                        className={addClasses(site)}
+                                        onClick={(e) => handleClick(e, site[0])}>
+                                        {site[1].name}
+                                    </div>
+                                )
+                            })}
+                        </div>
+                }
+        </div>
     )
 }
 
