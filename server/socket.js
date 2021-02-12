@@ -39,7 +39,7 @@ module.exports = io => {
         sysLog(`Connect @ ${socket.id} (${userData.username}). Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
 
 
-        const { clientData, allMembers, siteCache } = createUserData(userData, messagePool)
+        const { clientData, siteCache } = createUserData(userData, messagePool)
         groupToSiteCache = { ...groupToSiteCache, ...siteCache }
 
         userData.groups.forEach(({ _id, site }) => {
@@ -60,8 +60,9 @@ module.exports = io => {
             }
         })
 
-        clientData.onlineMembers = getOnlineMembers(allMembers)
-        allMembers.forEach(member => clientData.associatedUsers[member].online = Boolean(userIDToSocketIDCache[member]))
+        for (const user in clientData.associatedUsers) {
+            clientData.associatedUsers[user].online = Boolean(userIDToSocketIDCache[user])
+        }
         // console.log(JSON.stringify(clientData, null, 4),"\n","clientData END")
         socket.emit("welcome-message", { userData: clientData })
 
@@ -156,11 +157,6 @@ module.exports = io => {
                             [groupID]: {
                                 name: 'General',
                                 members: [userData._id],
-                                // members: [{
-                                //     _id: userData._id,
-                                //     name: userData.name,
-                                //     username: userData.username
-                                // }],
                                 messages: [{
                                     user: 'SERVER',
                                     timestamp: utcTime(),
@@ -202,11 +198,6 @@ module.exports = io => {
                     [groupID]: {
                         name: group,
                         members: [userData._id],
-                        // members: [{
-                        //     _id: userData._id,
-                        //     name: userData.name,
-                        //     username: userData.username
-                        // }],
                         messages: [{
                             user: 'SERVER',
                             timestamp: utcTime(),
@@ -279,16 +270,16 @@ module.exports = io => {
                 socket.join(group)
                 socket.to(group).emit("join-message", {
                     user,
-                    online: true,
                     site,
                     group
                 })
-                let memberIDs = data.generalGroup.members.map(m => m._id)
+                
                 let associatedUsers = {}
                 data.generalGroup.members.map(member => associatedUsers[member._id] = {
                     username: member.username,
                     name: member.name,
-                    picture: member.picture
+                    picture: member.picture,
+                    online: Boolean(userIDToSocketIDCache[member._id])
                 })
                 let siteData = {
                     [site]: {
@@ -297,23 +288,17 @@ module.exports = io => {
                         groups: {
                             [group]: {
                                 name: 'General',
-                                members: [...memberIDs, userData._id],
-                                // members: [
-                                //     ...data.generalGroup.members,
-                                //     user
-                                // ],
+                                members: [...Object.keys(associatedUsers), userData._id],
                                 messages: []
                             }
                         }
                     }
                 }
-                let onlineMembers = getOnlineMembers(memberIDs)
-                memberIDs.forEach(m => associatedUsers[m].online = Boolean(userIDToSocketIDCache[m]))
 
                 sysLog(`${userData.username} accepted invitation and joined ${data.site.name}`)
-                callback(true, { siteData, associatedUsers, onlineMembers })
+                callback(true, { siteData, associatedUsers })
                 restSocketsJoin(userData._id, socket.id, group)
-                restSocketsUpdate(userData._id, socket.id, "invitation-accepted", { siteData, associatedUsers, onlineMembers })
+                restSocketsUpdate(userData._id, socket.id, "invitation-accepted", { siteData, associatedUsers })
             }
             else {
                 sysLog(`Join attempt from ${userData.username} to ${site} failed: ${data}`)
@@ -335,18 +320,17 @@ module.exports = io => {
                 groupToSiteCache[group] = site
                 io.to(group).emit("join-message", {
                     user: userData,
-                    online,
                     site,
                     group
                 })
                 // if user is online send him data
                 if (online) {
                     let associatedUsers = {}
-                    let memberIDs = data.generalGroup.members.map(m => m._id)
                     data.generalGroup.members.map(member => associatedUsers[member._id] = {
                         username: member.username,
                         name: member.name,
-                        picture: member.picture
+                        picture: member.picture,
+                        online: Boolean(userIDToSocketIDCache[member._id])
                     })
                     let siteData = {
                         [site]: {
@@ -355,22 +339,16 @@ module.exports = io => {
                             groups: {
                                 [group]: {
                                     name: data.generalGroup.name,
-                                    members: [...memberIDs, user],
-                                    // members: [
-                                    //     ...data.generalGroup.members,
-                                    //     user
-                                    // ],
+                                    members: [...Object.keys(associatedUsers), user],
                                     messages: []
                                 }
                             }
                         }
                     }
-                    let onlineMembers = getOnlineMembers(memberIDs)
-                    memberIDs.forEach(m => associatedUsers[m].online = Boolean(userIDToSocketIDCache[m]))
 
                     userIDToSocketIDCache[user].forEach(socket => {
                         io.sockets.sockets.get(socket).join(group)
-                        io.sockets.sockets.get(socket).emit('request-accepted', { site: siteData, associatedUsers, onlineMembers })
+                        io.sockets.sockets.get(socket).emit('request-accepted', { site: siteData, associatedUsers })
                     })
 
                 }
@@ -393,7 +371,6 @@ module.exports = io => {
                 }
                 io.to(group).emit("join-message", {
                     user,
-                    online,
                     site,
                     group
                 })
@@ -403,14 +380,10 @@ module.exports = io => {
                         [group]: {
                             name: data.groupData.name,
                             members: [...data.groupData.members.map(m => m._id), data.userData._id],
-                            // members: [
-                            //     ...data.groupData.members,
-                            //     user
-                            // ],
                             messages: []
                         }
                     }
-                    console.log(groupData);
+
                     userIDToSocketIDCache[member].forEach(socket => {
                         io.sockets.sockets.get(socket).join(group)
                         io.sockets.sockets.get(socket).emit('added-to-group', { site, group: groupData })
@@ -494,7 +467,7 @@ module.exports = io => {
 
         socket.on('search-projects', async (socketData, callback) => {
             if (!isValid(socketData, userData._id)) return
-            const {site = '', page = 0 } = socketData
+            const { site = '', page = 0 } = socketData
             const data = await db.searchProjects(site, page)
             if (data.success) {
                 callback(true, data.projects)
@@ -531,36 +504,18 @@ module.exports = io => {
         })
     })
 
-    // function getGroupMembers(group, members) {
-    //     members = members.map(member => member.username)
-    //     const onlineSIDs = io.sockets.adapter.rooms.get(group) || new Set()
-    //     const online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
-    //     const offline = members.filter(member => !online.includes(member))
-    //     return { online, offline }
-    // }
-
-    function getOnlineMembers(members) {
-        return members.filter(m => userIDToSocketIDCache[m])
-    }
-
     function restSocketsUpdate(uid, sid, event, data) {
         // update rest connections when connected from multiply devices
-        if (userIDToSocketIDCache[uid].length > 1) {
-            let restSockets = userIDToSocketIDCache[uid].filter(socket => socket !== sid)
-            restSockets.forEach(socket => {
-                io.to(socket).emit(event, data)
-            })
-        }
+        userIDToSocketIDCache[uid].forEach(socket => {
+            if (socket !== sid) io.to(socket).emit(event, data)
+        })
     }
 
     function restSocketsJoin(uid, sid, gid) {
         // join rest connections when connected from multiply devices
-        if (userIDToSocketIDCache[uid].length > 1) {
-            let restSockets = userIDToSocketIDCache[uid].filter(socket => socket !== sid)
-            restSockets.forEach(socket => {
-                io.sockets.sockets.get(socket).join(gid)
-            })
-        }
+        userIDToSocketIDCache[uid].forEach(socket => {
+            if (socket !== sid) io.sockets.sockets.get(socket).join(gid)
+        })
     }
 }
 

@@ -223,7 +223,6 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                onlineMembers: [...new Set([...userData.onlineMembers, user._id])],
                 associatedUsers: {
                     ...userData.associatedUsers,
                     [user._id]: {
@@ -236,7 +235,7 @@ export default function UserDataReducer(userData, action) {
 
         case "join-message": {
             let timestamp = new Date().toUTCString()
-            let { user, online, site, group } = action.payload
+            let { user, site, group } = action.payload
             return {
                 ...userData,
                 sites: {
@@ -265,7 +264,6 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                ...(online) && { onlineMembers: [...new Set([...userData.onlineMembers, user._id])] },
                 associatedUsers: {
                     ...userData.associatedUsers,
                     [user._id]: {
@@ -303,7 +301,6 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                onlineMembers: userData.onlineMembers.filter(m => m !== user._id),
                 associatedUsers: {
                     ...userData.associatedUsers,
                     [user._id]: {
@@ -371,7 +368,7 @@ export default function UserDataReducer(userData, action) {
 
 
         case "request-accepted": {
-            let { site, associatedUsers, onlineMembers } = action.payload
+            let { site, associatedUsers } = action.payload
             return {
                 ...userData,
                 sites: {
@@ -379,7 +376,6 @@ export default function UserDataReducer(userData, action) {
                     ...site
                 },
                 requests: userData.requests.filter(r => r._id !== Object.keys(site)[0]),
-                onlineMembers: [...new Set([...userData.onlineMembers, ...onlineMembers])],
                 associatedUsers: {
                     ...userData.associatedUsers,
                     ...associatedUsers
@@ -467,7 +463,7 @@ export default function UserDataReducer(userData, action) {
 
 
         case "invitation-accepted": {
-            let { siteData, associatedUsers, onlineMembers, activeConnection } = action.payload
+            let { siteData, associatedUsers, activeConnection } = action.payload
             let activeSite = Object.keys(siteData)[0]
             let activeGroup = Object.keys(siteData[activeSite].groups)[0]
             return {
@@ -477,7 +473,6 @@ export default function UserDataReducer(userData, action) {
                     ...siteData
                 },
                 invitations: userData.invitations.filter(i => i._id !== Object.keys(siteData)[0]) || [],
-                onlineMembers: [...new Set([...userData.onlineMembers, ...onlineMembers])],
                 associatedUsers: {
                     ...userData.associatedUsers,
                     ...associatedUsers
