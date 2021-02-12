@@ -498,6 +498,27 @@ module.exports = io => {
             // if name is changed send newProfileData.name to connected rooms and users via socket? 
         })
 
+        socket.on('get-chat-history', async(id, callback) => {
+            const data = await db.getPrivateMessages(id, userData._id)
+            const chat = {
+                messages: []
+            }
+            if (data) {
+                chat.username = data.username
+                data.messages.forEach(msg => {
+                    let own = msg.source._id.toString() === userData._id.toString() // boolean
+                    chat.messages.push({
+                        user: msg.source.name,
+                        username: msg.source.username,
+                        msg: msg.content,
+                        timestamp: msg.createdAt,
+                        own
+                    })
+                })
+            }
+            callback(chat)
+        })
+
         socket.on('get-user-details', async (userId, callback) => {
             const userDetails = await db.getUserDetails(userId)
             callback(true, userDetails)

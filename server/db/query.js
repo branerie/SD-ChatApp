@@ -43,6 +43,17 @@ const getMessages = async (userData) => {
     return messages
 }
 
+const getPrivateMessages = async (id, uid) => {
+    const party = await User.findById(id)
+    const messages = await Message.find({
+        $or: [
+            { destination: id, source: uid },
+            { source: id, destination: uid },
+        ]
+    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username' }).lean()
+    return { messages, username: party.name }
+}
+
 const createPublicMessage = async (sender, recipient, msg) => {
     // check if group is valid and if user has access to it
     await Group.findById(recipient)
@@ -371,6 +382,7 @@ const getUserDetails = async (uid) => {
 module.exports = {
     getUserData,
     getMessages,
+    getPrivateMessages,
     removeChat,
     createPublicMessage,
     createPrivateMessage,

@@ -153,9 +153,9 @@ export default function UserDataReducer(userData, action) {
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {
-                                        user: userData.sites[site].groups[group].members.find(m => m._id === user).name,
+                                        user: userData.associatedUsers[user].name,
                                         // added in order to fetch user avatar as username is unique (can be replaced with id)
-                                        username: userData.sites[site].groups[group].members.find(m => m._id === user).username,
+                                        username: userData.associatedUsers[user].username,
                                         msg,
                                         timestamp,
                                         own
