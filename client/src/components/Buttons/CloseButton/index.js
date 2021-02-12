@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import './index.css'
+import styles from './index.module.css'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 
@@ -12,7 +12,10 @@ const CloseButton = ({ chat, lastActive }) => {
             dispatchUserData({ type: 'close-chat', payload: { chat, lastActive } })
     }
     return (
-        <button className='close-btn' onClick={handleClick}>X</button>
+        <div className={styles['close-btn']} onClick={handleClick}>
+            <div className={styles.right} ></div>
+            <div className={styles.left} ></div>
+        </div>
     )
 }
 

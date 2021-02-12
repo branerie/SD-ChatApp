@@ -1,10 +1,75 @@
 .project-circle-box {
     display: flex;
     flex-direction: column;
-    overflow: auto;
+    width: 100%;
+    padding-top: 10px;
     flex-grow: 1;
+    min-height: 10vh;
 }
 
+.project-container {
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.project-container::-webkit-scrollbar {
+    width: 12px;            
+  }
+
+.project-container::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px grey; 
+    border-radius: 10px;      
+  }
+
+.project-container::-webkit-scrollbar-thumb {
+    background-color: rgb(34, 34, 37);   
+    border-radius: 20px;       
+    border: 3px solid rgb(116, 116, 116);  
+  }
+
 .list {
-    padding: 0px;
+   display: flex;
+   justify-content: center;
+   flex-wrap: wrap;
+   margin: 2px 5px;
+   max-height: 100px;
+   border-radius: 5px;
+   padding: 10px;
+   cursor: pointer;
+
+}
+
+.owner {
+    background-color:  #3577EF ;
+}
+
+.selected {
+    background-color: #8faadd;
+    text-decoration: underline;
+    color: white;
+}
+
+.red {
+    background-color: #28817d;
+}
+
+.green {
+    background-color: #51879c;
+}
+
+.blue {
+    background-color: #6188d1;
+}
+
+.orange {
+    background-color: #72b5f3;
+}
+
+.project-title {
+    text-align: center;
+    margin-bottom: 10px;
+    padding: 5px;
+    background-color:white;
 }
