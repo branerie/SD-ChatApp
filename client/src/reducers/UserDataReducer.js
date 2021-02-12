@@ -223,28 +223,34 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                onlineMembers: [...new Set([...userData.onlineMembers, user._id])]
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        ...userData.associatedUsers[user._id],
+                        online: true
+                    }
+                }
             }
         }
 
         case "join-message": {
             let timestamp = new Date().toUTCString()
-            let { user, online, site, group } = action.payload
+            let { user, site, group } = action.payload
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        ...(userData.sites[site].invitations) && { invitations: userData.sites[site].invitations.filter(i => i._id !== user._id) },
-                        ...(userData.sites[site].requests) && { requests: userData.sites[site].requests.filter(i => i._id !== user._id) },
+                        ...(userData.sites[site].invitations) && { invitations: userData.sites[site].invitations.filter(i => i !== user._id) },
+                        ...(userData.sites[site].requests) && { requests: userData.sites[site].requests.filter(i => i !== user._id) },
                         groups: {
                             ...userData.sites[site].groups,
                             [group]: {
                                 ...userData.sites[site].groups[group],
                                 members: [
                                     ...userData.sites[site].groups[group].members,
-                                    user
+                                    user._id
                                 ],
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
@@ -258,7 +264,15 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                ...(online) && { onlineMembers: [...new Set([...userData.onlineMembers, user._id])] }
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        username: user.username,
+                        name: user.name,
+                        picture: user.picture,
+                        online: user.online
+                    }
+                }
             }
         }
 
@@ -287,7 +301,13 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                onlineMembers: userData.onlineMembers.filter(m => m !== user._id)
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        ...userData.associatedUsers[user._id],
+                        online: false
+                    }
+                }
             }
         }
 
@@ -301,10 +321,19 @@ export default function UserDataReducer(userData, action) {
                         ...userData.sites[site],
                         invitations: [
                             ...userData.sites[site].invitations || [],
-                            user
+                            user._id
                         ]
                     }
-                },
+                },                
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        username: user.username,
+                        name: user.name,
+                        picture: user.picture,
+                        online: user.online
+                    }
+                }
             }
         }
 
@@ -316,7 +345,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        invitations: userData.sites[site].invitations.filter(i => i._id !== user)
+                        invitations: userData.sites[site].invitations.filter(i => i !== user)
                     }
                 },
             }
@@ -331,7 +360,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.sites,
                     [site]: {
                         ...userData.sites[site],
-                        requests: userData.sites[site].requests.filter(r => r._id !== user)
+                        requests: userData.sites[site].requests.filter(r => r !== user)
                     }
                 },
             }
@@ -339,15 +368,18 @@ export default function UserDataReducer(userData, action) {
 
 
         case "request-accepted": {
-            let { site, onlineMembers } = action.payload
+            let { site, associatedUsers } = action.payload
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
                     ...site
                 },
-                onlineMembers: [...new Set([...userData.onlineMembers, ...onlineMembers])],
                 requests: userData.requests.filter(r => r._id !== Object.keys(site)[0]),
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    ...associatedUsers
+                }
             }
         }
 
@@ -413,16 +445,25 @@ export default function UserDataReducer(userData, action) {
                         ...userData.sites[site],
                         requests: [
                             ...userData.sites[site].requests || [],
-                            user
+                            user._id
                         ]
                     }
                 },
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        username: user.username,
+                        name: user.name,
+                        picture: user.picture,
+                        online: user.online
+                    }
+                }
             }
         }
 
 
         case "invitation-accepted": {
-            let { siteData, onlineMembers, activeConnection } = action.payload
+            let { siteData, associatedUsers, activeConnection } = action.payload
             let activeSite = Object.keys(siteData)[0]
             let activeGroup = Object.keys(siteData[activeSite].groups)[0]
             return {
@@ -432,7 +473,10 @@ export default function UserDataReducer(userData, action) {
                     ...siteData
                 },
                 invitations: userData.invitations.filter(i => i._id !== Object.keys(siteData)[0]) || [],
-                onlineMembers: [...new Set([...userData.onlineMembers, ...onlineMembers])],
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    ...associatedUsers
+                },
                 ...(activeConnection) && { activeSite },
                 ...(activeConnection) && { activeGroup },
                 ...(activeConnection) && { activeChat: false }
@@ -445,6 +489,20 @@ export default function UserDataReducer(userData, action) {
                 personal: {
                     ...userData.personal,
                     ...action.payload.newData
+                }
+            }
+        }
+
+        case "show-info": {
+            const { user } = action.payload
+            return {
+                ...userData,
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user]: {
+                        ...userData.associatedUsers[user],
+                        info: !userData.associatedUsers[user].info
+                    }
                 }
             }
         }

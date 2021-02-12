@@ -39,7 +39,7 @@ module.exports = io => {
         sysLog(`Connect @ ${socket.id} (${userData.username}). Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
 
 
-        const { clientData, allMembers, siteCache } = createUserData(userData, messagePool)
+        const { clientData, siteCache } = createUserData(userData, messagePool)
         groupToSiteCache = { ...groupToSiteCache, ...siteCache }
 
         userData.groups.forEach(({ _id, site }) => {
@@ -51,7 +51,8 @@ module.exports = io => {
                     user: {
                         _id: userData._id,
                         name: userData.name,
-                        username: userData.username
+                        username: userData.username,
+                        online: true
                     },
                     site: site._id,
                     group: _id
@@ -59,7 +60,9 @@ module.exports = io => {
             }
         })
 
-        clientData.onlineMembers = getOnlineMembers([...allMembers])
+        for (const user in clientData.associatedUsers) {
+            clientData.associatedUsers[user].online = Boolean(userIDToSocketIDCache[user])
+        }
         // console.log(JSON.stringify(clientData, null, 4),"\n","clientData END")
         socket.emit("welcome-message", { userData: clientData })
 
@@ -78,7 +81,8 @@ module.exports = io => {
                         user: {
                             _id: userData._id,
                             name: userData.name,
-                            username: userData.username
+                            username: userData.username,
+                            online: false
                         },
                         reason,
                         group,
@@ -152,11 +156,7 @@ module.exports = io => {
                         groups: {
                             [groupID]: {
                                 name: 'General',
-                                members: [{
-                                    _id: userData._id,
-                                    name: userData.name,
-                                    username: userData.username
-                                }],
+                                members: [userData._id],
                                 messages: [{
                                     user: 'SERVER',
                                     timestamp: utcTime(),
@@ -197,11 +197,7 @@ module.exports = io => {
                 const groupData = {
                     [groupID]: {
                         name: group,
-                        members: [{
-                            _id: userData._id,
-                            name: userData.name,
-                            username: userData.username
-                        }],
+                        members: [userData._id],
                         messages: [{
                             user: 'SERVER',
                             timestamp: utcTime(),
@@ -221,7 +217,8 @@ module.exports = io => {
         socket.on("send-invitation", async ({ user, site }, callback) => { //admin
             const data = await db.inviteUser(user, site, userData._id)
             if (data.success) {
-                if (userIDToSocketIDCache[data.userData._id]) {
+                data.userData.online = Boolean(userIDToSocketIDCache[data.userData._id])
+                if (data.userData.online) {
                     userIDToSocketIDCache[data.userData._id].forEach(socketID => {
                         io.to(socketID).emit('add-site-to-invitations', data.siteData)
                     })
@@ -237,9 +234,11 @@ module.exports = io => {
         socket.on("send-request", async (site, callback) => { // user
             const data = await db.sendRequest(site, userData._id)
             let user = {
+                picture: userData.picture,
                 username: userData.username,
                 name: userData.name,
-                _id: userData._id
+                _id: userData._id,
+                online: true
             }
             if (data.success) {
                 if (userIDToSocketIDCache[data.site.creator]) {
@@ -262,16 +261,25 @@ module.exports = io => {
                 let user = {
                     _id: userData._id,
                     username: userData.username,
-                    name: userData.name
+                    name: userData.name,
+                    picture: userData.picture,
+                    online: true
                 }
                 let group = data.generalGroup._id.toString()
                 groupToSiteCache[group] = site
                 socket.join(group)
                 socket.to(group).emit("join-message", {
                     user,
-                    online: true,
                     site,
                     group
+                })
+                
+                let associatedUsers = {}
+                data.generalGroup.members.map(member => associatedUsers[member._id] = {
+                    username: member.username,
+                    name: member.name,
+                    picture: member.picture,
+                    online: Boolean(userIDToSocketIDCache[member._id])
                 })
                 let siteData = {
                     [site]: {
@@ -280,22 +288,17 @@ module.exports = io => {
                         groups: {
                             [group]: {
                                 name: 'General',
-                                members: [
-                                    ...data.generalGroup.members,
-                                    user
-                                ],
+                                members: [...Object.keys(associatedUsers), userData._id],
                                 messages: []
                             }
                         }
                     }
                 }
-                let memberIDs = data.generalGroup.members.map(m => m._id)
-                let onlineMembers = getOnlineMembers(memberIDs)
 
                 sysLog(`${userData.username} accepted invitation and joined ${data.site.name}`)
-                callback(true, { siteData, onlineMembers })
+                callback(true, { siteData, associatedUsers })
                 restSocketsJoin(userData._id, socket.id, group)
-                restSocketsUpdate(userData._id, socket.id, "invitation-accepted", { siteData, onlineMembers })
+                restSocketsUpdate(userData._id, socket.id, "invitation-accepted", { siteData, associatedUsers })
             }
             else {
                 sysLog(`Join attempt from ${userData.username} to ${site} failed: ${data}`)
@@ -303,19 +306,32 @@ module.exports = io => {
         })
 
         socket.on('accept-request', async ({ user, site }, callback) => { // admin
-            const data = await db.acceptRequest(site, user._id, userData._id)
+            const data = await db.acceptRequest(site, user, userData._id)
             if (data.success) {
-                let online = userIDToSocketIDCache[user._id] ? true : false
+                let online = userIDToSocketIDCache[user] ? true : false
+                let userData = {
+                    _id: data.userData._id,
+                    username: data.userData.username,
+                    name: data.userData.name,
+                    picture: data.userData.picture,
+                    online
+                }
                 let group = data.generalGroup._id.toString()
                 groupToSiteCache[group] = site
                 io.to(group).emit("join-message", {
-                    user,
-                    online,
+                    user: userData,
                     site,
                     group
                 })
                 // if user is online send him data
                 if (online) {
+                    let associatedUsers = {}
+                    data.generalGroup.members.map(member => associatedUsers[member._id] = {
+                        username: member.username,
+                        name: member.name,
+                        picture: member.picture,
+                        online: Boolean(userIDToSocketIDCache[member._id])
+                    })
                     let siteData = {
                         [site]: {
                             name: data.site.name,
@@ -323,26 +339,21 @@ module.exports = io => {
                             groups: {
                                 [group]: {
                                     name: data.generalGroup.name,
-                                    members: [
-                                        ...data.generalGroup.members,
-                                        user
-                                    ],
+                                    members: [...Object.keys(associatedUsers), user],
                                     messages: []
                                 }
                             }
                         }
                     }
-                    let memberIDs = data.generalGroup.members.map(m => m._id)
-                    let onlineMembers = getOnlineMembers(memberIDs)
 
-                    userIDToSocketIDCache[user._id].forEach(socket => {
+                    userIDToSocketIDCache[user].forEach(socket => {
                         io.sockets.sockets.get(socket).join(group)
-                        io.sockets.sockets.get(socket).emit('request-accepted', { site: siteData, onlineMembers })
+                        io.sockets.sockets.get(socket).emit('request-accepted', { site: siteData, associatedUsers })
                     })
 
                 }
                 // callback()
-                sysLog(`Join request from ${user.username} to join ${site} accepted by admin.`)
+                sysLog(`Join request from ${user} to join ${site} accepted by admin.`)
             }
         })
 
@@ -354,11 +365,12 @@ module.exports = io => {
                 let user = {
                     _id: data.userData._id,
                     name: data.userData.name,
-                    username: data.userData.username
+                    username: data.userData.username,
+                    picture: data.userData.picture,
+                    online
                 }
                 io.to(group).emit("join-message", {
                     user,
-                    online,
                     site,
                     group
                 })
@@ -367,13 +379,11 @@ module.exports = io => {
                     let groupData = {
                         [group]: {
                             name: data.groupData.name,
-                            members: [
-                                ...data.groupData.members,
-                                user
-                            ],
+                            members: [...data.groupData.members.map(m => m._id), data.userData._id],
                             messages: []
                         }
                     }
+
                     userIDToSocketIDCache[member].forEach(socket => {
                         io.sockets.sockets.get(socket).join(group)
                         io.sockets.sockets.get(socket).emit('added-to-group', { site, group: groupData })
@@ -457,7 +467,7 @@ module.exports = io => {
 
         socket.on('search-projects', async (socketData, callback) => {
             if (!isValid(socketData, userData._id)) return
-            const {site = '', page = 0 } = socketData
+            const { site = '', page = 0 } = socketData
             const data = await db.searchProjects(site, page)
             if (data.success) {
                 callback(true, data.projects)
@@ -494,36 +504,18 @@ module.exports = io => {
         })
     })
 
-    // function getGroupMembers(group, members) {
-    //     members = members.map(member => member.username)
-    //     const onlineSIDs = io.sockets.adapter.rooms.get(group) || new Set()
-    //     const online = [...onlineSIDs].map(sid => io.sockets.sockets.get(sid).username)
-    //     const offline = members.filter(member => !online.includes(member))
-    //     return { online, offline }
-    // }
-
-    function getOnlineMembers(members) {
-        return members.filter(m => userIDToSocketIDCache[m])
-    }
-
     function restSocketsUpdate(uid, sid, event, data) {
         // update rest connections when connected from multiply devices
-        if (userIDToSocketIDCache[uid].length > 1) {
-            let restSockets = userIDToSocketIDCache[uid].filter(socket => socket !== sid)
-            restSockets.forEach(socket => {
-                io.to(socket).emit(event, data)
-            })
-        }
+        userIDToSocketIDCache[uid].forEach(socket => {
+            if (socket !== sid) io.to(socket).emit(event, data)
+        })
     }
 
     function restSocketsJoin(uid, sid, gid) {
         // join rest connections when connected from multiply devices
-        if (userIDToSocketIDCache[uid].length > 1) {
-            let restSockets = userIDToSocketIDCache[uid].filter(socket => socket !== sid)
-            restSockets.forEach(socket => {
-                io.sockets.sockets.get(socket).join(gid)
-            })
-        }
+        userIDToSocketIDCache[uid].forEach(socket => {
+            if (socket !== sid) io.sockets.sockets.get(socket).join(gid)
+        })
     }
 }
 

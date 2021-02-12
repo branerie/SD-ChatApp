@@ -29,10 +29,10 @@ const FriendsList = () => {
 
     if (!userData || !userData.activeSite) return null
     console.log(userData.sites[userData.activeSite].groups[userData.activeGroup].members)
-    let members = userData.sites[userData.activeSite].groups[userData.activeGroup].members.sort((A, B) => {
-        // default sort: alphabetical with online users on top and offline on bottom
-        return userData.onlineMembers.includes(B._id) - userData.onlineMembers.includes(A._id) || A.name.localeCompare(B.name)
-    })
+    let members = userData.sites[userData.activeSite].groups[userData.activeGroup].members//.sort((A, B) => {
+    //     // default sort: alphabetical with online users on top and offline on bottom
+    //     return userData.associatedUsers[B._id].online - userData.associatedUsers[A._id].online || A.name.localeCompare(B.name)
+    // })
 
     const group = userData.sites[userData.activeSite].groups[userData.activeGroup]
     console.log(group.name);
@@ -41,15 +41,14 @@ const FriendsList = () => {
             <ul>
                 {members.map(member => {
                     return <li
-                        key={member._id}
-                        className={userData.onlineMembers.includes(member._id) ? "online" : "offline"}
+                        key={member}
                         onDoubleClick={() => handleClick(member)}
                     >
                         <Friend 
-                            name={member.name} 
-                            id={member._id} 
-                            picturePath={member.picture}
-                            isOnline={userData.onlineMembers.includes(member._id)}
+                            name={userData.associatedUsers[member].name} 
+                            id={member} 
+                            picturePath={userData.associatedUsers[member].picture}
+                            isOnline={userData.associatedUsers[member].online}
                         />
                     </li>
                 })}
