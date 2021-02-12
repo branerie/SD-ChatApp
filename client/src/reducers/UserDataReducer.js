@@ -223,7 +223,14 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                onlineMembers: [...new Set([...userData.onlineMembers, user._id])]
+                onlineMembers: [...new Set([...userData.onlineMembers, user._id])],
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        ...userData.associatedUsers[user._id],
+                        online: true
+                    }
+                }
             }
         }
 
@@ -264,7 +271,8 @@ export default function UserDataReducer(userData, action) {
                     [user._id]: {
                         username: user.username,
                         name: user.name,
-                        picture: user.picture
+                        picture: user.picture,
+                        online: user.online
                     }
                 }
             }
@@ -295,7 +303,14 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                onlineMembers: userData.onlineMembers.filter(m => m !== user._id)
+                onlineMembers: userData.onlineMembers.filter(m => m !== user._id),
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        ...userData.associatedUsers[user._id],
+                        online: false
+                    }
+                }
             }
         }
 
@@ -318,7 +333,8 @@ export default function UserDataReducer(userData, action) {
                     [user._id]: {
                         username: user.username,
                         name: user.name,
-                        picture: user.picture
+                        picture: user.picture,
+                        online: user.online
                     }
                 }
             }
@@ -442,7 +458,8 @@ export default function UserDataReducer(userData, action) {
                     [user._id]: {
                         username: user.username,
                         name: user.name,
-                        picture: user.picture
+                        picture: user.picture,
+                        online: user.online
                     }
                 }
             }

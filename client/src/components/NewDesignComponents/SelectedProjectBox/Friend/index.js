@@ -14,7 +14,7 @@ const Friend = ({ id, name, picturePath, isOnline }) => {
     return (
         <div className={styles['friends']} onClick={openChatWithFriend}>
             <div className={styles['status-light']}>
-                    <StatusLight userId={id} size='small' />
+                    <StatusLight userId={id} isOnline={isOnline} size='small' />
             </div>
             <UserAvatar picturePath={picturePath} />
             <div className={styles['name']}>

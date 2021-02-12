@@ -51,7 +51,8 @@ module.exports = io => {
                     user: {
                         _id: userData._id,
                         name: userData.name,
-                        username: userData.username
+                        username: userData.username,
+                        online: true
                     },
                     site: site._id,
                     group: _id
@@ -60,6 +61,7 @@ module.exports = io => {
         })
 
         clientData.onlineMembers = getOnlineMembers(allMembers)
+        allMembers.forEach(member => clientData.associatedUsers[member].online = Boolean(userIDToSocketIDCache[member]))
         // console.log(JSON.stringify(clientData, null, 4),"\n","clientData END")
         socket.emit("welcome-message", { userData: clientData })
 
@@ -78,7 +80,8 @@ module.exports = io => {
                         user: {
                             _id: userData._id,
                             name: userData.name,
-                            username: userData.username
+                            username: userData.username,
+                            online: false
                         },
                         reason,
                         group,
@@ -223,7 +226,8 @@ module.exports = io => {
         socket.on("send-invitation", async ({ user, site }, callback) => { //admin
             const data = await db.inviteUser(user, site, userData._id)
             if (data.success) {
-                if (userIDToSocketIDCache[data.userData._id]) {
+                data.userData.online = Boolean(userIDToSocketIDCache[data.userData._id])
+                if (data.userData.online) {
                     userIDToSocketIDCache[data.userData._id].forEach(socketID => {
                         io.to(socketID).emit('add-site-to-invitations', data.siteData)
                     })
@@ -242,7 +246,8 @@ module.exports = io => {
                 picture: userData.picture,
                 username: userData.username,
                 name: userData.name,
-                _id: userData._id
+                _id: userData._id,
+                online: true
             }
             if (data.success) {
                 if (userIDToSocketIDCache[data.site.creator]) {
@@ -266,7 +271,8 @@ module.exports = io => {
                     _id: userData._id,
                     username: userData.username,
                     name: userData.name,
-                    picture: userData.picture
+                    picture: userData.picture,
+                    online: true
                 }
                 let group = data.generalGroup._id.toString()
                 groupToSiteCache[group] = site
@@ -302,6 +308,7 @@ module.exports = io => {
                     }
                 }
                 let onlineMembers = getOnlineMembers(memberIDs)
+                memberIDs.forEach(m => associatedUsers[m].online = Boolean(userIDToSocketIDCache[m]))
 
                 sysLog(`${userData.username} accepted invitation and joined ${data.site.name}`)
                 callback(true, { siteData, associatedUsers, onlineMembers })
@@ -316,13 +323,14 @@ module.exports = io => {
         socket.on('accept-request', async ({ user, site }, callback) => { // admin
             const data = await db.acceptRequest(site, user, userData._id)
             if (data.success) {
+                let online = userIDToSocketIDCache[user] ? true : false
                 let userData = {
                     _id: data.userData._id,
                     username: data.userData.username,
                     name: data.userData.name,
-                    picture: data.userData.picture
+                    picture: data.userData.picture,
+                    online
                 }
-                let online = userIDToSocketIDCache[user] ? true : false
                 let group = data.generalGroup._id.toString()
                 groupToSiteCache[group] = site
                 io.to(group).emit("join-message", {
@@ -358,6 +366,7 @@ module.exports = io => {
                         }
                     }
                     let onlineMembers = getOnlineMembers(memberIDs)
+                    memberIDs.forEach(m => associatedUsers[m].online = Boolean(userIDToSocketIDCache[m]))
 
                     userIDToSocketIDCache[user].forEach(socket => {
                         io.sockets.sockets.get(socket).join(group)
@@ -379,7 +388,8 @@ module.exports = io => {
                     _id: data.userData._id,
                     name: data.userData.name,
                     username: data.userData.username,
-                    picture: data.userData.picture
+                    picture: data.userData.picture,
+                    online
                 }
                 io.to(group).emit("join-message", {
                     user,

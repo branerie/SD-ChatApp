@@ -42,7 +42,7 @@ const PendingList = () => {
                                         name={userData.associatedUsers[user].name}
                                         id={user}
                                         picturePath={userData.associatedUsers[user].picture}
-                                        isOnline={userData.onlineMembers.includes(user)}
+                                        isOnline={userData.associatedUsers[user].online}
                                     />
                                     <div>
                                         <button onClick={() => showInfo(user)}>info</button>
@@ -66,7 +66,7 @@ const PendingList = () => {
                                         name={userData.associatedUsers[user].name}
                                         id={user}
                                         picturePath={userData.associatedUsers[user].picture}
-                                        isOnline={userData.onlineMembers.includes(user)}
+                                        isOnline={userData.associatedUsers[user].online}
                                     />
                                     <div>
                                         <button onClick={() => showInfo(user)}> info </button>
