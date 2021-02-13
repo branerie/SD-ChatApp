@@ -9,7 +9,7 @@ const UserAvatar = ({ picturePath }) => {
         <div className={styles['avatar']}>
             <img
                 src={picturePath ? getFaceCroppedImageUrl(picturePath) : emptyProfilePic}
-                className={`${styles['profile-pic']} && ${!picturePath && styles['pic-rounded']}`}
+                className={`${styles['profile-pic']} ${!picturePath && styles['pic-rounded']}`}
             />
         </div>
     )

@@ -38,9 +38,20 @@ const getMessages = async (userData) => {
             { destination: { $in: chats }, source: userData._id },
             { source: { $in: chats }, destination: userData._id },
         ]
-    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username' }).populate({ path: 'destination', select: 'name username' }).lean()
+    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username picture' }).populate({ path: 'destination', select: 'name username' }).lean()
     // console.log(messages);
     return messages
+}
+
+const getPrivateMessages = async (id, uid) => {
+    const party = await User.findById(id)
+    const messages = await Message.find({
+        $or: [
+            { destination: id, source: uid },
+            { source: id, destination: uid },
+        ]
+    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username' }).lean()
+    return { messages, username: party.name }
 }
 
 const createPublicMessage = async (sender, recipient, msg) => {
@@ -371,6 +382,7 @@ const getUserDetails = async (uid) => {
 module.exports = {
     getUserData,
     getMessages,
+    getPrivateMessages,
     removeChat,
     createPublicMessage,
     createPrivateMessage,

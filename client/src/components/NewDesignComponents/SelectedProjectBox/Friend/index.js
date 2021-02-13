@@ -2,17 +2,21 @@ import React, { useContext } from 'react'
 import styles from './index.module.css'
 import StatusLight from '../../CommonComponents/StatusLight'
 import { MessagesContext } from '../../../../context/MessagesContext'
+import { SocketContext } from '../../../../context/SocketContext'
 import UserAvatar from '../../CommonComponents/UserAvatar'
 
 const Friend = ({ id, name, picturePath, isOnline }) => {
     const { dispatchUserData } = useContext(MessagesContext)
+    const { socket } = useContext(SocketContext)
 
-    const openChatWithFriend = () => {
-        dispatchUserData({ type: 'open-chat', payload: { user: { _id: id, name: name } } })
+    const openPrivateChat = () => {
+        socket.emit('get-chat-history', id, (chat) => {
+            dispatchUserData({ type: 'open-chat', payload: { id, chat } })
+        })
     }
 
     return (
-        <div className={styles['friends']} onClick={openChatWithFriend}>
+        <div className={styles['friends']} onClick={openPrivateChat}>
             <div className={styles['status-light']}>
                     <StatusLight userId={id} isOnline={isOnline} size='small' />
             </div>

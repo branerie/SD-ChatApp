@@ -41,13 +41,11 @@ const TextArea = (props) => {
             dispatchUserData({
                 type: recipientType, 
                 payload: { 
-                    user: userData.personal._id,
-                    username: userData.personal.username,
+                    src: userData.personal._id,
                     msg, 
                     site, 
                     group: recipient, 
-                    chat: recipient,
-                    own: true
+                    chat: recipient
                 }
             })
         })

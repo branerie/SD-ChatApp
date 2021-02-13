@@ -1,8 +1,9 @@
-import React, { useEffect, useContext, useRef, useState, useMemo } from 'react'
+import React, { useEffect, useContext, useRef } from 'react'
 import styles from './index.module.css'
 import ChatTitle from './ChatTitle/'
 import UserNav from './UserNav/'
-import NewMessage from './NewMessage/'
+import Message from './Message/'
+import Notice from './Notice/'
 import DevLine from './DevLine/'
 import SendMessageBox from './SendMessageBox'
 
@@ -13,22 +14,7 @@ const CurrentChatWindow = (props) => {
     const { userData } = useContext(MessagesContext)
     const messagesRef = useRef()
 
-    useEffect(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight)
-
-    // TODO: When MessagesContext is changed to hold user data separately, should be removed
-    // and access to users' profile pics should be made directly from there
-    const allUsers = useMemo(() => {
-        if (!userData) return null
-
-        return Object.values(userData.sites).reduce((acc, site) => { 
-            const groups = Object.values(site.groups)
-    
-            const newAcc = { ...acc }
-            groups.forEach(g => g.members.forEach(m => newAcc[[m.username]] = m ))
-    
-            return newAcc
-        }, {})
-    }, [userData])
+    useEffect(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight, [userData])
 
     if (!userData) return (
         <div className={styles['current-chat-window']}>
@@ -42,20 +28,18 @@ const CurrentChatWindow = (props) => {
     let messages, title, msgBox = true
     if (userData.activeChat) {
         messages = userData.chats[userData.activeChat].messages
-        title = `@${userData.chats[userData.activeChat].username}`
+        title = userData.activeChat === userData.personal._id ? 'Notes' : `@${userData.chats[userData.activeChat].username}`
     } else if (userData.activeSite) {
-        let project = userData.sites[userData.activeSite].name
-        let group = userData.sites[userData.activeSite].groups[userData.activeGroup].name
         messages = userData.sites[userData.activeSite].groups[userData.activeGroup].messages
-        title = `#${group} (${project})`
+        title = `#${userData.sites[userData.activeSite].groups[userData.activeGroup].name}`
     } else {
         messages = [{
             user: "SERVER",
             msg: [`Welcome to SmartChat Network ${userData.personal.name}.`,
-            "If you don't have any membership yet, you can create your own projects or join an existing project.",
-            "By the time, we suggest you complete your profile by adding some info about yourself.",
-            "If skipped now, this can be done later from the settings button."
-        ].join('\n'),
+                "If you don't have any membership yet, you can create your own projects or join an existing project.",
+                "By the time, we suggest you complete your profile by adding some info about yourself.",
+                "If skipped now, this can be done later from the profile menu."
+            ].join('\n'),
             timestamp: new Date().toUTCString(),
             own: false
         }]
@@ -66,21 +50,23 @@ const CurrentChatWindow = (props) => {
     return (
         <div className={styles['current-chat-window']}>
             <UserNav />
-            <ChatTitle title={title}/>
+            <ChatTitle title={title} />
             <div ref={messagesRef} className={styles['message-box']}>
-                {messages.map(({ user, username, msg, timestamp, own }, i) => {
+                {messages.map(({ src, msg, timestamp, notice, event }, i) => {
                     let thisDate = new Date(timestamp).toDateString()
                     let prevDate = i > 0 ? new Date(messages[i - 1].timestamp).toDateString() : undefined
                     return (
                         <div key={i} >
                             {thisDate !== prevDate && <DevLine date={thisDate} />}
-                            <NewMessage message={{ 
-                                user, 
-                                msg, 
-                                timestamp, 
-                                own,
-                                avatar: allUsers[[username]] ? allUsers[[username]].picture : null}}
-                            />
+                            {notice ? <Notice message={{msg , event}}/> : <Message message={{
+                                    user: userData.associatedUsers[src] ? userData.associatedUsers[src].name : null,
+                                    msg,
+                                    timestamp,
+                                    own: src === userData.personal._id,
+                                    avatar: userData.associatedUsers[src] ? userData.associatedUsers[src].picture : null
+                                }}
+                                />
+                            }
                         </div>
                     )
                 })}

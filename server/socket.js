@@ -102,31 +102,26 @@ module.exports = io => {
             let newMessage = await db.createPublicMessage(userData._id, recipient, msg)
             if (!newMessage) return // validate query
             sysLog(`Message (group): ${userData.username} >> ${recipient}`)
-            socket.to(recipient).emit("group-chat-message", { user: userData._id.toString(), msg, group: recipient, site })
+            socket.to(recipient).emit("group-chat-message", { src: userData._id.toString(), msg, group: recipient, site })
             callback()
         })
 
         socket.on("single-chat-message", async ({ msg, recipient }, callback) => {
-            let newMessage = await db.createPrivateMessage(userData._id, recipient, msg)
+            let src = userData._id.toString()
+            let newMessage = await db.createPrivateMessage(src, recipient, msg)
             if (!newMessage) return // validate query            
 
             // send message to all sockets associated with recipient if any
             if (userIDToSocketIDCache[recipient]) {
-                sysLog(`Message (private): ${userData.username} >> ${recipient}`)
+                sysLog(`Message (private): ${src} >> ${recipient}`)
                 userIDToSocketIDCache[recipient].forEach(socketID => {
-                    io.to(socketID).emit("single-chat-message", {
-                        user: userData.name,
-                        username: userData.username,
-                        chat: userData._id,
-                        msg,
-                        own: recipient === userData._id.toString()
-                    })
+                    io.to(socketID).emit("single-chat-message", {src, chat: src, msg })
                 })
             } else {
                 // send offline msg to DB if not in blacklist
-                sysLog(`Message (offline): ${userData.username} >> ${recipient}`)
+                sysLog(`Message (offline): ${src} >> ${recipient}`)
             }
-            if (recipient !== userData._id.toString()) restSocketsUpdate(userData._id, socket.id, "single-chat-message", { user: userData._id, chat: recipient, msg, own: true })
+            if (recipient !== src) restSocketsUpdate(src, socket.id, "single-chat-message", { src, chat: recipient, msg })
             callback()
         })
 
@@ -158,10 +153,10 @@ module.exports = io => {
                                 name: 'General',
                                 members: [userData._id],
                                 messages: [{
-                                    user: 'SERVER',
+                                    notice: true,
+                                    event: 'system',
                                     timestamp: utcTime(),
-                                    msg: `Hello ${userData.name}. Welcome to your new project: ${site}. You can invite members in General group or start creating groups now.`,
-                                    own: false
+                                    msg: `Hello ${userData.name}. Welcome to your new project: ${site}. You can invite members in General group or start creating groups now.`
                                 }]
                             }
                         }
@@ -199,10 +194,10 @@ module.exports = io => {
                         name: group,
                         members: [userData._id],
                         messages: [{
-                            user: 'SERVER',
+                            notice: true,
+                            event: 'system',
                             timestamp: utcTime(),
-                            msg: `You have just created new group ${group} in your project. You can now start adding project members.`,
-                            own: false
+                            msg: `You have just created new group ${group} in your project. You can now start adding project members.`
                         }]
                     }
                 }
@@ -496,6 +491,24 @@ module.exports = io => {
             const newProfileData = await db.updateProfileData(userData._id, data)
             callback(data)
             // if name is changed send newProfileData.name to connected rooms and users via socket? 
+        })
+
+        socket.on('get-chat-history', async(id, callback) => {
+            const data = await db.getPrivateMessages(id, userData._id)
+            const chat = {
+                messages: []
+            }
+            if (data) {
+                chat.username = data.username
+                data.messages.forEach(msg => {
+                    chat.messages.push({
+                        src: msg.source._id,
+                        msg: msg.content,
+                        timestamp: msg.createdAt
+                    })
+                })
+            }
+            callback(chat)
         })
 
         socket.on('get-user-details', async (userId, callback) => {

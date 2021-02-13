@@ -33,10 +33,10 @@ const PrivateChatList = () => {
                             <div key={chat}
                                 className={chat === userData.activeChat ? `${styles.selected} ${styles.chat}` : styles.chat}
                                 onClick={(e) => handleClick(e, chat)}>
-                                    <StatusLight userId={chat} size='small'/>
-                                    <UserAvatar picturePath={chats[chat].username.picture} />
+                                    <StatusLight isOnline={userData.associatedUsers[chat].online} size='small'/>
+                                    <UserAvatar picturePath={userData.associatedUsers[chat].picture} />
                                     {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null}
-                                    <span className={styles['user-name']}>{chats[chat].username}</span>
+                                    <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
                             </div>
                             <CloseButton chat={chat} lastActive={prevActive.current}/>
                         </div>
