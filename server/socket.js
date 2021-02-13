@@ -153,10 +153,10 @@ module.exports = io => {
                                 name: 'General',
                                 members: [userData._id],
                                 messages: [{
-                                    user: 'SERVER',
+                                    notice: true,
+                                    event: 'system',
                                     timestamp: utcTime(),
-                                    msg: `Hello ${userData.name}. Welcome to your new project: ${site}. You can invite members in General group or start creating groups now.`,
-                                    // own: false
+                                    msg: `Hello ${userData.name}. Welcome to your new project: ${site}. You can invite members in General group or start creating groups now.`
                                 }]
                             }
                         }
@@ -194,10 +194,10 @@ module.exports = io => {
                         name: group,
                         members: [userData._id],
                         messages: [{
-                            user: 'SERVER',
+                            notice: true,
+                            event: 'system',
                             timestamp: utcTime(),
-                            msg: `You have just created new group ${group} in your project. You can now start adding project members.`,
-                            // own: false
+                            msg: `You have just created new group ${group} in your project. You can now start adding project members.`
                         }]
                     }
                 }

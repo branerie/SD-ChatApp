@@ -202,8 +202,9 @@ export default function UserDataReducer(userData, action) {
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {
-                                        user: "SERVER",
-                                        msg: `${user.name} is online.`,
+                                        notice: true,
+                                        event: 'online',
+                                        msg: `${user.name} is online`,
                                         timestamp
                                     }
                                 ],
@@ -243,7 +244,8 @@ export default function UserDataReducer(userData, action) {
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {
-                                        user: "SERVER",
+                                        notice: true,
+                                        event: 'joined',
                                         msg: `${user.name} has joined.`,
                                         timestamp
                                     }
@@ -280,8 +282,9 @@ export default function UserDataReducer(userData, action) {
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {
-                                        user: "SERVER",
-                                        msg: `${user.name} is offline.`,
+                                        notice: true,
+                                        event: 'offline',
+                                        msg: `${user.name} is offline`,
                                         timestamp
                                     }
                                 ],

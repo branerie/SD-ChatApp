@@ -2,7 +2,7 @@ import React from 'react'
 import styles from './index.module.css'
 import UserAvatar from '../../../CommonComponents/UserAvatar'
 
-const NewMessage = ({ message }) => {
+const Message = ({ message }) => {
 
     function getTime(timestamp) {
         return new Date(timestamp).toTimeString().split(':', 2).join(':')
@@ -29,4 +29,4 @@ const NewMessage = ({ message }) => {
     )
 }
 
-export default NewMessage
+export default Message
