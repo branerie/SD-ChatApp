@@ -38,7 +38,7 @@ const getMessages = async (userData) => {
             { destination: { $in: chats }, source: userData._id },
             { source: { $in: chats }, destination: userData._id },
         ]
-    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username' }).populate({ path: 'destination', select: 'name username' }).lean()
+    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username picture' }).populate({ path: 'destination', select: 'name username' }).lean()
     // console.log(messages);
     return messages
 }

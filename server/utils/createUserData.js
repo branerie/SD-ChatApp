@@ -89,38 +89,34 @@ const createUserData = (userData, messagePool) => {
     })
 
     messagePool.forEach(msg => {
-        let own = msg.source._id.toString() === userData._id.toString() // boolean
         switch (msg.onModel) {
             case "User":
                 // determine who is the other party in conversation
+                let own = msg.source._id.toString() === userData._id.toString() // boolean
                 let partyID = own ? msg.destination._id.toString() : msg.source._id.toString()
-                let partyName = own ? msg.destination.name : msg.source.name
-                if (!clientData.chats[partyID]) {
-                    clientData.chats[partyID] = {
-                        username: partyName,
-                        messages: []
-                    }
-                }
+                if (!clientData.chats[partyID]) clientData.chats[partyID] = { messages: [] }
                 clientData.chats[partyID].messages.push({
-                    user: msg.source.name,
-                    // added because username is unique, could be replaced by id
-                    // purpose is to map profile pics to user who created message
-                    username: msg.source.username,
+                    src: msg.source._id,
                     msg: msg.content,
-                    timestamp: msg.createdAt,
-                    own
+                    timestamp: msg.createdAt
                 })
                 break;
 
             case "Group":
-                clientData.sites[siteCache[msg.destination._id]].groups[msg.destination._id].messages.push({
-                    user: msg.source.name,
-                    // added because username is unique, could be replaced by id
-                    // purpose is to map profile pics to user who created message
-                    username: msg.source.username,
+                // future implementation of removing users from groups shoud fix situation
+                // when there are messages from these users that are not anymore in the group
+                if (!clientData.associatedUsers[msg.source._id]) {
+                    clientData.associatedUsers[msg.source._id] = {
+                        username: msg.source.username,
+                        name: msg.source.name,
+                        picture: msg.source.picture,
+                        online: false
+                    }
+                }
+                clientData.sites[siteCache[msg.destination._id]].groups[msg.destination._id].messages.push({                    
+                    src: msg.source._id,
                     msg: msg.content,
-                    timestamp: msg.createdAt,
-                    own
+                    timestamp: msg.createdAt
                 })
                 break;
 

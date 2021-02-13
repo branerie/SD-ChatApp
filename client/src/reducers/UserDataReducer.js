@@ -137,8 +137,7 @@ export default function UserDataReducer(userData, action) {
 
         case "group-chat-message": {
             let timestamp = new Date().toUTCString()
-            let { site, group, msg, user } = action.payload
-            let own = user === userData.personal._id
+            let { src, site, group, msg } = action.payload
             return {
                 ...userData,
                 sites: {
@@ -149,18 +148,11 @@ export default function UserDataReducer(userData, action) {
                             ...userData.sites[site].groups,
                             [group]: {
                                 ...userData.sites[site].groups[group],
-                                unread: group !== userData.activeGroup && !own,
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
-                                    {
-                                        user: userData.associatedUsers[user].name,
-                                        // added in order to fetch user avatar as username is unique (can be replaced with id)
-                                        username: userData.associatedUsers[user].username,
-                                        msg,
-                                        timestamp,
-                                        own
-                                    }
-                                ]
+                                    { src, msg, timestamp }
+                                ],
+                                unread: group !== userData.activeGroup && src !== userData.personal._id
                             }
                         }
                     }
@@ -170,8 +162,7 @@ export default function UserDataReducer(userData, action) {
 
         case "single-chat-message": {
             let timestamp = new Date().toUTCString()
-            let { user, username, chat, msg, own } = action.payload
-            if (own) user = userData.personal.name
+            let { src, chat, msg } = action.payload
             return {
                 ...userData,
                 chats: {
@@ -182,15 +173,12 @@ export default function UserDataReducer(userData, action) {
                                 ...userData.chats[chat],
                                 messages: [
                                     ...userData.chats[chat].messages || [],
-                                    { user, username, msg, timestamp, own }
+                                    { src, msg, timestamp }
                                 ],
-                                unread: chat !== userData.activeChat && !own
+                                unread: chat !== userData.activeChat && src !== userData.personal._id
                             }
                             : {
-                                username: user,
-                                messages: [
-                                    { user, username, msg, timestamp, own }
-                                ],
+                                messages: [{ src, msg, timestamp }],
                                 unread: true
                             }
                     }
