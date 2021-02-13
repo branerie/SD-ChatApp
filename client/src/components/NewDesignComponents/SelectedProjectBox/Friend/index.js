@@ -9,14 +9,14 @@ const Friend = ({ id, name, picturePath, isOnline }) => {
     const { dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
 
-    const openChatWithFriend = () => {
+    const openPrivateChat = () => {
         socket.emit('get-chat-history', id, (chat) => {
             dispatchUserData({ type: 'open-chat', payload: { id, chat } })
         })
     }
 
     return (
-        <div className={styles['friends']} onClick={openChatWithFriend}>
+        <div className={styles['friends']} onClick={openPrivateChat}>
             <div className={styles['status-light']}>
                     <StatusLight userId={id} isOnline={isOnline} size='small' />
             </div>

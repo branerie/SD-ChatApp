@@ -57,36 +57,36 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "load-chat": { // load selected chat data
+            const { chat } = action.payload
             return {
                 ...userData,
                 chats: {
                     ...userData.chats,
-                    [action.payload.chat]: {
-                        ...userData.chats[action.payload.chat],
+                    [chat]: {
+                        ...userData.chats[chat],
                         unread: false
                     }
                 },
                 activeSite: false,
                 activeGroup: false,
-                activeChat: action.payload.chat
+                activeChat: chat
             }
         }
 
         case "open-chat": {
-            let { user } = action.payload
+            const { id, chat } = action.payload
             return {
                 ...userData,
                 chats: {
                     ...userData.chats,
-                    [user._id]: {
-                        username: user.name,
-                        messages: userData.chats[user._id] ? userData.chats[user._id].messages : [],
+                    [id]: {
+                        ...chat,
                         unread: false
                     }
                 },
                 activeSite: false,
                 activeGroup: false,
-                activeChat: user._id
+                activeChat: id
             }
         }
 
