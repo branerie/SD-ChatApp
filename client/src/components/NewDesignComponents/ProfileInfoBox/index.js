@@ -31,14 +31,14 @@ const ProfileInfoBox = () => {
         }
 
         getUserDetails(userData.activeChat)
-    }, [userData.activeChat, isShown])
+    }, [userData.activeChat, isShown, userInChat.userId, socket])
 
     if (!userData.activeChat) return null
 
     return (
         <div className={styles.container}>
             <div className={styles['info-arrow']} onClick={() => setIsShown(!isShown)}>
-                <img src={isShown ? shrinkArrow : expandArrow} className={styles['arrow-img']} />
+                <img src={isShown ? shrinkArrow : expandArrow} className={styles['arrow-img']} alt=''/>
             </div>
             { isShown &&
                 <div className={styles['profile-info-box']}>

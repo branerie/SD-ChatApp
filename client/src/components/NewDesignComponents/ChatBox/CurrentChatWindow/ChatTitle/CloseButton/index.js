@@ -1,22 +1,27 @@
-import React, {useState}from 'react'
+import { useState, useContext } from 'react'
 import styles from './index.module.css'
 import closeButton from '../../../../../../images/closeButton.svg'
 import closeButtonHover from '../../../../../../images/closeButtonHover.svg'
-import {IsOpenedUseContext} from '../../../../../../context/isOpened'
+import { MessagesContext } from '../../../../../../context/MessagesContext'
+import { SocketContext } from '../../../../../../context/SocketContext'
 
-const CloseButton = (props) => {
+const CloseButton = ({chat, prevActive}) => {
     const [closeButtonSrc, setCloseButtonSrc] = useState(closeButton)
-    const context = IsOpenedUseContext()
-  
+    const { dispatchUserData } = useContext(MessagesContext)
+    const { socket } = useContext(SocketContext)
+
+    function handleClick() {
+            socket.emit('close-chat', chat)
+            dispatchUserData({ type: 'close-chat', payload: { chat, prevActive } })
+    }
+
     return (
         <img
             className={styles['close-button']}
             src={closeButtonSrc}
             onMouseEnter={() => { setCloseButtonSrc(closeButtonHover) }}
             onMouseOut={() => { setCloseButtonSrc(closeButton) }}
-            onClick={() => {
-                context.changeOpenState([props.title], false)
-            }}
+            onClick={handleClick}
             alt=''
         />
     )

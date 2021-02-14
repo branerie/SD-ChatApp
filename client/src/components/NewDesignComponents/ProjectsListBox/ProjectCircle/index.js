@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './index.module.css'
-import Avatar, {ConfigProvider} from 'react-avatar'
+import Avatar from 'react-avatar'
 
 const ProjectCircle = (props) => {
     

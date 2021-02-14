@@ -1,10 +1,10 @@
-import React, { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
 import Thread from './Thread'
 import { MessagesContext } from '../../../../context/MessagesContext'
 
 const ProjectTreads = () => {
-    const { userData, dispatchUserData } = useContext(MessagesContext)
+    const { userData } = useContext(MessagesContext)
 
     if (!userData || !userData.activeSite) return null //<div>Loading...</div>
 

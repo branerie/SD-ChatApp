@@ -9,10 +9,10 @@ const SendMessageBox = () => {
     return (
         <div className={styles['send-msg-box']}>
             <div className={styles['send-file']}>
-                <img src={sendFile} />
+                <img src={sendFile} alt=''/>
             </div>
             <div className={styles['voice-msg']}>
-                <img src={voiceMsg} />
+                <img src={voiceMsg} alt=''/>
             </div>
             <div className={styles['text-area-box']}>
                 <TextArea placeholder='Message'/>
