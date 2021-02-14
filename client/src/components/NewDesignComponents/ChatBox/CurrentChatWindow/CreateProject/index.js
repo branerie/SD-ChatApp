@@ -5,7 +5,7 @@ import { SocketContext } from '../../../../../context/SocketContext'
 
 const CreateProject = () => {
     const { socket } = useContext(SocketContext)
-    const { userData, dispatchUserData } = useContext(MessagesContext)
+    const { dispatchUserData } = useContext(MessagesContext)
     const [errors, setErrors] = useState([])
     const [site, setSite] = useState('')
     const [description, setDescription] = useState('')

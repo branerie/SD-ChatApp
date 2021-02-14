@@ -1,6 +1,5 @@
 import React from 'react'
 import styles from './index.module.css'
-import LoginButton from '../Buttons/HomePageButton'
 import { useHistory } from 'react-router-dom'
 import picture from '../../images/homePagePicture.png'
 

@@ -39,15 +39,16 @@ const ProfilePicture = () => {
 
     return (
         <div className={styles['pic-container']}>
-            <img 
-                src={userData.personal.picture 
-                        ? getFullImageUrl(userData.personal.picture)
-                        : emptyProfilePic} 
+            <img
+                alt=''
+                src={userData.personal.picture
+                    ? getFullImageUrl(userData.personal.picture)
+                    : emptyProfilePic}
                 className={styles['profile-picture']}
             />
-            <button 
-                type='button' 
-                className={styles['btn-change']} 
+            <button
+                type='button'
+                className={styles['btn-change']}
                 onClick={showWidget}
             >
                 Change Picture

@@ -12,7 +12,6 @@ import AddGroup from './AddGroup'
 const ProjectList = () => {
     const { userData } = useContext(MessagesContext)
     const site = userData.activeSite ? userData.sites[userData.activeSite].name : false
-    console.log(userData);
     const [backgroundShown, setBackgroundShown] = useState(false)
     const [addGroupWindowOpened, setAddGroupWindowOpened] = useState(false)
     if (!userData || !userData.sites[userData.activeSite]) return null //<div>Loading...</div>

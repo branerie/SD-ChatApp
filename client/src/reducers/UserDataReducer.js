@@ -91,11 +91,21 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'close-chat': {
-            const { [action.payload.chat]: _, ...chats } = userData.chats
+            const { chat, prevActive } = action.payload
+            const { activeSite, activeGroup, activeChat } = prevActive
+            const { [chat]: _, ...chats } = userData.chats
             return {
                 ...userData,
                 chats,
-                ...(action.payload.chat === userData.activeChat) && { activeChat: false }
+                ...(chat === userData.activeChat) ? { 
+                    activeSite, 
+                    activeGroup, 
+                    activeChat
+                } : {
+                    activeSite, 
+                    activeGroup, 
+                    activeChat: chat !== activeChat ? activeChat : false
+                },
             }
         }
 
@@ -315,7 +325,7 @@ export default function UserDataReducer(userData, action) {
                             user._id
                         ]
                     }
-                },                
+                },
                 associatedUsers: {
                     ...userData.associatedUsers,
                     [user._id]: {

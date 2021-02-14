@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
 import ProjectThreads from '../ProjectTreads'
 import ProjectList from '../ProjectList'
@@ -7,7 +7,7 @@ import PendingList from '../PendingList'
 import { MessagesContext } from '../../../../context/MessagesContext'
 
 const SelectedProject = () => {
-    const { userData, dispatchUserData} = useContext(MessagesContext)
+    const { userData} = useContext(MessagesContext)
 
     if (!userData.activeSite) return null
     return (

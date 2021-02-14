@@ -1,14 +1,11 @@
-import React, { useContext, useState } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
-import ProjectCircle from '../ProjectCircle'
-import AvatarColors from '../../../../context/AvatarColors'
+// import AvatarColors from '../../../../context/AvatarColors'
 import { MessagesContext } from '../../../../context/MessagesContext'
-import { SocketContext } from '../../../../context/SocketContext'
 
 const colors = [styles.red, styles.green, styles.blue, styles.orange]
 
 const ProjectCircleBox = () => {
-    const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
     let colorIndex = 0
 
