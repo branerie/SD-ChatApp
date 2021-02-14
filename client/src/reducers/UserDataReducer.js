@@ -11,7 +11,8 @@ export default function UserDataReducer(userData, action) {
                 ...action.payload.userData,
                 activeSite: false,
                 activeGroup: false,
-                activeChat: false
+                activeChat: false,
+                activeMenu: false
             }
         }
 
@@ -20,9 +21,18 @@ export default function UserDataReducer(userData, action) {
                 ...userData,
                 activeSite: false,
                 activeGroup: false,
-                activeChat: false
+                activeChat: false,
+                activeMenu: 'projects' 
             }
         }
+        case "load-profile":
+            return {
+                ...userData,
+                activeSite: false,
+                activeGroup: false,
+                activeChat: false,
+                activeMenu: 'profile'
+            }
         case "load-site": { // load selected site data
             let activeSite = action.payload.site
             let activeGroup = Object.keys(userData.sites[activeSite].groups)[0]
@@ -30,7 +40,8 @@ export default function UserDataReducer(userData, action) {
                 ...userData,
                 activeSite,
                 activeGroup,
-                activeChat: false
+                activeChat: false,
+                activeMenu: false
             }
         }
 
@@ -52,7 +63,8 @@ export default function UserDataReducer(userData, action) {
                     },
                 },
                 activeGroup,
-                activeChat: false
+                activeChat: false,
+                activeMenu: false
             }
         }
 
@@ -69,7 +81,8 @@ export default function UserDataReducer(userData, action) {
                 },
                 activeSite: false,
                 activeGroup: false,
-                activeChat: chat
+                activeChat: chat,
+                activeMenu: false
             }
         }
 
@@ -86,13 +99,14 @@ export default function UserDataReducer(userData, action) {
                 },
                 activeSite: false,
                 activeGroup: false,
-                activeChat: id
+                activeChat: id,
+                activeMenu: false
             }
         }
 
         case 'close-chat': {
             const { chat, prevActive } = action.payload
-            const { activeSite, activeGroup, activeChat } = prevActive
+            const { activeSite, activeGroup, activeChat, activeMenu } = prevActive
             const { [chat]: _, ...chats } = userData.chats
             return {
                 ...userData,
@@ -104,7 +118,8 @@ export default function UserDataReducer(userData, action) {
                 } : {
                     activeSite, 
                     activeGroup, 
-                    activeChat: chat !== activeChat ? activeChat : false
+                    activeChat: chat !== activeChat ? activeChat : false,
+                    activeMenu
                 },
             }
         }
@@ -125,7 +140,8 @@ export default function UserDataReducer(userData, action) {
                     }
                 },
                 ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false }
+                ...(activeConnection) && { activeChat: false },
+                ...(activeConnection) && { activeMenu: false }
             }
         }
 
@@ -141,7 +157,8 @@ export default function UserDataReducer(userData, action) {
                 },
                 ...(activeConnection) && { activeSite },
                 ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false }
+                ...(activeConnection) && { activeChat: false },
+                ...(activeConnection) && { activeMenu: false }
             }
         }
 

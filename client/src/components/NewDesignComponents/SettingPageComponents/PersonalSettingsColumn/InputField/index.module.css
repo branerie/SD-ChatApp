@@ -23,7 +23,12 @@
 }
 
 .label{
+    width: 100%;
     font-size: 14px;
     color: #707070;
     text-transform: capitalize;
+}
+
+.input-changed {
+    border-color: #379b37;
 }

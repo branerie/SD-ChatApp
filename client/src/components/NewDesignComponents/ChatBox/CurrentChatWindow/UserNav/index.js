@@ -12,11 +12,16 @@ const UserNav = () => {
     function loadProjects() {
         dispatchUserData({ type: 'load-projects' })
     }
+
+    function loadProfile() {
+        dispatchUserData({ type: 'load-profile' })
+    }
+
     return (
         <div className={styles['user-nav']}>
             <button onClick={loadProjects}>Projects</button>
-            <button>Profile</button>
-            <button onClick={() => logOut()}>Logout</button>
+            <button onClick={loadProfile}>Profile</button>
+            <button onClick={logOut}>Logout</button>
             <button onClick={() => history.push('/chat')}>Old</button>
         </div>
     )
