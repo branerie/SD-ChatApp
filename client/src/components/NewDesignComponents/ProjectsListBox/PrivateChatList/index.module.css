@@ -64,3 +64,29 @@
 .user-name {
     margin-left: 5px;
 }
+
+.smalList {
+    display: flex;
+    justify-content: space-around;
+    margin: 2px 5px;
+    max-height: 100px;
+    border-radius: 5px;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.red {
+    background-color: #28817d;
+}
+
+.green {
+    background-color: #51879c;
+}
+
+.blue {
+    background-color: #6188d1;
+}
+
+.orange {
+    background-color: #72b5f3;
+}
