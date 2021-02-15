@@ -1,21 +1,22 @@
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useRef, useEffect, useContext} from 'react'
 import styles from './index.module.css'
 import searchIcon from '../../../../../images/searchIcon.svg'
 import moreIcon from '../../../../../images/moreIcon.svg'
 import Input from '../../../CommonComponents/Input'
-import closeButton from '../../../../../images/closeButton.svg'
-import closeButtonHover from '../../../../../images/closeButtonHover.svg'
-import {IsOpenedUseContext} from '../../../../../context/isOpened'
 import FavIcon from './FavIcon'
 import NotificationIcon from './NotificationIcon'
 import CloseButton from './CloseButton'
 import { MessagesContext } from "../../../../../context/MessagesContext";
 
 const ChatTitle = (props) => {
-    const [closeButtonSrc, setCloseButtonSrc] = useState(closeButton)
-    const context = IsOpenedUseContext()
     const { userData } = useContext(MessagesContext)
-    
+    const prevActive = useRef()
+
+    useEffect(() => {
+        let { activeSite, activeGroup, activeChat } = userData
+        prevActive.current = { activeSite, activeGroup, activeChat }
+    })  //TODO: useEffect to check for dependency
+
     return (
         <div className={styles['chat-title']}>
             <div>
@@ -26,17 +27,17 @@ const ChatTitle = (props) => {
             </div>
             <div className={styles['input-box']}>
                 <Input placeholder='Search...' />
-                <img src={searchIcon} className={styles['search-icon']} />
+                <img src={searchIcon} className={styles['search-icon']} alt= ''/>
             </div>
             <div>
                 <NotificationIcon />
             </div>
             <div>
-                <img src={moreIcon} className={styles['more-icon']} />
+                <img src={moreIcon} className={styles['more-icon']} alt=''/>
             </div>
             { userData.activeChat && 
             <div>
-                <CloseButton title={props.title} />
+                <CloseButton chat={userData.activeChat} prevActive={prevActive.current}/>
             </div>
             }
         </div>

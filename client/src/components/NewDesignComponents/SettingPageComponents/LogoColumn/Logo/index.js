@@ -4,7 +4,7 @@ import logoImage from '../../../../../images/logoSettingsPage.svg'
 
 const Logo = () => {
     return (
-        <img src={logoImage} className={styles['image']} />
+        <img src={logoImage} className={styles['image']} alt=''/>
     )
 }
 

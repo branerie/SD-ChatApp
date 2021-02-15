@@ -25,7 +25,6 @@ const getUserData = async (id) => {
             }
         }],
     }).lean()
-    // data.groups.forEach(g => console.log(g.site))
     return data
 }
 
@@ -38,9 +37,20 @@ const getMessages = async (userData) => {
             { destination: { $in: chats }, source: userData._id },
             { source: { $in: chats }, destination: userData._id },
         ]
-    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username' }).populate({ path: 'destination', select: 'name username' }).lean()
+    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username picture' }).populate({ path: 'destination', select: 'name username' }).lean()
     // console.log(messages);
     return messages
+}
+
+const getPrivateMessages = async (id, uid) => {
+    const party = await User.findById(id)
+    const messages = await Message.find({
+        $or: [
+            { destination: id, source: uid },
+            { source: id, destination: uid },
+        ]
+    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username' }).lean()
+    return { messages, username: party.name }
 }
 
 const createPublicMessage = async (sender, recipient, msg) => {
@@ -135,6 +145,7 @@ const createGeneralGroup = async (creator, site) => {
         const newGroup = await groupData.save()
         // console.log(newGroup);
         await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
+        // await User.findByIdAndUpdate(creator, { $addToSet: { groups: [{gid: newGroup._id}] } })
         return { success: true, _id: newGroup._id }
     } catch (error) {
         // add validations in model and check for more errors
@@ -168,6 +179,7 @@ const createGroup = async (site, name, creator) => {
         const newGroup = await groupData.save()
         // console.log(newGroup);
         await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
+        // await User.findByIdAndUpdate(creator, { $addToSet: { groups: [{gid: newGroup._id}] } })
         return { success: true, _id: newGroup._id }
     } catch (error) {
         // add validations in model and check for more errors
@@ -367,10 +379,16 @@ const getUserDetails = async (uid) => {
     }
 }
 
+// const updateAccessTime = async (uid, gid) => {
+//     const atime = await User.updateOne({_id: uid, 'groups.gid': gid}, { $set: { 'groups.$.atime': new Date() } })
+//     console.log(atime)
+// }
+
 
 module.exports = {
     getUserData,
     getMessages,
+    getPrivateMessages,
     removeChat,
     createPublicMessage,
     createPrivateMessage,
@@ -387,5 +405,6 @@ module.exports = {
     rejectRequest,
     getUserDetails,
     searchProjects,
-    updateProfileData
+    updateProfileData,
+    // updateAccessTime
 }

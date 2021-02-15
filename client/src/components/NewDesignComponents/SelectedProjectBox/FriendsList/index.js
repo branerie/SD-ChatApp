@@ -28,14 +28,12 @@ const FriendsList = () => {
     }
 
     if (!userData || !userData.activeSite) return null
-    console.log(userData.sites[userData.activeSite].groups[userData.activeGroup].members)
     let members = userData.sites[userData.activeSite].groups[userData.activeGroup].members//.sort((A, B) => {
     //     // default sort: alphabetical with online users on top and offline on bottom
     //     return userData.associatedUsers[B._id].online - userData.associatedUsers[A._id].online || A.name.localeCompare(B.name)
     // })
 
     const group = userData.sites[userData.activeSite].groups[userData.activeGroup]
-    console.log(group.name);
     return (
         <div className={styles['friends-list']}>
             <ul>

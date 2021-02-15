@@ -1,9 +1,9 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../../../context/MessagesContext'
 
 const FriendsNumber = () => {
-    const { userData, dispatchUserData } = useContext(MessagesContext)
+    const { userData } = useContext(MessagesContext)
 
     if (!userData || !userData.activeSite) return null
     // console.log(userData.sites[userData.activeSite].groups[userData.activeGroup].members);
@@ -12,7 +12,7 @@ const FriendsNumber = () => {
         // default sort: alphabetical with online users on top and offline on bottom
     //     return userData.associatedUsers[B._id].online - userData.associatedUsers[A._id].online || A.username.localeCompare(B.username)
     // })
-
+    
     return (
         <div className={styles['friends']}>
             <div className={styles['friends-label']}>FRIENDS</div>

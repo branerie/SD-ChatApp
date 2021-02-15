@@ -1,7 +1,7 @@
 import React, { useContext, useRef, useEffect } from 'react'
 // import "./index.css"
 import { MessagesContext } from '../../context/MessagesContext'
-import CloseButton from '../Buttons/CloseButton'
+import CloseChat from '../Buttons/CloseChat'
 
 const ChatsPrivateList = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
@@ -34,7 +34,7 @@ const ChatsPrivateList = () => {
                                     `}
                             onClick={(e) => handleClick(e, chat)}>
                             <span>{chats[chat].username}</span>
-                            <CloseButton chat={chat} lastActive={prevActive.current}/>
+                            <CloseChat chat={chat} lastActive={prevActive.current}/>
                         </li>
                     )
                 })}

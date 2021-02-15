@@ -11,7 +11,8 @@ export default function UserDataReducer(userData, action) {
                 ...action.payload.userData,
                 activeSite: false,
                 activeGroup: false,
-                activeChat: false
+                activeChat: false,
+                activeMenu: false
             }
         }
 
@@ -20,9 +21,18 @@ export default function UserDataReducer(userData, action) {
                 ...userData,
                 activeSite: false,
                 activeGroup: false,
-                activeChat: false
+                activeChat: false,
+                activeMenu: 'projects' 
             }
         }
+        case "load-profile":
+            return {
+                ...userData,
+                activeSite: false,
+                activeGroup: false,
+                activeChat: false,
+                activeMenu: 'profile'
+            }
         case "load-site": { // load selected site data
             let activeSite = action.payload.site
             let activeGroup = Object.keys(userData.sites[activeSite].groups)[0]
@@ -30,7 +40,8 @@ export default function UserDataReducer(userData, action) {
                 ...userData,
                 activeSite,
                 activeGroup,
-                activeChat: false
+                activeChat: false,
+                activeMenu: false
             }
         }
 
@@ -52,50 +63,64 @@ export default function UserDataReducer(userData, action) {
                     },
                 },
                 activeGroup,
-                activeChat: false
+                activeChat: false,
+                activeMenu: false
             }
         }
 
         case "load-chat": { // load selected chat data
+            const { chat } = action.payload
             return {
                 ...userData,
                 chats: {
                     ...userData.chats,
-                    [action.payload.chat]: {
-                        ...userData.chats[action.payload.chat],
+                    [chat]: {
+                        ...userData.chats[chat],
                         unread: false
                     }
                 },
                 activeSite: false,
                 activeGroup: false,
-                activeChat: action.payload.chat
+                activeChat: chat,
+                activeMenu: false
             }
         }
 
         case "open-chat": {
-            let { user } = action.payload
+            const { id, chat } = action.payload
             return {
                 ...userData,
                 chats: {
                     ...userData.chats,
-                    [user._id]: {
-                        username: user.name,
-                        messages: userData.chats[user._id] ? userData.chats[user._id].messages : [],
+                    [id]: {
+                        ...chat,
                         unread: false
                     }
                 },
                 activeSite: false,
                 activeGroup: false,
-                activeChat: user._id
+                activeChat: id,
+                activeMenu: false
             }
         }
 
         case 'close-chat': {
-            const { [action.payload.chat]: _, ...chats } = userData.chats
+            const { chat, prevActive } = action.payload
+            const { activeSite, activeGroup, activeChat, activeMenu } = prevActive
+            const { [chat]: _, ...chats } = userData.chats
             return {
                 ...userData,
                 chats,
-                ...(action.payload.chat === userData.activeChat) && { activeChat: false }
+                ...(chat === userData.activeChat) ? { 
+                    activeSite, 
+                    activeGroup, 
+                    activeChat
+                } : {
+                    activeSite, 
+                    activeGroup, 
+                    activeChat: chat !== activeChat ? activeChat : false,
+                    activeMenu
+                },
             }
         }
 
@@ -115,7 +140,8 @@ export default function UserDataReducer(userData, action) {
                     }
                 },
                 ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false }
+                ...(activeConnection) && { activeChat: false },
+                ...(activeConnection) && { activeMenu: false }
             }
         }
 
@@ -131,14 +157,14 @@ export default function UserDataReducer(userData, action) {
                 },
                 ...(activeConnection) && { activeSite },
                 ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false }
+                ...(activeConnection) && { activeChat: false },
+                ...(activeConnection) && { activeMenu: false }
             }
         }
 
         case "group-chat-message": {
             let timestamp = new Date().toUTCString()
-            let { site, group, msg, user } = action.payload
-            let own = user === userData.personal._id
+            let { src, site, group, msg } = action.payload
             return {
                 ...userData,
                 sites: {
@@ -149,18 +175,11 @@ export default function UserDataReducer(userData, action) {
                             ...userData.sites[site].groups,
                             [group]: {
                                 ...userData.sites[site].groups[group],
-                                unread: group !== userData.activeGroup && !own,
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
-                                    {
-                                        user: userData.sites[site].groups[group].members.find(m => m._id === user).name,
-                                        // added in order to fetch user avatar as username is unique (can be replaced with id)
-                                        username: userData.sites[site].groups[group].members.find(m => m._id === user).username,
-                                        msg,
-                                        timestamp,
-                                        own
-                                    }
-                                ]
+                                    { src, msg, timestamp }
+                                ],
+                                unread: group !== userData.activeGroup && src !== userData.personal._id
                             }
                         }
                     }
@@ -170,8 +189,7 @@ export default function UserDataReducer(userData, action) {
 
         case "single-chat-message": {
             let timestamp = new Date().toUTCString()
-            let { user, username, chat, msg, own } = action.payload
-            if (own) user = userData.personal.name
+            let { src, chat, msg } = action.payload
             return {
                 ...userData,
                 chats: {
@@ -182,15 +200,12 @@ export default function UserDataReducer(userData, action) {
                                 ...userData.chats[chat],
                                 messages: [
                                     ...userData.chats[chat].messages || [],
-                                    { user, username, msg, timestamp, own }
+                                    { src, msg, timestamp }
                                 ],
-                                unread: chat !== userData.activeChat && !own
+                                unread: chat !== userData.activeChat && src !== userData.personal._id
                             }
                             : {
-                                username: user,
-                                messages: [
-                                    { user, username, msg, timestamp, own }
-                                ],
+                                messages: [{ src, msg, timestamp }],
                                 unread: true
                             }
                     }
@@ -214,8 +229,9 @@ export default function UserDataReducer(userData, action) {
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {
-                                        user: "SERVER",
-                                        msg: `${user.name} is online.`,
+                                        notice: true,
+                                        event: 'online',
+                                        msg: `${user.name} is online`,
                                         timestamp
                                     }
                                 ],
@@ -255,7 +271,8 @@ export default function UserDataReducer(userData, action) {
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {
-                                        user: "SERVER",
+                                        notice: true,
+                                        event: 'joined',
                                         msg: `${user.name} has joined.`,
                                         timestamp
                                     }
@@ -292,8 +309,9 @@ export default function UserDataReducer(userData, action) {
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
                                     {
-                                        user: "SERVER",
-                                        msg: `${user.name} is offline.`,
+                                        notice: true,
+                                        event: 'offline',
+                                        msg: `${user.name} is offline`,
                                         timestamp
                                     }
                                 ],
@@ -324,7 +342,7 @@ export default function UserDataReducer(userData, action) {
                             user._id
                         ]
                     }
-                },                
+                },
                 associatedUsers: {
                     ...userData.associatedUsers,
                     [user._id]: {

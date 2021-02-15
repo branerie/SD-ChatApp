@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import { useContext } from 'react'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import { SocketContext } from '../../../../context/SocketContext'
 import Friend from '../Friend'
@@ -36,8 +36,8 @@ const PendingList = () => {
                 <ul><span className='header'>Invitations</span>
                     {userData.sites[userData.activeSite].invitations.map(user => {
                         return (
-                            <>
-                                <li key={user}>
+                            <div key={user}>
+                                <li>
                                     <Friend
                                         name={userData.associatedUsers[user].name}
                                         id={user}
@@ -50,7 +50,7 @@ const PendingList = () => {
                                     </div>
                                 </li>
                                 {userData.associatedUsers[user].info && <span>({userData.associatedUsers[user].username})</span>}
-                            </>
+                            </div>
                         )
                     })}
                 </ul>
@@ -60,8 +60,8 @@ const PendingList = () => {
                 <ul><span className='header'>Requests</span>
                     {userData.sites[userData.activeSite].requests.map(user => {
                         return (
-                            <>
-                                <li key={user}>
+                            <div key={user}>
+                                <li>
                                     <Friend
                                         name={userData.associatedUsers[user].name}
                                         id={user}
@@ -75,7 +75,7 @@ const PendingList = () => {
                                     </div>
                                 </li>
                                 {userData.associatedUsers[user].info && <span>({userData.associatedUsers[user].username})</span>}
-                            </>
+                            </div>
                         )
                     })}
                 </ul>

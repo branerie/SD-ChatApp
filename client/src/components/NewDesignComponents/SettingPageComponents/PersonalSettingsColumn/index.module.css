@@ -1,9 +1,8 @@
 .personal-settings-container{
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 25%;
     margin-left: 20px;
+    width: 100%;
 }
 
 .title{
@@ -43,4 +42,25 @@
 
 .form {
     margin-top: 30px;
+}
+
+.btn {
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    border: 1px solid #707070;
+    border-radius: 0.7rem;
+    cursor: pointer;
+}
+
+.btn:disabled {
+    background-color: #ccc;
+    cursor: default;
+}
+
+.btn-save {
+    background-color: #379b37;
+}
+
+.btn-revert {
+    background-color: #dd3c5c;
 }

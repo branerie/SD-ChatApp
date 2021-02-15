@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../../../context/MessagesContext'
 
@@ -34,8 +34,6 @@ const ProjectCircleBox = ({isSmallList}) => {
         const classList = [styles.list]
         if (site[0] === userData.activeSite) classList.push(styles.selected)
         if (site[1].creator === userData.personal._id) classList.push(styles.owner)
-        // if (context.newMessages[site] && site !== context.userData.activeGroup) classList.push("new-messages")
-
         if (classList.length === 1) {
             const currentColorIndex = colorIndex % colors.length
             const currentColor = colors[currentColorIndex]
