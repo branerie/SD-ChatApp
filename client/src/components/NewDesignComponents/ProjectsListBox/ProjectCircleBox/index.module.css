@@ -29,15 +29,15 @@
   }
 
 .list {
-   display: flex;
-   justify-content: center;
-   flex-wrap: wrap;
-   margin: 2px 5px;
-   max-height: 100px;
-   border-radius: 5px;
-   padding: 10px;
-   cursor: pointer;
-
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 2px 5px;
+    max-height: 100px;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+ 
 }
 
 .owner {

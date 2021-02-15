@@ -1,14 +1,10 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import styles from './index.module.css'
-import ProjectCircle from '../ProjectCircle'
-import AvatarColors from '../../../../context/AvatarColors'
 import { MessagesContext } from '../../../../context/MessagesContext'
-import { SocketContext } from '../../../../context/SocketContext'
 
 const colors = [styles.red, styles.green, styles.blue, styles.orange]
 
 const ProjectCircleBox = ({isSmallList}) => {
-    const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
     let colorIndex = 0
 
@@ -22,6 +18,17 @@ const ProjectCircleBox = ({isSmallList}) => {
         // default sort: user sites first, then alphabetically
         return (B[1].creator === userData.personal._id) - (A[1].creator === userData.personal._id) || A[1].name.localeCompare(B[1].name)
     })
+
+    function avatarLetter(line){
+        const splitedName = line.split(' ')
+        const firstLatterArray = []
+        for (let i = 0 ; i < splitedName.length ; i++) {
+            firstLatterArray.push(splitedName[i].charAt(0).toUpperCase())
+        }
+        const renderLetter = firstLatterArray.join('')
+        return renderLetter
+
+    }
 
     function addClasses(site){
         const classList = [styles.list]
@@ -47,7 +54,14 @@ const ProjectCircleBox = ({isSmallList}) => {
                     ?
                     (<div className={styles['project-container']}>
                         {sites.map(site => {
-                            return <ProjectCircle name={site[1].name} />
+                            return (
+                                    <div 
+                                        key={site[0]}
+                                        className={addClasses(site)}
+                                        onClick={(e) => handleClick(e, site[0])}>
+                                        {avatarLetter(site[1].name)}
+                                </div>
+                            )
                         })}
                     </div>)
                     :
