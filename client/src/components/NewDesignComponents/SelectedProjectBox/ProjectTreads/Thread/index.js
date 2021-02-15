@@ -1,30 +1,20 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
-// import {IsOpenedUseContext} from '../../../../../context/isOpened'
 import { MessagesContext } from '../../../../../context/MessagesContext'
+// import { SocketContext } from '../../../../../context/SocketContext'
 
-const ProjectThreads = (props) => {
-    // const context = IsOpenedUseContext()
+const ProjectThreads = ({title, gid}) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
+    // const { socket } = useContext(SocketContext)
 
     if (!userData || !userData.activeSite) return null //<div>Loading...</div>
 
-    function handleClick(e, activeGroup) {
-        if (e.target.nodeName === 'BUTTON') return
+    function loadGroup(activeGroup) {
+        // socket.emit('update-atime', activeGroup, () => {})
         dispatchUserData({ type: "load-group", payload: { activeGroup } })
     }
 
-    return (
-            <div 
-                className={styles['tread']}   
-                onClick={(e) => { 
-                    // context.changeOpenState([props.title], true) 
-                    handleClick(e, props.gid)
-                }}
-            >
-                {props.title}
-            </div>
-    )
+    return <div className={styles.tread} onClick={() => loadGroup(gid)}>{title}</div>
 }
 
 export default ProjectThreads

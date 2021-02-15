@@ -1,4 +1,4 @@
-const mongoose = require ('mongoose')
+const mongoose = require('mongoose')
 
 const UserSchema = new mongoose.Schema({
     username: {
@@ -40,6 +40,17 @@ const UserSchema = new mongoose.Schema({
         type: 'ObjectId',
         ref: 'Group'
     }],
+    // groupsAtime: [{
+    //     _id: false,
+    //     gid: {
+    //         type: 'ObjectId',
+    //         ref: 'Group'
+    //     },
+    //     atime: {
+    //         type: Date,
+    //         default: Date.now
+    //     }
+    // }],
     invitations: [{
         type: 'ObjectId',
         ref: 'Site'

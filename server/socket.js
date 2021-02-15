@@ -515,6 +515,11 @@ module.exports = io => {
             const userDetails = await db.getUserDetails(userId)
             callback(true, userDetails)
         })
+
+        // socket.on('update-atime', async(gid, callback) => {
+        //     const atime = await db.updateAccessTime(userData._id, gid)
+        //     callback()
+        // })
     })
 
     function restSocketsUpdate(uid, sid, event, data) {
