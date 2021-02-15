@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useMemo, useState } from 'react'
 import styles from './index.module.css'
 import InputField from './InputField'
 
@@ -20,6 +20,9 @@ const PersonalSettingsColumn = () => {
     
     const [data, setData] = useState(initState)
     
+    const isModified = useMemo(() => {
+        return Object.entries(data).some(([key, value]) => initState[key] !== value)
+    }, [data, initState])
     
     function updateData(key, value) {
         setData({
@@ -50,11 +53,29 @@ const PersonalSettingsColumn = () => {
             <form className={styles['form']} onSubmit={(e) => updateProfile(e)}>
                 {Object.entries(data).map(([key, value]) => {
                     return (
-                        <InputField key={key} input={key} value={value} updateData={updateData}/>
+                        <InputField 
+                            key={key} 
+                            input={key}
+                            value={value} 
+                            updateData={updateData}
+                            isChanged={initState[key] !== value}
+                        />
                     )
                 })}
-                <button type="button" onClick={() => setData(initState)}>Revert</button>
-                <button type="submit">Save Changes</button>
+                <button type="button" 
+                    onClick={() => setData(initState)} 
+                    className={`${styles['btn-revert']} ${styles.btn}`}
+                    disabled={!isModified}
+                >
+                    Revert
+                </button>
+                <button 
+                    type="submit"
+                    className={`${styles['btn-save']} ${styles.btn}`}
+                    disabled={!isModified}
+                >
+                    Save Changes
+                </button>
             </form>
         </div>
     )
