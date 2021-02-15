@@ -25,7 +25,6 @@ const getUserData = async (id) => {
             }
         }],
     }).lean()
-    // data.groups.forEach(g => console.log(g.site))
     return data
 }
 
@@ -146,6 +145,7 @@ const createGeneralGroup = async (creator, site) => {
         const newGroup = await groupData.save()
         // console.log(newGroup);
         await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
+        // await User.findByIdAndUpdate(creator, { $addToSet: { groups: [{gid: newGroup._id}] } })
         return { success: true, _id: newGroup._id }
     } catch (error) {
         // add validations in model and check for more errors
@@ -179,6 +179,7 @@ const createGroup = async (site, name, creator) => {
         const newGroup = await groupData.save()
         // console.log(newGroup);
         await User.updateOne({ _id: creator }, { $addToSet: { groups: [newGroup._id] } })
+        // await User.findByIdAndUpdate(creator, { $addToSet: { groups: [{gid: newGroup._id}] } })
         return { success: true, _id: newGroup._id }
     } catch (error) {
         // add validations in model and check for more errors
@@ -378,6 +379,11 @@ const getUserDetails = async (uid) => {
     }
 }
 
+// const updateAccessTime = async (uid, gid) => {
+//     const atime = await User.updateOne({_id: uid, 'groups.gid': gid}, { $set: { 'groups.$.atime': new Date() } })
+//     console.log(atime)
+// }
+
 
 module.exports = {
     getUserData,
@@ -399,5 +405,6 @@ module.exports = {
     rejectRequest,
     getUserDetails,
     searchProjects,
-    updateProfileData
+    updateProfileData,
+    // updateAccessTime
 }
