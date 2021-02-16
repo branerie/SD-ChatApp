@@ -171,17 +171,18 @@ module.exports = io => {
         })
 
         socket.on('create-group', async ({ site, group }, callback) => { //admin
-            if (group === undefined) {
+            if (group) group = group.trim()
+            if (!group) {
                 // Avoid db query but validate it in the schema with required flag. Also set this check on Client Side.
                 sysLog(`${userData._id} @ ${socket.id} attempt to create group with no name in ${site}`)
-                callback(false, 'Group name is required')
+                callback(false, ['Group name is required'])
                 return
             }
 
             if (group.toLowerCase() === 'general') {
                 // Avoid db query. Also set this check on Client Side.
                 sysLog(`${userData._id} @ ${socket.id} attempt to create General group in ${site}`)
-                callback(false, 'General is reserved name')
+                callback(false, ['General is reserved name'])
                 return
             }
             const data = await db.createGroup(site, group, userData._id)
@@ -205,7 +206,7 @@ module.exports = io => {
                 restSocketsJoin(userData._id, socket.id, groupID)
                 restSocketsUpdate(userData._id, socket.id, "create-group", { site, groupData })
             } else {
-                callback(false, data.message)
+                callback(false, [data.message])
             }
         })
 
@@ -352,7 +353,7 @@ module.exports = io => {
             }
         })
 
-        socket.on('add-member', async ({ member, site, group }) => {
+        socket.on('add-member', async ({ member, site, group }, callback) => {
             if (member === '') return // stop this on client side also
             const data = await db.addUserToGroup(member, site, group, userData._id)
             if (data.success) {
@@ -384,6 +385,7 @@ module.exports = io => {
                         io.sockets.sockets.get(socket).emit('added-to-group', { site, group: groupData })
                     })
                 }
+                callback()
             }
         })
 
@@ -466,6 +468,17 @@ module.exports = io => {
             const data = await db.searchProjects(site, page)
             if (data.success) {
                 callback(true, data.projects)
+            } else {
+                callback(false)
+            }
+        })
+
+        socket.on('search-people', async (socketData, callback) => {
+            if (!isValid(socketData, userData._id)) return
+            const { name = '', page = 0 } = socketData
+            const data = await db.searchPeople(name, page)
+            if (data.success) {
+                callback(true, data.people)
             } else {
                 callback(false)
             }

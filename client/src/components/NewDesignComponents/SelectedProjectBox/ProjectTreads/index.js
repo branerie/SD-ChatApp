@@ -13,9 +13,7 @@ const ProjectTreads = () => {
         return (B[1].name === 'General') - (A[1].name === 'General') || A[1].name.localeCompare(B[1].name)
     })
 
-    
-
-    return (
+        return (
         <ul className={styles['project-treads']}>
 
             {groups.map(([gid, group]) => {

@@ -2,19 +2,12 @@ import React, { useState, useContext } from 'react'
 import styles from './index.module.css'
 import Friend from '../Friend'
 import { MessagesContext } from '../../../../context/MessagesContext'
-import AddMember from './AddMember'
 import TransparentBackground from '../../CommonComponents/TransparentBackground'
-// import ChatGroupAddMember from '../../../ChatGroupAddMember'
 
 const FriendsList = () => {
     const { userData } = useContext(MessagesContext)
     const [backgroundOpened, setBackgroundOpened] = useState(false)
     const [addMemberOpened, setAddMemberOpened] = useState(false)
-    
-    const openInviteFriendWindow = () => {
-        setBackgroundOpened(true)
-        setAddMemberOpened(true)
-    }
     
     const closeOpenedWindows = () => {
         setBackgroundOpened(false)
@@ -33,7 +26,6 @@ const FriendsList = () => {
     //     return userData.associatedUsers[B._id].online - userData.associatedUsers[A._id].online || A.name.localeCompare(B.name)
     // })
 
-    const group = userData.sites[userData.activeSite].groups[userData.activeGroup]
     return (
         <div className={styles['friends-list']}>
             <ul>
@@ -51,16 +43,6 @@ const FriendsList = () => {
                     </li>
                 })}
             </ul>
-            {
-                userData.sites[userData.activeSite].creator === userData.personal._id ?
-                    <button onClick={openInviteFriendWindow}>
-                        {group.name === 'General' ? 'Invite Member' : 'Add Member'}
-                        </button> :
-                    <div></div>
-            }
-            <div>
-                {addMemberOpened ? <AddMember closeOpenedWindows={closeOpenedWindows}/> : <div />}
-            </div>
             <div>
                 {backgroundOpened ? <TransparentBackground closeOpenedWindows={closeOpenedWindows} /> : <div />}
             </div>

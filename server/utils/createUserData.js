@@ -51,6 +51,7 @@ const createUserData = (userData, messagePool) => {
         if (!clientData.sites[site._id]) {
             clientData.sites[site._id] = {
                 name: site.name,
+                description: site.description,
                 creator: site.creator,
                 groups: {}
             }

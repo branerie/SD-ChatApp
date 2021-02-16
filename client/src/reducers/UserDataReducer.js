@@ -12,7 +12,7 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                activeMenu: false
+                activeMenu: 'projects'
             }
         }
 
@@ -25,7 +25,18 @@ export default function UserDataReducer(userData, action) {
                 activeMenu: 'projects' 
             }
         }
-        case "load-profile":
+
+        case "load-project-settings": {
+            return {
+                ...userData,
+                // activeSite: false,
+                // activeGroup: false,
+                // activeChat: false,
+                activeMenu: 'settings' 
+            }
+        }
+
+        case "load-profile": {
             return {
                 ...userData,
                 activeSite: false,
@@ -33,6 +44,8 @@ export default function UserDataReducer(userData, action) {
                 activeChat: false,
                 activeMenu: 'profile'
             }
+        }
+
         case "load-site": { // load selected site data
             let activeSite = action.payload.site
             let activeGroup = Object.keys(userData.sites[activeSite].groups)[0]
@@ -114,12 +127,12 @@ export default function UserDataReducer(userData, action) {
                 ...(chat === userData.activeChat) ? { 
                     activeSite, 
                     activeGroup, 
-                    activeChat
+                    activeChat: false
                 } : {
-                    activeSite, 
-                    activeGroup, 
-                    activeChat: chat !== activeChat ? activeChat : false,
-                    activeMenu
+                    // activeSite, 
+                    // activeGroup, 
+                    // activeChat,
+                    // activeMenu
                 },
             }
         }
