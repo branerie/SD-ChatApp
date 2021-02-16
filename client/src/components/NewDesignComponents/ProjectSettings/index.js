@@ -1,20 +1,14 @@
 import { useContext, useState } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from "../../../context/MessagesContext"
+import BasicSettings from './BasicSettings'
 import AddGroup from './AddGroup'
 import PendingList from './PendingList'
 import GroupsMembership from './GroupsMembership'
 
 const ProjectSettings = () => {
     const { userData } = useContext(MessagesContext)
-    const [description, setDescription] = useState(userData.sites[userData.activeSite].description)
-
     const [member, setMember] = useState()
-    
-
-    function updateDescription() {
-
-    }
 
     function findPeople() {
 
@@ -30,18 +24,9 @@ const ProjectSettings = () => {
 
     return (
         <div>
-            <h3>Project Settings</h3>
             <h2>{userData.sites[userData.activeSite].name}</h2>
-            <div className={styles['form-control']} >
-                <label htmlFor="a">Update project description</label>
-                <input
-                    className={styles.input}
-                    type='text'
-                    value={description}
-                    placeholder='Project description...'
-                    onChange={e => setDescription(e.target.value)} />
-            </div>
-            <button onClick={updateDescription}>Update</button>
+            <h3>Project Settings</h3>
+            <BasicSettings />
             <AddGroup />
             <div className={styles['form-control']} >
                 <label htmlFor="a">Search for people and send invitations</label>

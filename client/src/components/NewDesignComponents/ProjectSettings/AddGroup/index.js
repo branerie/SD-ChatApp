@@ -32,7 +32,7 @@ const AddGroup = () => {
                     onChange={e => setGroup(e.target.value)}
                 />
             </div>
-            <button className={styles['form-btn']} onClick={addGroup}>Add</button>
+            <button onClick={addGroup}>Add</button>
             {errors.length > 0 &&
                 <ul className={styles.errors}>
                     {errors.map((error, index) => {

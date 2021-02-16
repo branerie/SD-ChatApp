@@ -171,7 +171,7 @@ module.exports = io => {
         })
 
         socket.on('create-group', async ({ site, group }, callback) => { //admin
-            group = group.trim()
+            if (group) group = group.trim()
             if (!group) {
                 // Avoid db query but validate it in the schema with required flag. Also set this check on Client Side.
                 sysLog(`${userData._id} @ ${socket.id} attempt to create group with no name in ${site}`)
