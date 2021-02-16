@@ -42,7 +42,7 @@ const GroupsMembership = () => {
                                 <div
                                     key={gid}
                                     onClick={() => loadGroup(gid)}
-                                    className={gid === activeGroup && styles.selected}
+                                    className={gid === activeGroup ? styles.selected : undefined}
                                 >{name}</div>
                             )
                         })

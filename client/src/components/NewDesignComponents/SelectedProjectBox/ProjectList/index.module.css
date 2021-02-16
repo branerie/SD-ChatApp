@@ -23,3 +23,15 @@
 .small-icons{
     margin-left: auto;
 }
+
+.info {
+    margin-right: 15px;
+    border: 1px solid white;
+    border-radius: 50%;
+    text-align: center;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    color: white;
+    font-size: x-small;
+}

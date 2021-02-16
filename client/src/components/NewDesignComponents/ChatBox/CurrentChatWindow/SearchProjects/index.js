@@ -91,9 +91,8 @@ const SearchProjects = () => {
                     }
                     {sites.slice(cursor, cursor + limit).map(site => {
                         return (
-                            <div>
-
-                                <li key={site._id}>
+                            <div key={site._id}>
+                                <li>
                                     <span>{site.name}</span>
                                     <div>
                                         <button onClick={() => sendRequest(site.name)}>Join</button>

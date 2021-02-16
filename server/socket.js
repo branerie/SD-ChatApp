@@ -171,17 +171,18 @@ module.exports = io => {
         })
 
         socket.on('create-group', async ({ site, group }, callback) => { //admin
-            if (group === undefined) {
+            group = group.trim()
+            if (!group) {
                 // Avoid db query but validate it in the schema with required flag. Also set this check on Client Side.
                 sysLog(`${userData._id} @ ${socket.id} attempt to create group with no name in ${site}`)
-                callback(false, 'Group name is required')
+                callback(false, ['Group name is required'])
                 return
             }
 
             if (group.toLowerCase() === 'general') {
                 // Avoid db query. Also set this check on Client Side.
                 sysLog(`${userData._id} @ ${socket.id} attempt to create General group in ${site}`)
-                callback(false, 'General is reserved name')
+                callback(false, ['General is reserved name'])
                 return
             }
             const data = await db.createGroup(site, group, userData._id)
@@ -205,7 +206,7 @@ module.exports = io => {
                 restSocketsJoin(userData._id, socket.id, groupID)
                 restSocketsUpdate(userData._id, socket.id, "create-group", { site, groupData })
             } else {
-                callback(false, data.message)
+                callback(false, [data.message])
             }
         })
 

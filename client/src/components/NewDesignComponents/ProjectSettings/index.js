@@ -1,21 +1,18 @@
 import { useContext, useState } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from "../../../context/MessagesContext"
+import AddGroup from './AddGroup'
 import PendingList from './PendingList'
 import GroupsMembership from './GroupsMembership'
 
 const ProjectSettings = () => {
     const { userData } = useContext(MessagesContext)
     const [description, setDescription] = useState(userData.sites[userData.activeSite].description)
-    const [group, setGroup] = useState()
+
     const [member, setMember] = useState()
     
 
     function updateDescription() {
-
-    }
-
-    function addGroup() {
 
     }
 
@@ -45,16 +42,7 @@ const ProjectSettings = () => {
                     onChange={e => setDescription(e.target.value)} />
             </div>
             <button onClick={updateDescription}>Update</button>
-            <div className={styles['form-control']} >
-                <label htmlFor="a">Add new group</label>
-                <input
-                    className={styles.input}
-                    type='text'
-                    value={group}
-                    placeholder='Group name...'
-                    onChange={e => setGroup(e.target.value)} />
-            </div>
-            <button onClick={addGroup}>Add</button>
+            <AddGroup />
             <div className={styles['form-control']} >
                 <label htmlFor="a">Search for people and send invitations</label>
                 <input

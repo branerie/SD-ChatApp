@@ -163,7 +163,7 @@ const createGroup = async (site, name, creator) => {
     }
 
     // 2. check that group name is unique (for this site, not in model)
-    const groupCheck = await Group.findOne({ name, site })
+    const groupCheck = await Group.findOne({ name: { $regex : new RegExp(`^${name}$`, "i") }, site })
     if (groupCheck !== null) {
         return { success: false, message: 'Group exists' }
     }
@@ -183,7 +183,7 @@ const createGroup = async (site, name, creator) => {
         return { success: true, _id: newGroup._id }
     } catch (error) {
         // add validations in model and check for more errors
-        return { success: false, message: error.code }
+        return { success: false, message: 'error.code' }
     }
 }
 
