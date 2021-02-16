@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import { SocketContext } from '../../../../context/SocketContext'
-import Friend from '../Friend'
+import Friend from '../../SelectedProjectBox/Friend'
 
 const PendingList = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
@@ -31,7 +31,7 @@ const PendingList = () => {
 
     return (
         <div>
-            {/* <h2>Pending</h2> */}
+            <h3>Pending</h3>
             {userData.sites[userData.activeSite].invitations && userData.sites[userData.activeSite].invitations.length > 0 && (
                 <ul><span className='header'>Invitations</span>
                     {userData.sites[userData.activeSite].invitations.map(user => {

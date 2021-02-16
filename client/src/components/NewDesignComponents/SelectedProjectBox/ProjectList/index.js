@@ -10,7 +10,7 @@ import AddGroup from './AddGroup'
 
 
 const ProjectList = () => {
-    const { userData } = useContext(MessagesContext)
+    const { userData, dispatchUserData } = useContext(MessagesContext)
     const site = userData.activeSite ? userData.sites[userData.activeSite].name : false
     const [backgroundShown, setBackgroundShown] = useState(false)
     const [addGroupWindowOpened, setAddGroupWindowOpened] = useState(false)
@@ -26,6 +26,10 @@ const ProjectList = () => {
         setBackgroundShown(false)
     }
 
+    function projectSettings() {
+        dispatchUserData({type: 'load-project-settings', payload: {}})
+    }
+
     return (
         <div className={styles['project-list']}>
             {site}
@@ -35,7 +39,7 @@ const ProjectList = () => {
                     <img src={notificationIconFilled} alt="Notification" className={styles['plus-icon']} onClick={openAddProjectWindow} /> :
                     <img src={notificationProjectIcon} alt="Notification" className={styles['plus-icon']} onClick={openAddProjectWindow} />
                 }
-                <img src={settingIcon} alt="Settings Icon" className={styles['settings-icon']} />
+                <img src={settingIcon} alt="Settings Icon" className={styles['settings-icon']} onClick={projectSettings}/>
             </div>
             <div>
                 {addGroupWindowOpened && <AddGroup closeOpenedWindows={closeOpenedWindows}/>}

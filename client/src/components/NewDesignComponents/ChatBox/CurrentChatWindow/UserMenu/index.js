@@ -7,6 +7,7 @@ import { useContext } from 'react'
 import { MessagesContext } from '../../../../../context/MessagesContext'
 import PersonalSettingsColumn from '../../../SettingPageComponents/PersonalSettingsColumn'
 import LogoColumn from '../../../SettingPageComponents/LogoColumn'
+import ProjectSettings from '../../../ProjectSettings'
 
 const UserMenu = () => {
     const { userData: { activeMenu } } = useContext(MessagesContext)
@@ -26,6 +27,11 @@ const UserMenu = () => {
                 <div className={styles['profile-container']}>
                     <LogoColumn />
                     <PersonalSettingsColumn />
+                </div>
+                }
+                { activeMenu === 'settings' &&
+                <div >
+                    <ProjectSettings />
                 </div>
                 }
             </div>

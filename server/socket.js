@@ -352,7 +352,7 @@ module.exports = io => {
             }
         })
 
-        socket.on('add-member', async ({ member, site, group }) => {
+        socket.on('add-member', async ({ member, site, group }, callback) => {
             if (member === '') return // stop this on client side also
             const data = await db.addUserToGroup(member, site, group, userData._id)
             if (data.success) {
@@ -384,6 +384,7 @@ module.exports = io => {
                         io.sockets.sockets.get(socket).emit('added-to-group', { site, group: groupData })
                     })
                 }
+                callback()
             }
         })
 

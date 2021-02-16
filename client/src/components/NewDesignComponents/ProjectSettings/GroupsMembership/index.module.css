@@ -1,0 +1,22 @@
+
+.container {
+	display: flex;
+	justify-content: space-between;
+}
+
+.add-member {
+	display: flex;
+}
+
+.add-member button {
+	height: 18px;
+	font-size: 8px;
+}
+
+.group div {
+	cursor: pointer;
+}
+
+.selected {
+	color: green;
+}
