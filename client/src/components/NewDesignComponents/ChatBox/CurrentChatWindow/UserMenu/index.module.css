@@ -10,9 +10,14 @@
     flex-direction: column;
     flex-basis: 100%;
     margin: 10px 30px;
+    overflow-y: auto;
 }
 
 .user-menu-fields > div {
     padding: 20px 0px;
     border-bottom: 1px solid black;
+}
+
+.profile-container {
+    display: flex;
 }

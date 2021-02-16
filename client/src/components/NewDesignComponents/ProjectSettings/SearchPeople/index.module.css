@@ -1,0 +1,36 @@
+.form-control {
+	margin: 10px 0px;
+	width: 100%;
+}
+
+.input {
+	font-size: 16px;
+	padding: 5px;
+	height: 40px;
+	width: 100%;
+	/* border: none; */
+    border-radius: 15px;
+    outline: none;
+}
+
+.form-btn {
+	float: right;
+}
+
+.menu-field ul {
+	clear: right;
+}
+
+.menu-field hr {
+	clear: right;
+	margin-top: 10px;
+}
+
+.errors {
+	color: red;
+	margin-left: 20px;
+}
+
+.errors li {
+	padding: 0;
+}

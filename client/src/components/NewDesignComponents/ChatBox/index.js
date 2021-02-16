@@ -5,11 +5,11 @@ import { useContext } from 'react'
 import { MessagesContext } from '../../../context/MessagesContext'
 
 const ChatBox = () => {
-    const {userData} = useContext(MessagesContext)
+    const { userData } = useContext(MessagesContext)
 
     return (
         <div className={styles['chat-box']}>
-            {userData.activeSite || userData.activeChat ? <CurrentChatWindow /> : <UserMenu />}
+            {userData.activeMenu ? <UserMenu /> : <CurrentChatWindow />}
         </div>
     )
 }

@@ -1,11 +1,10 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
-// import AvatarColors from '../../../../context/AvatarColors'
 import { MessagesContext } from '../../../../context/MessagesContext'
 
 const colors = [styles.red, styles.green, styles.blue, styles.orange]
 
-const ProjectCircleBox = () => {
+const ProjectCircleBox = ({isSmallList}) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     let colorIndex = 0
 
@@ -20,12 +19,21 @@ const ProjectCircleBox = () => {
         return (B[1].creator === userData.personal._id) - (A[1].creator === userData.personal._id) || A[1].name.localeCompare(B[1].name)
     })
 
+    function avatarLetter(line){
+        const splitedName = line.split(' ')
+        const firstLatterArray = []
+        for (let i = 0 ; i < splitedName.length ; i++) {
+            firstLatterArray.push(splitedName[i].charAt(0).toUpperCase())
+        }
+        const renderLetter = firstLatterArray.join('')
+        return renderLetter
+
+    }
+
     function addClasses(site){
         const classList = [styles.list]
         if (site[0] === userData.activeSite) classList.push(styles.selected)
         if (site[1].creator === userData.personal._id) classList.push(styles.owner)
-        // if (context.newMessages[site] && site !== context.userData.activeGroup) classList.push("new-messages")
-
         if (classList.length === 1) {
             const currentColorIndex = colorIndex % colors.length
             const currentColor = colors[currentColorIndex]
@@ -38,23 +46,37 @@ const ProjectCircleBox = () => {
     }
 
     return (
-        // <AvatarColors >
-            <div className={styles['project-circle-box']}>
-                <div className={styles['project-title']}>Projects List</div>
-                <div className={styles['project-container']}>
-                    {sites.map(site => {
-                        return (
-                            <div 
-                                key={site[0]}
-                                className={addClasses(site)}
-                                onClick={(e) => handleClick(e, site[0])}>
-                                {site[1].name}
-                            </div>
-                        )
-                    })}
-                </div>
-            </div>
-        // </AvatarColors>
+        <div className={styles['project-circle-box']}>
+            <div className={styles['project-title']}>Projects List</div>
+                { isSmallList 
+                    ?
+                    (<div className={styles['project-container']}>
+                        {sites.map(site => {
+                            return (
+                                    <div 
+                                        key={site[0]}
+                                        className={addClasses(site)}
+                                        onClick={(e) => handleClick(e, site[0])}>
+                                        {avatarLetter(site[1].name)}
+                                </div>
+                            )
+                        })}
+                    </div>)
+                    :
+                        <div className={styles['project-container']}>
+                            {sites.map(site => {
+                                return (
+                                    <div 
+                                        key={site[0]}
+                                        className={addClasses(site)}
+                                        onClick={(e) => handleClick(e, site[0])}>
+                                        {site[1].name}
+                                    </div>
+                                )
+                            })}
+                        </div>
+                }
+        </div>
     )
 }
 

@@ -1,0 +1,26 @@
+.form-control {
+	margin: 10px 0px;
+	width: 100%;
+}
+.container {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 10px;
+}
+
+.add-member {
+	display: flex;
+}
+
+.add-member button {
+	height: 18px;
+	font-size: 8px;
+}
+
+.group div {
+	cursor: pointer;
+}
+
+.selected {
+	color: green;
+}

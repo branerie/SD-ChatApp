@@ -15,7 +15,7 @@ const FriendsNumber = () => {
     
     return (
         <div className={styles['friends']}>
-            <div className={styles['friends-label']}>FRIENDS</div>
+            <div className={styles['friends-label']}>MEMBERS</div>
             <div className={styles['number']}>{members.length}</div> 
         </div>
     )

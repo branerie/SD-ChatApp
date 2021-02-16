@@ -11,7 +11,8 @@ export default function UserDataReducer(userData, action) {
                 ...action.payload.userData,
                 activeSite: false,
                 activeGroup: false,
-                activeChat: false
+                activeChat: false,
+                activeMenu: 'projects'
             }
         }
 
@@ -20,9 +21,31 @@ export default function UserDataReducer(userData, action) {
                 ...userData,
                 activeSite: false,
                 activeGroup: false,
-                activeChat: false
+                activeChat: false,
+                activeMenu: 'projects' 
             }
         }
+
+        case "load-project-settings": {
+            return {
+                ...userData,
+                // activeSite: false,
+                // activeGroup: false,
+                // activeChat: false,
+                activeMenu: 'settings' 
+            }
+        }
+
+        case "load-profile": {
+            return {
+                ...userData,
+                activeSite: false,
+                activeGroup: false,
+                activeChat: false,
+                activeMenu: 'profile'
+            }
+        }
+
         case "load-site": { // load selected site data
             let activeSite = action.payload.site
             let activeGroup = Object.keys(userData.sites[activeSite].groups)[0]
@@ -31,7 +54,8 @@ export default function UserDataReducer(userData, action) {
                 activeSite,
                 activeGroup,
                 activeChat: false,
-                details: null
+                details: null,
+                activeMenu: false
             }
         }
 
@@ -53,7 +77,8 @@ export default function UserDataReducer(userData, action) {
                     },
                 },
                 activeGroup,
-                activeChat: false
+                activeChat: false,
+                activeMenu: false
             }
         }
 
@@ -71,7 +96,8 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: chat,
-                details: { id: chat, isShown: false }     
+                details: { id: chat, isShown: false },
+                activeMenu: false
             }
         }
 
@@ -89,26 +115,28 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: id,
-                details: { id: id, isShown: false }
+                details: { id: id, isShown: false },
+                activeMenu: false
             }
         }
 
         case 'close-chat': {
             const { chat, prevActive } = action.payload
-            const { activeSite, activeGroup, activeChat } = prevActive
+            const { activeSite, activeGroup, activeChat, activeMenu } = prevActive
             const { [chat]: _, ...chats } = userData.chats
             return {
                 ...userData,
                 chats,
                 ...(chat === userData.activeChat) ? { 
                     activeSite, 
-                    activeGroup, 
-                    activeChat,
-                    details: null
+                    activeGroup,
+                    details: null,
+                    activeChat: false
                 } : {
-                    activeSite, 
-                    activeGroup, 
-                    activeChat: chat !== activeChat ? activeChat : false
+                    // activeSite, 
+                    // activeGroup, 
+                    // activeChat,
+                    // activeMenu
                 },
             }
         }
@@ -129,7 +157,8 @@ export default function UserDataReducer(userData, action) {
                     }
                 },
                 ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false }
+                ...(activeConnection) && { activeChat: false },
+                ...(activeConnection) && { activeMenu: false }
             }
         }
 
@@ -145,7 +174,8 @@ export default function UserDataReducer(userData, action) {
                 },
                 ...(activeConnection) && { activeSite },
                 ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false }
+                ...(activeConnection) && { activeChat: false },
+                ...(activeConnection) && { activeMenu: false }
             }
         }
 
