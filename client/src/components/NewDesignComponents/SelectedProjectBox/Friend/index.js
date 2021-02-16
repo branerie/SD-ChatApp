@@ -5,6 +5,8 @@ import { MessagesContext } from '../../../../context/MessagesContext'
 import { SocketContext } from '../../../../context/SocketContext'
 import UserAvatar from '../../CommonComponents/UserAvatar'
 
+import infoButton from '../../../../images/informationButton.svg'
+
 const Friend = ({ id, name, picturePath, isOnline }) => {
     const { dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
@@ -16,15 +18,22 @@ const Friend = ({ id, name, picturePath, isOnline }) => {
     }
 
     return (
-        <div className={styles['friends']} onClick={openPrivateChat}>
-            <div className={styles['status-light']}>
+        <div className={styles['friends']}>
+            <div className={styles['friend-main']} onClick={openPrivateChat}>
+                <div className={styles['status-light']}>
                     <StatusLight userId={id} isOnline={isOnline} size='small' />
+                </div>
+                <UserAvatar picturePath={picturePath} />
+                <div className={styles['name']}>
+                    {name}
+                </div>
             </div>
-            <UserAvatar picturePath={picturePath} />
-            <div className={styles['name']}>
-                {name}
-            </div>
-
+            <img 
+                src={infoButton} 
+                className={styles['btn-info']} 
+                alt='Link to user info'
+                onClick={() => dispatchUserData({ type: 'show-details', id, show: true })}
+            />
         </div>
     )
 }

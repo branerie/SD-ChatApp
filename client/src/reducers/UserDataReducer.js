@@ -30,7 +30,8 @@ export default function UserDataReducer(userData, action) {
                 ...userData,
                 activeSite,
                 activeGroup,
-                activeChat: false
+                activeChat: false,
+                details: null
             }
         }
 
@@ -69,7 +70,8 @@ export default function UserDataReducer(userData, action) {
                 },
                 activeSite: false,
                 activeGroup: false,
-                activeChat: chat
+                activeChat: chat,
+                details: { id: chat, isShown: false }     
             }
         }
 
@@ -86,7 +88,8 @@ export default function UserDataReducer(userData, action) {
                 },
                 activeSite: false,
                 activeGroup: false,
-                activeChat: id
+                activeChat: id,
+                details: { id: id, isShown: false }
             }
         }
 
@@ -100,7 +103,8 @@ export default function UserDataReducer(userData, action) {
                 ...(chat === userData.activeChat) ? { 
                     activeSite, 
                     activeGroup, 
-                    activeChat
+                    activeChat,
+                    details: null
                 } : {
                     activeSite, 
                     activeGroup, 
@@ -506,6 +510,25 @@ export default function UserDataReducer(userData, action) {
                     }
                 }
             }
+        }
+
+        case "show-details": {
+            return { 
+                ...userData, 
+                details: { id: action.id, isShown: action.show } 
+            }
+        }
+
+        case "toggle-details": {
+            const currentDetails = userData.details
+            return {
+                ...userData,
+                details: { ...currentDetails, isShown: !currentDetails.isShown }
+            }
+        }
+
+        case "clear-details": {
+            return { ...userData, details: null }
         }
 
         case "disconnect-message": {

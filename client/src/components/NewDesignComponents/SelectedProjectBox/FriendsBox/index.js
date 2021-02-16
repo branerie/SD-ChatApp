@@ -9,7 +9,6 @@ const FriendsBox = () => {
         <div className={styles['friends-box']}>
             <FriendsNumber />
             <FriendsList />
-            
         </div>
     )
 }

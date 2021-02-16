@@ -7,7 +7,7 @@ import PendingList from '../PendingList'
 import { MessagesContext } from '../../../../context/MessagesContext'
 
 const SelectedProject = () => {
-    const { userData} = useContext(MessagesContext)
+    const { userData } = useContext(MessagesContext)
 
     if (!userData.activeSite) return null
     return (

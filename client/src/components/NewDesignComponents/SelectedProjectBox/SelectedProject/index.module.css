@@ -5,4 +5,5 @@
     flex-basis: 225px;
     flex-grow: 0;
     flex-shrink: 0;
+    overflow-y: scroll;
 }
