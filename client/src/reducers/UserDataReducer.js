@@ -127,12 +127,12 @@ export default function UserDataReducer(userData, action) {
                 ...(chat === userData.activeChat) ? { 
                     activeSite, 
                     activeGroup, 
-                    activeChat
+                    activeChat: false
                 } : {
-                    activeSite, 
-                    activeGroup, 
-                    activeChat: chat !== activeChat ? activeChat : false,
-                    activeMenu
+                    // activeSite, 
+                    // activeGroup, 
+                    // activeChat,
+                    // activeMenu
                 },
             }
         }

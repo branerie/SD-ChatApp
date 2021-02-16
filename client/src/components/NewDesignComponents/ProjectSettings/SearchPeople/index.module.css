@@ -13,8 +13,17 @@
     outline: none;
 }
 
-.menu-field button {
+.form-btn {
 	float: right;
+}
+
+.menu-field ul {
+	clear: right;
+}
+
+.menu-field hr {
+	clear: right;
+	margin-top: 10px;
 }
 
 .errors {
@@ -25,4 +34,3 @@
 .errors li {
 	padding: 0;
 }
-

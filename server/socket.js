@@ -473,6 +473,17 @@ module.exports = io => {
             }
         })
 
+        socket.on('search-people', async (socketData, callback) => {
+            if (!isValid(socketData, userData._id)) return
+            const { name = '', page = 0 } = socketData
+            const data = await db.searchPeople(name, page)
+            if (data.success) {
+                callback(true, data.people)
+            } else {
+                callback(false)
+            }
+        })
+
         socket.on('update-profile-data', async (data, callback) => {
             //move this to middleware
             if (!data || data.constructor.name !== 'Object') {

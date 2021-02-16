@@ -28,8 +28,8 @@ const GroupsMembership = () => {
     }
 
     return (
-        <div>
-            <h3>Membership</h3>
+        <div className={styles['form-control']}>
+            <p>Membership</p>
             <div className={styles.container}>
                 <div className={styles.group}>
                     <p>Select group:</p>
@@ -79,6 +79,7 @@ const GroupsMembership = () => {
                     }
                 </div>
             </div>
+            <hr/>
         </div>
     )
 }

@@ -21,9 +21,7 @@ const SearchProjects = () => {
                 setSites(data)
             } else {
                 setError("No results found")
-
             }
-                       
             setPage(page + 1)
         })
     }

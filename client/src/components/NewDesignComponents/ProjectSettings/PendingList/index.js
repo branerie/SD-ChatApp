@@ -31,7 +31,7 @@ const PendingList = () => {
 
     return (
         <div>
-            <h3>Pending</h3>
+            <p>Pending</p>
             {userData.sites[userData.activeSite].invitations && userData.sites[userData.activeSite].invitations.length > 0 && (
                 <ul><span className='header'>Invitations</span>
                     {userData.sites[userData.activeSite].invitations.map(user => {

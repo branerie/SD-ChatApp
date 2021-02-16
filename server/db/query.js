@@ -37,7 +37,13 @@ const getMessages = async (userData) => {
             { destination: { $in: chats }, source: userData._id },
             { source: { $in: chats }, destination: userData._id },
         ]
-    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username picture' }).populate({ path: 'destination', select: 'name username' }).lean()
+    }, '-_id -__v -updatedAt').populate({ 
+        path: 'source', 
+        select: 'name username picture' 
+    }).populate({ 
+        path: 'destination', 
+        select: 'name username' 
+    }).lean()
     // console.log(messages);
     return messages
 }
@@ -49,7 +55,11 @@ const getPrivateMessages = async (id, uid) => {
             { destination: id, source: uid },
             { source: id, destination: uid },
         ]
-    }, '-_id -__v -updatedAt').populate({ path: 'source', select: 'name username' }).lean()
+    }, '-_id -__v -updatedAt').populate({ 
+        path: 'source', 
+        select: 'name username' 
+    }).lean()
+    
     return { messages, username: party.name }
 }
 
@@ -340,6 +350,7 @@ const cancelInvitation = async (sid, uid, aid) => {
         return error.message
     }
 }
+
 const searchProjects = async(pattern, page) => {
     const limit = 5
     const skip = page * limit
@@ -355,6 +366,23 @@ const searchProjects = async(pattern, page) => {
     }).skip(skip).limit(limit)
 
     return { success: projects.length > 0, projects}
+}
+
+const searchPeople = async(pattern, page) => {
+    const limit = 5
+    const skip = page * limit
+    const people = await User.find({
+        $or: [
+            { name: { $regex: pattern, $options: 'i' } },
+            { username: { $regex: pattern, $options: 'i' } },
+            { email: { $regex: pattern, $options: 'i' } },
+        ]
+    },
+        'name username picture company position'
+    ).skip(skip).limit(limit)
+
+    console.log(people);
+    return { success: people.length > 0, people}
 }
 
 const updateProfileData = async (uid, data) => {
@@ -405,6 +433,7 @@ module.exports = {
     rejectRequest,
     getUserDetails,
     searchProjects,
+    searchPeople,
     updateProfileData,
     // updateAccessTime
 }

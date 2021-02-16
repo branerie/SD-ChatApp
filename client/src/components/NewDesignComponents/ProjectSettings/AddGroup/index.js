@@ -9,11 +9,11 @@ const AddGroup = () => {
     const [group, setGroup] = useState()
     const [errors, setErrors] = useState([])
 
-    function addGroup() {
+    function addGroup(open) {
         let site = userData.activeSite
         socket.emit("create-group", { site, group }, (success, groupData) => {
             if (success) {
-                dispatchUserData({ type: "create-group", payload: { site, groupData, activeConnection: true } })
+                dispatchUserData({ type: "create-group", payload: { site, groupData, activeConnection: open } })
                 setGroup('')
             } else {
                 setErrors(groupData)
@@ -24,7 +24,7 @@ const AddGroup = () => {
     return (
         <div className={styles['menu-field']}>
             <div className={styles['form-control']} >
-                <label htmlFor="a">Add new group</label>
+                <p>Add new group</p>
                 <input
                     className={styles.input}
                     type='text'
@@ -32,7 +32,8 @@ const AddGroup = () => {
                     onChange={e => setGroup(e.target.value)}
                 />
             </div>
-            <button onClick={addGroup}>Add</button>
+            <button onClick={() => addGroup(false)}>Add</button>
+            <button onClick={() => addGroup(true)}>Add &amp; Open</button>
             {errors.length > 0 &&
                 <ul className={styles.errors}>
                     {errors.map((error, index) => {
