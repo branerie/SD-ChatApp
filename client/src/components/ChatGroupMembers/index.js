@@ -8,6 +8,7 @@ const ChatGroupMembers = () => {
 
     function handleClick(user) {
         dispatchUserData({ type: 'open-chat', payload: { user } })
+        
         // TODO
         // context.updateChats(user, "open")
         // context.changeWindow(user, false)

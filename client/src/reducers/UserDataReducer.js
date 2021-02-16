@@ -54,6 +54,7 @@ export default function UserDataReducer(userData, action) {
                 activeSite,
                 activeGroup,
                 activeChat: false,
+                details: null,
                 activeMenu: false
             }
         }
@@ -95,6 +96,7 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: chat,
+                details: { id: chat, isShown: false },
                 activeMenu: false
             }
         }
@@ -113,6 +115,7 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: id,
+                details: { id: id, isShown: false },
                 activeMenu: false
             }
         }
@@ -126,7 +129,8 @@ export default function UserDataReducer(userData, action) {
                 chats,
                 ...(chat === userData.activeChat) ? { 
                     activeSite, 
-                    activeGroup, 
+                    activeGroup,
+                    details: null,
                     activeChat: false
                 } : {
                     // activeSite, 
@@ -536,6 +540,25 @@ export default function UserDataReducer(userData, action) {
                     }
                 }
             }
+        }
+
+        case "show-details": {
+            return { 
+                ...userData, 
+                details: { id: action.id, isShown: action.show } 
+            }
+        }
+
+        case "toggle-details": {
+            const currentDetails = userData.details
+            return {
+                ...userData,
+                details: { ...currentDetails, isShown: !currentDetails.isShown }
+            }
+        }
+
+        case "clear-details": {
+            return { ...userData, details: null }
         }
 
         case "disconnect-message": {
