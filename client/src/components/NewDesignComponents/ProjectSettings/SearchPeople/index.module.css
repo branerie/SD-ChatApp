@@ -26,6 +26,20 @@
 	margin-top: 10px;
 }
 
+.list-item {
+	margin-top: 5px;
+	height: 32px;
+}
+
+.card { 
+	display: flex;
+	align-items: center;
+}
+
+.card span {
+	margin-left: 10px;
+}
+
 .errors {
 	color: red;
 	margin-left: 20px;

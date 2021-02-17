@@ -1,4 +1,4 @@
-.project-circle-box {
+.project-box {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -6,15 +6,24 @@
     min-height: 10vh;
 }
 
+.project-box-sm {
+    align-items: center;
+}
+
+.project-box-lg {
+    padding: 0 5px;;
+}
+
 .project-container {
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
+    scrollbar-width: none;
 }
 
 .project-container::-webkit-scrollbar {
-    width: 12px;            
+    width: 0px;            
   }
 
 .project-container::-webkit-scrollbar-track {
@@ -32,12 +41,19 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    margin: 2px 5px;
-    max-height: 100px;
-    border-radius: 5px;
+    margin: 1px 0;
     padding: 10px;
     cursor: pointer;
- 
+}
+
+.small-list {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+.large-list {    
+    border-radius: 5px;
 }
 
 .owner {
@@ -68,7 +84,8 @@
 
 .project-title {
     text-align: center;
-    margin-bottom: 10px;
-    padding: 5px;
-    background-color:white;
+    text-transform: uppercase;
+    font-size: small;
+    padding-bottom: 5px;
+    color: white;
 }

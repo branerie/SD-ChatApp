@@ -28,7 +28,7 @@ const CurrentChatWindow = (props) => {
     let messages, title, msgBox = true
     if (userData.activeChat) {
         messages = userData.chats[userData.activeChat].messages
-        title = userData.activeChat === userData.personal._id ? 'Notes' : `@${userData.chats[userData.activeChat].username}`
+        title = userData.activeChat === userData.personal._id ? 'Notes' : `@${userData.associatedUsers[userData.activeChat].name}`
     } else if (userData.activeSite) {
         messages = userData.sites[userData.activeSite].groups[userData.activeGroup].messages
         title = `#${userData.sites[userData.activeSite].groups[userData.activeGroup].name}`
@@ -58,7 +58,9 @@ const CurrentChatWindow = (props) => {
                     return (
                         <div key={i} >
                             {thisDate !== prevDate && <DevLine date={thisDate} />}
-                            {notice ? <Notice message={{msg , event}}/> : <Message message={{
+                            {notice ?
+                                <Notice message={{ msg, event }} /> :
+                                <Message message={{
                                     user: userData.associatedUsers[src] ? userData.associatedUsers[src].name : null,
                                     msg,
                                     timestamp,

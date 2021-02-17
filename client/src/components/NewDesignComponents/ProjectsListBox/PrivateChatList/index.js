@@ -1,7 +1,6 @@
 import React, { useContext, useRef, useEffect } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../../../context/MessagesContext'
-import CloseChat from '../../../Buttons/CloseChat'
 import CloseButton from '../../ChatBox/CurrentChatWindow/ChatTitle/CloseButton/index'
 import NewMessageLight from '../NewMessageLight'
 import UserAvatar from '../../CommonComponents/UserAvatar'
@@ -67,7 +66,7 @@ const PrivateChatList = ({isSmallList}) => {
 
     return (
         <div className={styles.container}>
-            <div className={styles['chats-title']}>Private Chats</div>
+            <div className={styles['chats-title']}>chats</div>
                 {isSmallList
                 ?
                     <div className={styles['chats-container']}>
@@ -98,7 +97,7 @@ const PrivateChatList = ({isSmallList}) => {
                                             {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null}
                                             <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
                                     </div>
-                                    <CloseButton chat={chat} lastActive={prevActive.current}/>
+                                    <CloseButton chat={chat} prevActive={prevActive.current}/>
                                 </div>
                             )
                         })}
