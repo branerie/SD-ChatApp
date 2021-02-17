@@ -3,6 +3,7 @@ import styles from './index.module.css'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import { SocketContext } from '../../../../context/SocketContext'
 import Friend from '../../SelectedProjectBox/Friend'
+import UserAvatar from '../../CommonComponents/UserAvatar'
 
 const SearchPeople = () => {
     const { socket } = useContext(SocketContext)
@@ -94,12 +95,11 @@ const SearchPeople = () => {
                     {names.slice(cursor, cursor + limit).map(name => {
                         return (
                             <div key={name._id}>
-                                <li>
-                                    <Friend
-                                        name={name.name}
-                                        id={name._id}
-                                        picturePath={name.picture}
-                                    />
+                                <li className={styles['list-item']}>
+                                    <div className={styles.card}>
+                                        <UserAvatar picturePath={name.picture} />
+                                        <span>{name.name}</span>
+                                    </div>
                                     <div>
                                         <button onClick={() => inviteMember(name.username)}>Invite</button>
                                         <button onClick={() => showMemberInfo(name)}>{showInfo[name._id] ? 'Less' : 'More'}</button>

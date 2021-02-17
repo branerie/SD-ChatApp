@@ -98,7 +98,7 @@ const PrivateChatList = ({isSmallList}) => {
                                             {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null}
                                             <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
                                     </div>
-                                    <CloseButton chat={chat} lastActive={prevActive.current}/>
+                                    <CloseButton chat={chat} prevActive={prevActive.current}/>
                                 </div>
                             )
                         })}

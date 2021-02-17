@@ -16,14 +16,14 @@ const CloseButton = ({chat, prevActive}) => {
     }
 
     return (
-        <img
-            className={styles['close-button']}
-            src={closeButtonSrc}
-            onMouseEnter={() => { setCloseButtonSrc(closeButtonHover) }}
-            onMouseOut={() => { setCloseButtonSrc(closeButton) }}
-            onClick={handleClick}
-            alt=''
-        />
+            <img
+                className={styles['close-button']}
+                src={closeButtonSrc}
+                onMouseEnter={() => { setCloseButtonSrc(closeButtonHover) }}
+                onMouseOut={() => { setCloseButtonSrc(closeButton) }}
+                onClick={handleClick}
+                alt='Close chat'
+            />
     )
 }
 
