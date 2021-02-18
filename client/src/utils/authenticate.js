@@ -26,7 +26,7 @@ const authenticate = async (url, body, onSuccess, onFailure) => {
         }
     } catch (error) {
         // Server or connection down
-        onFailure(error)
+        onFailure(['Connection to server failed'])
     }
 }
 

@@ -11,7 +11,7 @@ const ProjectsList = () => {
     return (
         <div className={isSmallList ? `${styles['project-small-list']} ${styles['projects-list']}`: styles['projects-list']}>
             <div className={styles['info-arrow']} onClick={() => setMakeSmallList(!isSmallList)}>
-                <img src={isSmallList ?  expandArrow : shrinkArrow } className={styles['arrow-img']} />
+                <img src={isSmallList ?  expandArrow : shrinkArrow } className={styles['arrow-img']} alt=''/>
             </div>
             <ProjectCircleBox isSmallList={isSmallList}/>
             <PrivateChatList isSmallList={isSmallList}/>

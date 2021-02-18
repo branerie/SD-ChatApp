@@ -2,7 +2,6 @@ import { useContext, useState } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import { SocketContext } from '../../../../context/SocketContext'
-import Friend from '../../SelectedProjectBox/Friend'
 import UserAvatar from '../../CommonComponents/UserAvatar'
 
 const SearchPeople = () => {

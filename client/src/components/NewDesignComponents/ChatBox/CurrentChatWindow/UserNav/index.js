@@ -1,7 +1,7 @@
 import {useContext} from 'react'
 import { useHistory } from 'react-router-dom'
 import styles from './index.module.css'
-import { AuthenticateUser } from '../../../../../context/authenticationContext'
+import { AuthenticateUser } from '../../../../../context/AuthenticationContext'
 import { MessagesContext } from '../../../../../context/MessagesContext'
 
 const UserNav = () => {

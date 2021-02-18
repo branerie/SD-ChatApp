@@ -1,14 +1,17 @@
-import React from 'react'
 import styles from './index.module.css'
 
-const Alert = (props) => {
+const Alert = ({ alerts }) => {
+
     return (
         <div>
-            {props.alert ? (
-                <div className={styles.alert}>
-                    {props.alert}
-                </div>
-            ) : null}
+            {alerts.map((alert, index) => {
+                return (
+                    <div key={index} className={styles.alert}>
+                        {alert}
+                    </div>
+                )
+            }
+            )}
         </div>
     )
 }

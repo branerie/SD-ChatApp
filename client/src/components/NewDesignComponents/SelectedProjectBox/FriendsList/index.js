@@ -1,19 +1,11 @@
-import React, { useState, useContext } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
 import Friend from '../Friend'
 import { MessagesContext } from '../../../../context/MessagesContext'
-import TransparentBackground from '../../CommonComponents/TransparentBackground'
 
 const FriendsList = () => {
     const { userData } = useContext(MessagesContext)
-    const [backgroundOpened, setBackgroundOpened] = useState(false)
-    const [addMemberOpened, setAddMemberOpened] = useState(false)
     
-    const closeOpenedWindows = () => {
-        setBackgroundOpened(false)
-        setAddMemberOpened(false)
-    }
-
     function handleClick(member) {
         // TODO
         // context.updateChats(user, "open")
@@ -43,9 +35,6 @@ const FriendsList = () => {
                     </li>
                 })}
             </ul>
-            <div>
-                {backgroundOpened ? <TransparentBackground closeOpenedWindows={closeOpenedWindows} /> : <div />}
-            </div>
         </div>
     )
 }

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
 import io from "socket.io-client"
-import { AuthenticateUser } from './authenticationContext'
+import { useEffect, useState, createContext } from 'react'
+import { AuthenticateUser } from './AuthenticationContext'
 
-export const SocketContext = React.createContext()
+export const SocketContext = createContext()
 
-export default function SocketContextProvider(props) {
+export default function SocketContextProvider({ children }) {
     const auth = AuthenticateUser()
     const [socket, setSocket] = useState()
 
@@ -24,7 +24,7 @@ export default function SocketContextProvider(props) {
 
     return (
         <SocketContext.Provider value={{ socket }}>
-            {props.children}
+            {children}
         </SocketContext.Provider>
     )
 }

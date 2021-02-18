@@ -1,14 +1,13 @@
-import React from 'react'
-import styles from './index.module.css'
+import PageWrapper from '../../components/PageWrapper'
 import PageHeader from  '../../components/PageHeader'
 import HomeMain from  '../../components/HomeMain'
 
 const HomePage = () => {
     return (
-        <div className={styles['home-container']}>   
+        <PageWrapper>   
             <PageHeader />
             <HomeMain />
-        </div>
+        </PageWrapper>
     )
 }
 

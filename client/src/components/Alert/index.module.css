@@ -1,5 +1,5 @@
 .alert {
-    color: maroon;
+    color: var(--color-alert);
 }
 
 .alert::before {

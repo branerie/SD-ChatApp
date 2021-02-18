@@ -8,7 +8,7 @@ import StatusLight from '../../CommonComponents/StatusLight'
 
 const colors = [styles.red, styles.green, styles.blue, styles.orange]
 
-const PrivateChatList = ({isSmallList}) => {
+const PrivateChatList = ({ isSmallList }) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const prevActive = useRef()
     let colorIndex = 0
@@ -28,7 +28,7 @@ const PrivateChatList = ({isSmallList}) => {
 
     const checkForPicture = (id) => userData.associatedUsers[id].picture
 
-    function addClasses(chat){
+    function addClasses(chat) {
         const classList = [styles.smallList]
 
         if (checkIsOnline(chat)) {
@@ -40,9 +40,9 @@ const PrivateChatList = ({isSmallList}) => {
         if (chat === userData.activeChat) classList.push(styles.selected)
 
         if (!checkForPicture(chat)) {
-        const currentColorIndex = colorIndex % colors.length
-        const currentColor = colors[currentColorIndex]
-        classList.push(currentColor)
+            const currentColorIndex = colorIndex % colors.length
+            const currentColor = colors[currentColorIndex]
+            classList.push(currentColor)
         }
 
         colorIndex++
@@ -50,59 +50,57 @@ const PrivateChatList = ({isSmallList}) => {
         return classList.join(' ')
     }
 
-    function avatarLetter(line){
+    function avatarLetter(line) {
         const splitedName = line.split(' ')
         const firstLatterArray = []
-        for (let i = 0 ; i < splitedName.length ; i++) {
+        for (let i = 0; i < splitedName.length; i++) {
             firstLatterArray.push(splitedName[i].charAt(0).toUpperCase())
         }
         const renderLetter = firstLatterArray.join('')
         return renderLetter
 
     }
-    
+
     if (!userData) return null //<div>Loading...</div>
     const chats = userData.chats
 
     return (
         <div className={styles.container}>
             <div className={styles['chats-title']}>chats</div>
+            <div className={styles['chats-container']}>
                 {isSmallList
-                ?
-                    <div className={styles['chats-container']}>
-                        {Object.keys(chats).map(chat =>{
-                            const picForAvatar = checkForPicture(chat)
-                            return (
-                                <div 
-                                    key={chat}
-                                    className={addClasses(chat)}
+                    ?
+                    Object.keys(chats).map(chat => {
+                        const picForAvatar = checkForPicture(chat)
+                        return (
+                            <div
+                                key={chat}
+                                className={addClasses(chat)}
+                                onClick={(e) => handleClick(e, chat)}>
+                                {picForAvatar
+                                    ? <UserAvatar picturePath={picForAvatar} />
+                                    : <div>{avatarLetter(userData.associatedUsers[chat].name)}</div>}
+                            </div>
+                        )
+                    })
+                    :
+                    Object.keys(chats).map(chat => {
+                        return (
+                            <div key={chat} className={styles.list}>
+                                <div
+                                    className={chat === userData.activeChat ? `${styles.selected} ${styles.chat}` : styles.chat}
                                     onClick={(e) => handleClick(e, chat)}>
-                                        {picForAvatar
-                                        ? <UserAvatar picturePath={picForAvatar} />
-                                        : <div>{avatarLetter(userData.associatedUsers[chat].name)}</div>}
+                                    <StatusLight isOnline={checkIsOnline(chat)} size='small' />
+                                    <UserAvatar picturePath={checkForPicture(chat)} />
+                                    {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null}
+                                    <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
                                 </div>
-                            )
-                        })}
-                    </div>
-                :
-                    <div className={styles['chats-container']}>
-                        {Object.keys(chats).map(chat => {
-                            return (
-                                <div className={styles.list} >
-                                    <div key={chat}
-                                        className={chat === userData.activeChat ? `${styles.selected} ${styles.chat}` : styles.chat}
-                                        onClick={(e) => handleClick(e, chat)}>
-                                            <StatusLight isOnline={checkIsOnline(chat)} size='small'/>
-                                            <UserAvatar picturePath={checkForPicture(chat)} />
-                                            {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null}
-                                            <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
-                                    </div>
-                                    <CloseButton chat={chat} prevActive={prevActive.current}/>
-                                </div>
-                            )
-                        })}
-                    </div>
-            }
+                                <CloseButton chat={chat} prevActive={prevActive.current} />
+                            </div>
+                        )
+                    })
+                }
+            </div>
         </div>
     )
 

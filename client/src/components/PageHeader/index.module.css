@@ -1,13 +1,17 @@
-.login-header {
+.header {
 	display: flex;
 	justify-content: space-between;
 	padding: 20px;
 }
 
-.login-header img {
+.header img {
 	width: 120px;
 }
 
-.login-header img:hover {
+.header img:hover {
 	cursor: pointer;
+}
+
+.nav {
+    display: flex;
 }

@@ -1,4 +1,4 @@
-.home-container {
+.container {
 	height: 100%;
 	display: flex;
 	justify-content: space-evenly;
@@ -6,20 +6,20 @@
 	align-items: center;
 	color: white;
 }
-.home-container div {
+.container div {
 	margin-bottom: 50px;
 }
 
-.home-container div h1 {
+.container div h1 {
 	width: 80%;
 	margin-bottom: 30px;
 }
 
-.home-container div p {
+.container div p {
 	margin-bottom: 50px;
 }
 
-.try-now-btn {
+.container button {
 	cursor: pointer;
 	margin: 0;
 	padding: 10px 15px;
