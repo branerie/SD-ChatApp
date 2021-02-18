@@ -1,7 +1,6 @@
-import React from 'react'
 import { useContext } from 'react'
-import { MessagesContext } from '../../../../context/MessagesContext'
-import { SocketContext } from '../../../../context/SocketContext'
+import { MessagesContext } from '../../../context/MessagesContext'
+import { SocketContext } from '../../../context/SocketContext'
 import styles from './index.module.css'
 
 

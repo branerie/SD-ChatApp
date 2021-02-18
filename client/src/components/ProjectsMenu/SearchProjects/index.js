@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react'
 import styles from './index.module.css'
-import { MessagesContext } from '../../../../context/MessagesContext'
-import { SocketContext } from '../../../../context/SocketContext'
+import { MessagesContext } from '../../../context/MessagesContext'
+import { SocketContext } from '../../../context/SocketContext'
 
 const SearchProjects = () => {
     const limit = 5
