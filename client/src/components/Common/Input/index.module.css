@@ -1,0 +1,22 @@
+.input {
+    border: none;
+    color: #C2C2C2;
+    width: 155px;
+    outline: none;
+    width:100%;
+    background-color: #707070;
+}
+
+.input::placeholder {
+    color: lightgray;
+    font-style: italic;
+}
+
+.input-writing {
+    border: none;
+    color: white;
+    background-color: #707070;
+    width: 155px;
+    outline: none;
+    width:100%;
+}

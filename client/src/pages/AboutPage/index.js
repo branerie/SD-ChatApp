@@ -1,15 +1,13 @@
-import React from 'react'
-import styles from './index.module.css'
+import PageWrapper from '../../components/PageWrapper'
 import PageHeader from '../../components/PageHeader'
-
 
 const AboutPage = () => {
     return (
-        <div className={styles['login-container']}>
+        <PageWrapper>
             <PageHeader />
             <div>About Page</div>
             <div>Under Construction</div>
-        </div>
+        </PageWrapper>
     )
 }
 

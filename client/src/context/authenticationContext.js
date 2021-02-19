@@ -1,21 +1,20 @@
-import React, { useState, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect, createContext } from 'react'
 import getCookie from '../utils/cookie'
 
-const AuthenticationContext = React.createContext()
+const AuthenticationContext = createContext()
 
 export function AuthenticateUser() {
     return useContext(AuthenticationContext)
 
 }
 
-export default function AuthenticationProvider(props) {
+export default function AuthenticationContextProvider({ children }) {
     const [user, setUser] = useState({})
 
-    const logIn = (user) => {
+    const logIn = (data) => {
         setUser({
-            ...user,
-            loggedIn: true,
-            newDesign: false
+            ...data,
+            loggedIn: true
         })
     }
 
@@ -34,7 +33,7 @@ export default function AuthenticationProvider(props) {
             return
         }
 
-        async function fetchData() {
+        (async () => {
             try {
                 const promise = await fetch(url, {
                     method: 'POST',
@@ -56,18 +55,15 @@ export default function AuthenticationProvider(props) {
             } catch (error) {
                 // handle server not accessible error
                 // maybe logOut is not neccessary here
-                logOut()
+                // logOut()
             }
-        }
-
-        fetchData()
+        })()
         return
-        
     }, [])
 
     return (
-        <AuthenticationContext.Provider value={{ user, logIn, logOut}}>
-            {props.children}
+        <AuthenticationContext.Provider value={{ user, logIn, logOut }}>
+            {children}
         </AuthenticationContext.Provider>
     )
 }

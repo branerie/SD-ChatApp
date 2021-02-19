@@ -1,0 +1,27 @@
+.notice {
+    display: flex;    
+    margin: 4px auto;
+    margin: 4px 12px;
+    padding: 5px 10px;
+    justify-content: center;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    border-radius: 10px;
+}
+
+.online {
+    background-color: springgreen;
+}
+
+.offline {
+    background-color: salmon;
+}
+
+.joined {
+    background-color: cyan;
+}
+
+.system {
+    background-color: darkkhaki;
+}

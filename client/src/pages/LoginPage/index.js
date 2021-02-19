@@ -1,14 +1,13 @@
-import React from 'react'
-import styles from './index.module.css'
+import PageWrapper from '../../components/PageWrapper'
 import PageHeader from '../../components/PageHeader'
 import LoginMain from '../../components/LoginMain'
 
 const LoginPage = () => {
     return (
-        <div className={styles['login-container']}>
+        <PageWrapper>
             <PageHeader />
             <LoginMain />         
-        </div>
+        </PageWrapper>
     )
 }
 

@@ -1,46 +1,40 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
+import { useHistory } from "react-router-dom"
 import styles from './index.module.css'
 import Input from '../Input'
 import Alert from '../Alert'
 import SubmitButton from '../Buttons/SubmitButton'
 import authenticate from '../../utils/authenticate'
-import { AuthenticateUser } from '../../context/authenticationContext'
-import inputValidation from '../../utils/inputValidation'
-import { useHistory } from "react-router-dom"
+import { AuthenticateUser } from '../../context/AuthenticationContext'
+import { registerValidation } from '../../utils/inputValidation'
 
 const RegisterMain = () => {
     const url = `${process.env.REACT_APP_HOST}/register`
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [rePassword, setRePassword] = useState('')
-
-    const [alertMessage, setAlertMessage] = useState(null)
+    const [errors, setErrors] = useState([])
     const auth = AuthenticateUser()
     const history = useHistory()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
-        if (alertMessage) {
-            return
-        }
+        if (errors.length) return
 
         await authenticate(url, {
             username,
             password,
             rePassword
-        }, (user) => {
-            console.log(user);
-            console.log('Successful registration');
+        }, user => {
             auth.logIn(user)
-            history.push('/newchat')
-        }, (error) => {
-            console.log('Error', error);
+            history.push('/main')
+        }, error => {
+            setErrors(error)
         })
     }
 
     useEffect(() => {
-        setAlertMessage(inputValidation(username, password, rePassword))
+        setErrors(registerValidation(username, password, rePassword))
     }, [username, password, rePassword])
 
     return (
@@ -62,7 +56,7 @@ const RegisterMain = () => {
                 label='Repeat password'
                 type='password'
             />
-            <Alert alert={alertMessage} />
+            {errors.length > 0 && <Alert alerts={errors} />}
             <SubmitButton title='REGISTER' />
         </form>
     )

@@ -1,5 +1,30 @@
 const { User, Site, Group, Message } = require('../models')
 
+const registerUser = async (username, password) => {
+    const user = new User({
+        username,
+        password
+    })
+    try {
+        const userObject = await user.save()
+        return { success: true, userObject }
+    } catch (error) {
+        if (error.code === 11000) {
+            return { success: false, error: ['Username already registered.'] }
+        }
+    }
+}
+
+const loginUser = async (username) => {
+        const userObject = await User.findOne({ username })
+        return userObject
+}
+
+const verifyUser = async (id) => {
+        const user = await User.findById(id)
+        return user
+}
+
 const getUserData = async (id) => {
     let data = await User.findById(id, '-password -__v').populate({
         path: 'chats',
@@ -37,12 +62,12 @@ const getMessages = async (userData) => {
             { destination: { $in: chats }, source: userData._id },
             { source: { $in: chats }, destination: userData._id },
         ]
-    }, '-_id -__v -updatedAt').populate({ 
-        path: 'source', 
-        select: 'name username picture' 
-    }).populate({ 
-        path: 'destination', 
-        select: 'name username' 
+    }, '-_id -__v -updatedAt').populate({
+        path: 'source',
+        select: 'name username picture'
+    }).populate({
+        path: 'destination',
+        select: 'name username'
     }).lean()
     // console.log(messages);
     return messages
@@ -55,11 +80,11 @@ const getPrivateMessages = async (id, uid) => {
             { destination: id, source: uid },
             { source: id, destination: uid },
         ]
-    }, '-_id -__v -updatedAt').populate({ 
-        path: 'source', 
-        select: 'name username' 
+    }, '-_id -__v -updatedAt').populate({
+        path: 'source',
+        select: 'name username'
     }).lean()
-    
+
     return { messages, username: party.name }
 }
 
@@ -119,7 +144,7 @@ const syncUserAndProjectData = async (uid, gid, sid) => {
     }
 }
 
-const createSite = async (name, description ,creator) => {
+const createSite = async (name, description, creator) => {
     const siteData = new Site({
         name,
         description,
@@ -173,7 +198,7 @@ const createGroup = async (site, name, creator) => {
     }
 
     // 2. check that group name is unique (for this site, not in model)
-    const groupCheck = await Group.findOne({ name: { $regex : new RegExp(`^${name}$`, "i") }, site })
+    const groupCheck = await Group.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") }, site })
     if (groupCheck !== null) {
         return { success: false, message: 'Group exists' }
     }
@@ -351,24 +376,25 @@ const cancelInvitation = async (sid, uid, aid) => {
     }
 }
 
-const searchProjects = async(pattern, page) => {
+const searchProjects = async (pattern, page) => {
     const limit = 5
     const skip = page * limit
     const projects = await Site.find({
         name: {
-            $regex: pattern, 
+            $regex: pattern,
             $options: 'i'
-        }},
+        }
+    },
         'name description creator createdAt'
     ).populate({
         path: 'creator',
         select: 'name'
     }).skip(skip).limit(limit)
 
-    return { success: projects.length > 0, projects}
+    return { success: projects.length > 0, projects }
 }
 
-const searchPeople = async(pattern, page) => {
+const searchPeople = async (pattern, page) => {
     const limit = 5
     const skip = page * limit
     const people = await User.find({
@@ -382,7 +408,7 @@ const searchPeople = async(pattern, page) => {
     ).skip(skip).limit(limit)
 
     console.log(people);
-    return { success: people.length > 0, people}
+    return { success: people.length > 0, people }
 }
 
 const updateProfileData = async (uid, data) => {
@@ -414,6 +440,9 @@ const getUserDetails = async (uid) => {
 
 
 module.exports = {
+    registerUser,
+    loginUser,
+    verifyUser,
     getUserData,
     getMessages,
     getPrivateMessages,

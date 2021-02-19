@@ -1,0 +1,8 @@
+.menu {
+    display: flex;
+    flex-direction: column;
+    /* flex-basis: 100%; */
+    background-color: #707070;
+    padding: 10px 30px;
+    overflow-y: auto;
+}

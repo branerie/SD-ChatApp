@@ -1,0 +1,25 @@
+.text-area {
+    border: none;
+    color: white;
+    width: 155px;
+    outline: none;
+    width:100%;
+    resize: none;
+    background-color: #707070;
+}
+
+.text-area::placeholder {
+    color: lightgray;
+    font-style: italic;
+  }
+
+.emoji {
+    position: absolute;
+    right: 1rem;
+    bottom: 3rem;
+}
+
+.link-emoji {
+    margin-right: 1rem;
+    cursor: pointer;
+}

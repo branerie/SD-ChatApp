@@ -1,9 +1,0 @@
-.selected-project {
-    background-color: #707070;
-    display: flex; 
-    flex-direction: column;
-    flex-basis: 225px;
-    flex-grow: 0;
-    flex-shrink: 0;
-    overflow-y: scroll;
-}

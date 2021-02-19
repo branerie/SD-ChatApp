@@ -1,14 +1,31 @@
-const inputDataValidation = (username, password, rePassword) => {
-    if (!username) {
-        return 'Please fill your username'
+export function registerValidation(username, password, rePassword, errors = []) {
+    if (!username || !password) {
+        errors.push('Username and password required')
     }
-    if (!password) {
-        return 'Please fill your password'
+    if (!username.match(/^[a-zA-Z0-9]*$/)) {
+        errors.push('Allowed only alphanumerics')
+    }
+    if (username.length < 4) {
+        errors.push('Username must be min 4 symbols long')
+    }
+    if (username.length > 20) {
+        errors.push('Username must be max 20 symbols long')
+    }
+    if (password.length < 8 && password !== process.env.REACT_APP_DEV_PASSWORD) {
+        errors.push('Password must be min 8 symbols long')
+    }
+    if (password.length > 63) {
+        errors.push('Password must be max 63 symbols long')
     }
     if (password !== rePassword) {
-        return 'Please check your password'
+        errors.push('Passwords mismatch')
     }
-    return null
+    return errors
 }
 
-export default inputDataValidation
+export function loginValidation (username, password, errors = []) {
+    if (!username || !password) {
+        errors.push('Username and password required')
+    }
+    return errors
+}

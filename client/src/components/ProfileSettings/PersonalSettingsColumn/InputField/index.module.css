@@ -1,0 +1,35 @@
+.container {
+    display: flex;
+    margin-bottom: 20px;
+    width: 100%;
+    align-items: center;
+    align-content: center;
+}
+
+.input {
+    outline: none;
+    height: 30px;
+    margin-left: 10px;
+    width: 85%;
+    border:none;
+    background: #707070;
+}
+
+.wrapper {
+    width: auto;
+    /* margin-left: 10px; */
+    border-color: #707070;
+    border: 1px solid;
+    border-radius: 12px;
+}
+
+.label {
+    width: 100%;
+    font-size: 14px;
+    color: white;
+    text-transform: capitalize;
+}
+
+.changed {
+    border-color: #379b37;
+}

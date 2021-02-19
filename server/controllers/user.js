@@ -1,8 +1,9 @@
 const { hashPassword, jwt, inputValidation } = require('../utils')
-const express = require('express');
+const express = require('express')
 const router = express.Router()
-const bcrypt = require('bcrypt');
-const models = require('../models');
+const bcrypt = require('bcrypt')
+const models = require('../models')
+const db = require('../db/query')
 
 router.post('/login', async (request, response, next) => {
     const {
@@ -10,29 +11,30 @@ router.post('/login', async (request, response, next) => {
         password
     } = request.body
 
-    if (!inputValidation.login(username, password)) {
-        response.status(401).send({ error: 'Username and password are required!' })
+    const validationErrors = inputValidation.login(username, password)
+    if (validationErrors.length) {
+        response.status(401).send({ error: validationErrors })
         return
     }
 
-    const userObject = await models.User.findOne({ username })
+    const userObject = await db.loginUser(username)
     if (!userObject) {
         console.error('User not found')
-        response.status(403).send({ error: 'Username or password invalid!' })
+        await bcrypt.compare(password, '$2b$10$duMmYs10wdOwnp4/Sw0rDTo3qUa1iz3rESp.n/3tim3A1iTtlEbit')
+        response.status(403).send({ error: ['Username or password invalid!'] })
         return
     }
-    const isPasswordCorrect = await bcrypt.compare(password, userObject.password)
 
-
-    if (!isPasswordCorrect) {
+    const passTest = await bcrypt.compare(password, userObject.password)
+    if (passTest) {
+        const token = jwt.createToken(userObject)
+        response.header('Authorization', token)
+        response.send({ username: userObject.username, _id: userObject._id })
+    } else {
         console.error('Wrong password')
-        response.status(403).send({ error: 'Username or password invalid!' })
+        response.status(403).send({ error: ['Username or password invalid!'] })
         return
     }
-    const token = jwt.createToken(userObject)
-    response.header('Authorization', token)
-    // console.log(userObject)
-    response.send({ username: userObject.username, _id: userObject._id })
 })
 
 router.post('/register', async (request, response, next) => {
@@ -42,21 +44,21 @@ router.post('/register', async (request, response, next) => {
         rePassword
     } = request.body
 
-    if (!inputValidation.register(username, password, rePassword)) {
-        response.status(401).send({ error: 'Username and matching passwords are required!' })
+    const validationErrors = inputValidation.register(username, password, rePassword)
+    if (validationErrors.length) {
+        response.status(401).send({ error: validationErrors })
         return
     }
 
     const encryptedPassword = await hashPassword(password)
-    const user = new models.User({
-        username,
-        password: encryptedPassword
-    })
-    const userObject = await user.save()
-    const token = jwt.createToken(userObject)
-
-    response.header('Authorization', token)
-    response.send({ username: userObject.username, _id: userObject._id })
+    const data = await db.registerUser(username, encryptedPassword)
+    if (data.success) {
+        const token = jwt.createToken(data.userObject)
+        response.header('Authorization', token)
+        response.send({ username: data.userObject.username, _id: data.userObject._id })
+    } else {
+        response.status(401).send({error: data.error})
+    }
 })
 
 router.post('/verify', async (request, response, next) => {
@@ -66,7 +68,7 @@ router.post('/verify', async (request, response, next) => {
         response.send({ status: false })
         return
     }
-    const user = await models.User.findById(data.userID)
+    const user = await db.verifyUser(data.userID)
     if (!user) {
         response.send({ status: false })
         return

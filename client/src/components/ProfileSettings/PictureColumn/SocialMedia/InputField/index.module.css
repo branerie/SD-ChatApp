@@ -1,0 +1,30 @@
+.input-field {
+    display: flex;
+    margin-bottom: 20px;
+    width: 100%;
+    align-items: center;
+    align-content: center;
+}
+
+.icon {
+    width: 20px;
+    height: 20px;
+    margin-left: 15px;
+}
+
+.input {
+    background-color: #707070;
+    outline: none;
+    height: 30px;
+    margin-left: 10px;
+    width: 85%;
+    border:none;
+}
+
+.input-container{
+    width: 130px;
+    margin-left: 10px;
+    border-color: white;
+    border: 1px solid;
+    border-radius: 12px;
+}

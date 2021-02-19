@@ -1,17 +1,15 @@
-import React from 'react'
-import "./style.css"
-import AuthenticationProvider from './context/authenticationContext'
+import AuthenticationContextProvider from './context/AuthenticationContext'
 import ThemeContextProvider from './context/ThemeContext'
 import Navigation from './Navigation'
 
-const App = (props) => {
+const App = ({ children }) => {
   return (
     <ThemeContextProvider>
-      <AuthenticationProvider>
+      <AuthenticationContextProvider>
         <Navigation>
-          {props.children}
+          {children}
         </Navigation>
-      </AuthenticationProvider>
+      </AuthenticationContextProvider>
     </ThemeContextProvider>
   )
 }
