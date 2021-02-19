@@ -1,13 +1,13 @@
 import React from 'react'
 import styles from './index.module.css'
-import LogoColumn from './LogoColumn'
+import PictureColumn from './PictureColumn'
 import PersonalSettingsColumn from './PersonalSettingsColumn'
 
 
 const ProfileSettings = () => {
     return (
-        <div className={styles['setting-page']}>
-            <LogoColumn />
+        <div className={styles.menu}>
+            <PictureColumn />
             <PersonalSettingsColumn />
         </div>
     )

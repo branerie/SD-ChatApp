@@ -1,9 +1,8 @@
-.user-nav {
+.nav {
     display: flex;
     justify-content: flex-end;
-    border-bottom: 1px solid black;
 }
 
-.user-nav button {
+.nav button {
     margin: 10px;
 }

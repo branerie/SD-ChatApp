@@ -46,11 +46,11 @@ const PersonalSettingsColumn = () => {
     }
 
     return (
-        <div className={styles['personal-settings-container']}>
-            <div className={styles['title']}>
+        <div className={styles.container}>
+            <div className={styles.title}>
                 <u>Personal Settings</u>
             </div>
-            <form className={styles['form']} onSubmit={(e) => updateProfile(e)}>
+            <form className={styles.form} onSubmit={(e) => updateProfile(e)}>
                 {Object.entries(data).map(([key, value]) => {
                     return (
                         <InputField 
@@ -64,14 +64,14 @@ const PersonalSettingsColumn = () => {
                 })}
                 <button type="button" 
                     onClick={() => setData(initState)} 
-                    className={`${styles['btn-revert']} ${styles.btn}`}
+                    className={`${styles.revert} ${styles.btn}`}
                     disabled={!isModified}
                 >
                     Revert
                 </button>
                 <button 
                     type="submit"
-                    className={`${styles['btn-save']} ${styles.btn}`}
+                    className={`${styles.save} ${styles.btn}`}
                     disabled={!isModified}
                 >
                     Save Changes

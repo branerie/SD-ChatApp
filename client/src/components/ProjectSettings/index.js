@@ -1,3 +1,4 @@
+import styles from './index.module.css'
 import BasicSettings from './BasicSettings'
 import AddGroup from './AddGroup'
 import SearchPeople from './SearchPeople'
@@ -7,7 +8,7 @@ import PendingList from './PendingList'
 const ProjectSettings = () => {
 
     return (
-        <div>
+        <div className={styles.menu}>
             <h3>Project Settings</h3>
             <BasicSettings />
             <AddGroup />

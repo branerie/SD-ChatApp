@@ -13,6 +13,7 @@
 }
 
 .input {
+    background-color: #707070;
     outline: none;
     height: 30px;
     margin-left: 10px;
@@ -23,7 +24,7 @@
 .input-container{
     width: 130px;
     margin-left: 10px;
-    border-color: #707070;
+    border-color: white;
     border: 1px solid;
     border-radius: 12px;
 }

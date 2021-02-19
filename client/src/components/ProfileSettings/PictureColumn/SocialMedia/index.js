@@ -1,4 +1,3 @@
-import React from 'react'
 import styles from './index.module.css'
 import InputField from './InputField'
 import facebook from '../../../../images/socialMedia/facebook.svg'

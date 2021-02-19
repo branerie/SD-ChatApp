@@ -4,7 +4,7 @@ import SocketContextProvider from '../../context/SocketContext'
 import MessagesContextProvider from '../../context/MessagesContext'
 import LeftSidebar from '../../components/LeftSidebar'
 import ProjectSidebar from '../../components/ProjectSidebar'
-import ChatBox from '../../components/ChatBox'
+import MainWindow from '../../components/MainWindow'
 import ProfileInfoBox from '../../components/ProfileInfoBox'
 
 const ChatPageNewDesign = () => {
@@ -14,7 +14,7 @@ const ChatPageNewDesign = () => {
                 <div className={styles['chat-page-new-design']}>
                     <LeftSidebar />
                     <ProjectSidebar />
-                    <ChatBox />
+                    <MainWindow />
                     <ProfileInfoBox />
                 </div>
             </MessagesContextProvider>

@@ -1,7 +1,6 @@
-import React, { useEffect, useContext, useRef } from 'react'
+import { useEffect, useContext, useRef } from 'react'
 import styles from './index.module.css'
 import ChatTitle from './ChatTitle'
-import UserNav from './UserNav'
 import Message from './Message'
 import Notice from './Notice'
 import DevLine from './DevLine'
@@ -9,7 +8,7 @@ import SendMessageBox from './SendMessageBox'
 
 import { MessagesContext } from '../../../context/MessagesContext'
 
-const CurrentChatWindow = (props) => {
+const ChatWindow = (props) => {
 
     const { userData } = useContext(MessagesContext)
     const messagesRef = useRef()
@@ -48,10 +47,9 @@ const CurrentChatWindow = (props) => {
     }
 
     return (
-        <div className={styles['current-chat-window']}>
-            <UserNav />
+        <div className={styles.container}>
             <ChatTitle title={title} />
-            <div ref={messagesRef} className={styles['message-box']}>
+            <div ref={messagesRef} className={styles.messages}>
                 {messages.map(({ src, msg, timestamp, notice, event }, i) => {
                     let thisDate = new Date(timestamp).toDateString()
                     let prevDate = i > 0 ? new Date(messages[i - 1].timestamp).toDateString() : undefined
@@ -78,4 +76,4 @@ const CurrentChatWindow = (props) => {
     )
 }
 
-export default CurrentChatWindow
+export default ChatWindow

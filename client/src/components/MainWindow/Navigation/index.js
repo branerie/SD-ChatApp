@@ -1,9 +1,9 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
-import { AuthenticateUser } from '../../../../context/AuthenticationContext'
-import { MessagesContext } from '../../../../context/MessagesContext'
+import { AuthenticateUser } from '../../../context/AuthenticationContext'
+import { MessagesContext } from '../../../context/MessagesContext'
 
-const UserNav = () => {
+const Navigation = () => {
     const { logOut } = AuthenticateUser()
     const { dispatchUserData } = useContext(MessagesContext)
 
@@ -16,7 +16,7 @@ const UserNav = () => {
     }
 
     return (
-        <div className={styles['user-nav']}>
+        <div className={styles.nav}>
             <button onClick={loadProjects}>Projects</button>
             <button onClick={loadProfile}>Profile</button>
             <button onClick={logOut}>Logout</button>
@@ -24,4 +24,4 @@ const UserNav = () => {
     )
 }
 
-export default UserNav
+export default Navigation

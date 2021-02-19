@@ -2,11 +2,11 @@ import styles from './index.module.css'
 import UserNav from '../UserNav'
 import CreateProject from '../../../ProjectsMenu/CreateProject'
 import SearchProjects from '../../../ProjectsMenu/SearchProjects'
-import PendingProjects from '../../../ProjectsMenu//PendingProjects'
+import PendingProjects from '../../../ProjectsMenu/PendingProjects'
 import { useContext } from 'react'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import PersonalSettingsColumn from '../../../ProfileSettings/PersonalSettingsColumn'
-import LogoColumn from '../../../ProfileSettings/LogoColumn'
+import LogoColumn from '../../../ProfileSettings/PictureColumn'
 import ProjectSettings from '../../../ProjectSettings'
 
 const UserMenu = () => {

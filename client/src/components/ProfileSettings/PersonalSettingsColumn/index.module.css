@@ -1,4 +1,4 @@
-.personal-settings-container{
+.container{
     display: flex;
     flex-direction: column;
     margin-left: 20px;
@@ -6,38 +6,9 @@
 }
 
 .title{
-    color: #707070;
+    color: white;
     margin-top: 50px;
     font-size: 18px;
-}
-
-.input {
-    outline: none;
-    height: 20px;
-    margin-left: 10px;
-    width: 90%;
-    border:none;
-}
-
-.input-container{
-    width: auto;
-    margin-left: 10px;
-    border-color: #707070;
-    border: 1px solid;
-    border-radius: 12px;
-}
-
-.input-field {
-    display: flex;
-    margin-bottom: 20px;
-    width: 100%;
-    align-items: center;
-    align-content: center;
-}
-
-.label{
-    font-size: 14px;
-    color: #707070;
 }
 
 .form {
@@ -57,10 +28,10 @@
     cursor: default;
 }
 
-.btn-save {
+.save {
     background-color: #379b37;
 }
 
-.btn-revert {
+.revert {
     background-color: #dd3c5c;
 }
