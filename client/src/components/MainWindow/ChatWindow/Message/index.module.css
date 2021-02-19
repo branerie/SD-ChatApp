@@ -1,4 +1,4 @@
-.new-message {
+.container {
     display: flex;
     padding: 10px 15px;
     margin: 4px 12px;
@@ -6,22 +6,18 @@
     border-radius: 10px;
 }
 
-.new-message-own {
+.own {
     flex-direction: row-reverse;
     background-color: #e5f1db;
 }
 
-.avatar {
-    margin-left: 10px;
-}
-
-.text-box {
+.data {
     margin: 0 10px;
     display: flex;
     flex-direction: column;
 }
 
-.text-box-own {
+.owndata {
     align-items: flex-end;
 }
 

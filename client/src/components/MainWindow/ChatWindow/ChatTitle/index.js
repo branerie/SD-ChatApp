@@ -1,8 +1,8 @@
-import React, {useRef, useEffect, useContext} from 'react'
+import {useRef, useEffect, useContext} from 'react'
 import styles from './index.module.css'
 import searchIcon from '../../../../images/searchIcon.svg'
 import moreIcon from '../../../../images/moreIcon.svg'
-import Input from '../../../CommonComponents/Input'
+import Input from '../../../Common/Input'
 import FavIcon from './FavIcon'
 import NotificationIcon from './NotificationIcon'
 import CloseButton from './CloseButton'
@@ -18,11 +18,11 @@ const ChatTitle = (props) => {
     })  //TODO: useEffect to check for dependency
 
     return (
-        <div className={styles['chat-title']}>
+        <div className={styles.container}>
             <div>
                 <FavIcon />
             </div>                
-            <div className={styles['title']}>
+            <div className={styles.title}>
                 {props.title}
             </div>
             <div className={styles['input-box']}>
@@ -33,7 +33,7 @@ const ChatTitle = (props) => {
                 <NotificationIcon />
             </div>
             <div>
-                <img src={moreIcon} className={styles['more-icon']} alt=''/>
+                <img src={moreIcon} className={styles.more} alt=''/>
             </div>
             { userData.activeChat && 
             <div>

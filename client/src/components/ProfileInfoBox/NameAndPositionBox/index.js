@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './index.module.css'
-import StatusLight from '../../CommonComponents/StatusLight'
+import StatusLight from '../../Common/StatusLight'
 
 const Name = ({ isOnline, name, position }) => {
     return (

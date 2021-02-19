@@ -3,7 +3,7 @@ import styles from './index.module.css'
 import ChatTitle from './ChatTitle'
 import Message from './Message'
 import Notice from './Notice'
-import DevLine from './DevLine'
+import DateSeparator from './DateSeparator'
 import SendMessageBox from './SendMessageBox'
 
 import { MessagesContext } from '../../../context/MessagesContext'
@@ -55,7 +55,7 @@ const ChatWindow = (props) => {
                     let prevDate = i > 0 ? new Date(messages[i - 1].timestamp).toDateString() : undefined
                     return (
                         <div key={i} >
-                            {thisDate !== prevDate && <DevLine date={thisDate} />}
+                            {thisDate !== prevDate && <DateSeparator date={thisDate} />}
                             {notice ?
                                 <Notice message={{ msg, event }} /> :
                                 <Message message={{

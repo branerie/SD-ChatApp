@@ -1,27 +1,21 @@
 .notice {
-    display: flex;
-    
-    margin: 4px 50px;
-    /* background-color: #f0f0f0; */
-    
-}
-
-.message {
-    margin: auto;
+    display: flex;    
+    margin: 4px auto;
+    margin: 4px 12px;
     padding: 5px 10px;
+    justify-content: center;
     overflow-x: hidden;
-    max-width: 50vw;
     word-wrap: break-word;
     white-space: pre-wrap;
     border-radius: 10px;
 }
 
 .online {
-    background-color: chartreuse;
+    background-color: springgreen;
 }
 
 .offline {
-    background-color: coral;
+    background-color: salmon;
 }
 
 .joined {

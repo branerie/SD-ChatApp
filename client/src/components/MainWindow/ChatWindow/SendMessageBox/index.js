@@ -1,8 +1,7 @@
-import React from 'react'
 import styles from './index.module.css'
 import sendFile from '../../../../images/sendFile.svg'
 import voiceMsg from '../../../../images/voiceMsg.svg'
-import TextArea from '../../../CommonComponents/TextArea'
+import TextArea from '../../../Common/TextArea'
 
 
 const SendMessageBox = () => {
@@ -15,7 +14,7 @@ const SendMessageBox = () => {
                 <img src={voiceMsg} alt=''/>
             </div>
             <div className={styles['text-area-box']}>
-                <TextArea placeholder='Message'/>
+                <TextArea />
             </div>
         </div>
     )

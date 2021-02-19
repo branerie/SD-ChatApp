@@ -1,0 +1,17 @@
+.separator {
+    display: flex;
+    align-items: center;
+    margin: 10px 15px;
+    color: #8D8D8D;
+}
+
+.date {
+    font-size: 12px;
+    margin: 0 10px;
+}
+
+.side {
+    height: 2px;
+    background-color: #8D8D8D;
+    flex-grow: 1;
+}

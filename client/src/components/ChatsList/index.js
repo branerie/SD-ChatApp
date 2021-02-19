@@ -1,10 +1,10 @@
-import React, { useContext, useRef, useEffect } from 'react'
+import { useContext, useRef, useEffect } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../context/MessagesContext'
-import CloseButton from '../MainWindow/ChatWindow/ChatTitle/CloseButton/index'
-import NewMessageLight from '../CommonComponents/NewMessageLight'
-import UserAvatar from '../CommonComponents/UserAvatar'
-import StatusLight from '../CommonComponents/StatusLight'
+import CloseButton from '../MainWindow/ChatWindow/ChatTitle/CloseButton'
+import NewMessageLight from '../Common/NewMessageLight'
+import UserAvatar from '../Common/UserAvatar'
+import StatusLight from '../Common/StatusLight'
 
 const colors = [styles.red, styles.green, styles.blue, styles.orange]
 

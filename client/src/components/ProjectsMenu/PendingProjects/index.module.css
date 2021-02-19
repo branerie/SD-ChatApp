@@ -1,3 +1,4 @@
-.menu-field ul li button{
-	margin-left: 5px;
+.row {
+	display: flex;
+	justify-content: space-between;
 }

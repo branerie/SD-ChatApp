@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react'
-import Picker from 'emoji-picker-react'
 import styles from './index.module.css'
+import Picker from 'emoji-picker-react'
 import TextareaAutosize from 'react-textarea-autosize'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
@@ -54,13 +54,12 @@ const TextArea = (props) => {
         <>
             <TextareaAutosize
                 className={styles['text-area']}
-                placeholder={props.placeholder}
+                placeholder='Message...'
                 value={msg}
                 onChange={e => setMsg(replaceEmojis(e.target.value))}
                 onKeyPress={e => getKey(e)}
                 autoFocus
-                maxRows={4}
-                minRows={1}
+                maxRows={2}
             />
             <div onClick={() => setIsVisible(!isVisible)} className={styles['link-emoji']}>
                 <img src={emotIcon} alt=''/>

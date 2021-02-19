@@ -27,8 +27,11 @@
 }
 
 .list-item {
+	display: flex;
 	margin-top: 5px;
 	height: 32px;
+	justify-content: space-between;
+	align-items: baseline;
 }
 
 .card { 

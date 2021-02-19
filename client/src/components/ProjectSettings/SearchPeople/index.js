@@ -1,8 +1,9 @@
 import { useContext, useState } from 'react'
 import styles from './index.module.css'
+import SmallButton from '../../Buttons/SmallButton'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
-import UserAvatar from '../../CommonComponents/UserAvatar'
+import UserAvatar from '../../Common/UserAvatar'
 
 const SearchPeople = () => {
     const { socket } = useContext(SocketContext)
@@ -100,8 +101,8 @@ const SearchPeople = () => {
                                         <span>{name.name}</span>
                                     </div>
                                     <div>
-                                        <button onClick={() => inviteMember(name.username)}>Invite</button>
-                                        <button onClick={() => showMemberInfo(name)}>{showInfo[name._id] ? 'Less' : 'More'}</button>
+                                        <SmallButton onClick={() => inviteMember(name.username)} title='Invite'/>
+                                        <SmallButton onClick={() => showMemberInfo(name)} title={showInfo[name._id] ? 'Less' : 'More'}/>
                                     </div>
                                 </li>
                                 {showInfo[name._id] &&

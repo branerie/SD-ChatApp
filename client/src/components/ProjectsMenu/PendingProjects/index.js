@@ -1,7 +1,8 @@
+import styles from './index.module.css'
+import SmallButton from '../../Buttons/SmallButton'
 import { useContext } from 'react'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
-import styles from './index.module.css'
 
 
 const PendingProjects = () => {
@@ -39,7 +40,7 @@ const PendingProjects = () => {
     // if (!userData.invitations && !userData.requests) return null
 
     return (
-        <div className={styles['menu-field']}>
+        <div>
             {userData.invitations && userData.invitations.length > 0 && (
                 <div>
                     <h3>Invitations</h3>
@@ -48,12 +49,12 @@ const PendingProjects = () => {
                     <ul>
                         {userData.invitations.map(site => {
                             return (
-                                <li key={site._id}>
+                                <li className={styles.row} key={site._id}>
                                     <span>{site.name}</span>
                                     <div>
-                                        <button onClick={() => acceptInvitation(site._id)}>Accept</button>
-                                        <button onClick={() => rejectInvitation(site._id)}>Reject</button>
-                                        <button onClick={() => showInvitationInfo(site._id)}>Info</button>
+                                        <SmallButton onClick={() => acceptInvitation(site._id)} title='Accept' />
+                                        <SmallButton onClick={() => rejectInvitation(site._id)} title='Reject' />
+                                        <SmallButton onClick={() => showInvitationInfo(site._id)} title='Info' />
                                     </div>
                                 </li>
                             )
@@ -70,11 +71,11 @@ const PendingProjects = () => {
                     <ul>
                         {userData.requests.map(site => {
                             return (
-                                <li key={site._id}>
+                                <li className={styles.row} key={site._id}>
                                     <span>{site.name}</span>
                                     <div>
-                                        <button onClick={() => cancelRequest(site._id)}>Cancel</button>
-                                        <button onClick={() => showRequestInfo(site._id)}>Info</button>
+                                        <SmallButton onClick={() => cancelRequest(site._id)} title='Cancel' />
+                                        <SmallButton onClick={() => showRequestInfo(site._id)} title='Info' />
                                     </div>
                                 </li>
                             )

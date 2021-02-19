@@ -1,5 +1,6 @@
 import { useState, useContext } from 'react'
 import styles from './index.module.css'
+import SmallButton from '../../Buttons/SmallButton'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 
@@ -90,11 +91,11 @@ const SearchProjects = () => {
                     {sites.slice(cursor, cursor + limit).map(site => {
                         return (
                             <div key={site._id}>
-                                <li>
+                                <li className={styles.row}>
                                     <span>{site.name}</span>
                                     <div>
-                                        <button onClick={() => sendRequest(site.name)}>Join</button>
-                                        <button onClick={() => showProjectInfo(site)}>{showInfo[site._id] ? 'Less' : 'More'}</button>
+                                        <SmallButton onClick={() => sendRequest(site.name)} title='Join' />
+                                        <SmallButton onClick={() => showProjectInfo(site)} title={showInfo[site._id] ? 'Less' : 'More'} />
                                     </div>
                                 </li>
                                 {showInfo[site._id] &&

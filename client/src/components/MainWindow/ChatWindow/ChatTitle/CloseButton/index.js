@@ -17,7 +17,7 @@ const CloseButton = ({chat, prevActive}) => {
 
     return (
             <img
-                className={styles['close-button']}
+                className={styles.btn}
                 src={closeButtonSrc}
                 onMouseEnter={() => { setCloseButtonSrc(closeButtonHover) }}
                 onMouseOut={() => { setCloseButtonSrc(closeButton) }}
