@@ -1,0 +1,37 @@
+.container {
+    color: #FFFFFF;
+    font-size: 20px;
+    margin-left: 24px;
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+}
+
+.icons {
+    margin-left: auto;
+}
+
+.notification {
+    width: 14px;
+    height: 14px;
+    margin-right: 5px;
+    margin-left: auto;
+}
+
+.settings {
+    width: 14px;
+    height: 14px;
+    margin-right: 15px;
+}
+
+.info {
+    margin-right: 15px;
+    border: 1px solid white;
+    border-radius: 50%;
+    text-align: center;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    color: white;
+    font-size: x-small;
+}

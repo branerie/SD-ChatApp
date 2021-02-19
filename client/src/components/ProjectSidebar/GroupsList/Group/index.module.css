@@ -1,0 +1,12 @@
+.group {
+    margin: 1px 10px;
+    font-size: 14px;
+    padding: 10px;
+    color: #B5B5B5;
+}
+
+.group:hover, .selected {
+    color: white;
+    background-color: #7C7D7F;
+    border-radius: 5px;
+}
