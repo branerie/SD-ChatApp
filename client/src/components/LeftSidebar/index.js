@@ -10,10 +10,10 @@ const LeftSidebar = () => {
 
     return (
         <div className={`${styles['projects-list']} ${isSmallList && styles['project-small-list']}`}>
+            <ProjectsList isSmallList={isSmallList}/>
             <div className={styles['info-arrow']} onClick={() => setMakeSmallList(!isSmallList)}>
                 <img src={isSmallList ?  expandArrow : shrinkArrow } className={styles['arrow-img']} alt=''/>
             </div>
-            <ProjectsList isSmallList={isSmallList}/>
             <ChatsList isSmallList={isSmallList}/>
         </div>
     )

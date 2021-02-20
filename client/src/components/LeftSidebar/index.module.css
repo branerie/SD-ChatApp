@@ -1,11 +1,10 @@
 .projects-list {
-    background: #707070;
     width: 225px;
     height: 100%;
-    margin-left: 0;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
+    padding-top: 10px;
 }
 
 .project-small-list {
@@ -13,8 +12,8 @@
 }
 
 .info-arrow {
-    min-width: 1.5rem;
-    max-width: 1.5rem;
+    min-width: 1rem;
+    max-width: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;

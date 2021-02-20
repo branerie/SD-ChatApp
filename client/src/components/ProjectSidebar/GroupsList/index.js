@@ -14,15 +14,18 @@ const GroupsList = () => {
     })
 
     return (
-        <ul className={styles.container}>
-            {groups.map(([gid, group]) => {
-                return (
-                    <li key={gid} >
-                        <Group title={group.name} gid={gid} />
-                    </li>
-                )
-            })}
-        </ul>
+        <div>
+            <div className={styles.title}>groups</div>
+            <ul className={styles.container}>
+                {groups.map(([gid, group]) => {
+                    return (
+                        <li key={gid} >
+                            <Group title={group.name} gid={gid} />
+                        </li>
+                    )
+                })}
+            </ul>
+        </div>
     )
 }
 

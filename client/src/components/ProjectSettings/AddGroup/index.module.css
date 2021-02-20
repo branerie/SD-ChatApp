@@ -23,7 +23,7 @@
 }
 
 .errors {
-	color: red;
+	color: var(--notification-color);
 	margin-left: 20px;
 }
 

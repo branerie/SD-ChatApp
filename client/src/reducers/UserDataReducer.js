@@ -12,8 +12,23 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                activeMenu: 'projects'
+                activeMenu: 'projects',
+                personal: {
+                    ...action.payload.userData.personal,
+                    theme: 'dark' // dummy. take this from db
+                }
             }
+        }
+
+        case 'change-theme': {
+            return {
+                ...userData,
+                personal: {
+                    ...userData.personal,
+                    theme: userData.personal.theme === 'light' ? 'dark' : 'light'
+                }
+            }
+
         }
 
         case "load-projects": {

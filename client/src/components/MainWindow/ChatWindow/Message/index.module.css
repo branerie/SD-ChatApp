@@ -2,13 +2,13 @@
     display: flex;
     padding: 10px 15px;
     margin: 4px 12px;
-    background-color: #f0f0f0;
+    background-color: var(--bg-color-message);
     border-radius: 10px;
 }
 
 .own {
     flex-direction: row-reverse;
-    background-color: #e5f1db;
+    background-color: var(--bg-color-own-message);
 }
 
 .data {
@@ -28,7 +28,7 @@
 .time {
     font-style: italic;
     font-size: 12px;
-    color: #8D8D8D;
+    color: var(--txt-color-chat);
 }
 
 .message {

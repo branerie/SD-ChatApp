@@ -41,9 +41,15 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
+    color: var(--txt-color-project);
     margin: 1px 0;
     padding: 10px;
     cursor: pointer;
+}
+
+.list:hover {
+    background-color: var(--bg-color-sel);
+    color: var(--txt-color-sel);
 }
 
 .small-list {
@@ -57,13 +63,12 @@
 }
 
 .owner {
-    background-color:  #3577EF ;
+    background-color: var(--bg-color-own-project);
 }
 
 .selected {
-    background-color: #8faadd;
-    text-decoration: underline;
-    color: white;
+    background-color: var(--bg-color-sel);
+    color: var(--txt-color-sel);
 }
 
 .red {
@@ -83,9 +88,9 @@
 }
 
 .project-title {
+    color: var(--txt-color);
     text-align: center;
     text-transform: uppercase;
     font-size: small;
     padding-bottom: 5px;
-    color: white;
 }

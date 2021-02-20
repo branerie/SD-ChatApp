@@ -6,7 +6,7 @@
 .profile-info-box {
     display: flex;
     flex-direction: column;
-    background-color: white;
+    background-color: var(--bg-color);
 }
 
 .info-arrow {
@@ -15,10 +15,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #707070;
+    background-color: var(--bg-color);
     cursor: pointer;
-    border-right: 3px solid black;
-    border-left: 3px solid black;
+    border-right: 3px solid var(--separator-color);
+    border-left: 3px solid var(--separator-color);
 }
 
 .arrow-img {

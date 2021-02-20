@@ -1,20 +1,15 @@
 .circle {
     border-radius: 50%;
     display: inline-block;
-    margin: 0 10px;
-    margin-top: 9px;
+    margin: 0 10px 0 5px;
 }
 
 .red {
-    background-color:#FF6059;
-}
-
-.yellow {
-    background-color: #FFBD2E;
+    background-color: var(--offline-color);
 }
 
 .green {
-    background-color: #29C941;
+    background-color: var(--online-color);
 }
 
 .small{
