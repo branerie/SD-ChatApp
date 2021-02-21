@@ -1,0 +1,41 @@
+.container {
+    color: var(--txt-color);
+    display: flex;
+    align-items: baseline;
+    margin-left: 25px;
+}
+
+.title {
+    color: var(--txt-color);
+    font-size: 20px;
+}
+.icons {
+    margin-left: auto;
+}
+
+.notification {    
+    margin: 0 5px;
+}
+
+.empty {
+    fill: var(--txt-color);
+}
+
+.full {
+    fill: var(--notification-color);
+}
+
+.settings {
+    fill: var(--txt-color);
+}
+
+.info {
+    margin-right: 5px;
+    border: 1px solid var(--txt-color);
+    border-radius: 50%;
+    text-align: center;
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    font-size: x-small;
+}

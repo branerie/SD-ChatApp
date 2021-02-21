@@ -1,4 +1,14 @@
-.fav-star {
+.star {
+    width: 16px;
+    height: 16px;
     align-items: center;
-    margin-left: 20px;
+    margin-left: 10px;
+}
+
+.empty {
+    fill: var(--txt-color);
+}
+
+.full {
+    fill: var(--starred-color);
 }

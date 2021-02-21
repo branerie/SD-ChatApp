@@ -22,5 +22,5 @@
 }
 
 .selected {
-	color: green;
+	color: var(--bg-color-sel);
 }

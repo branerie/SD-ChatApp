@@ -1,6 +1,6 @@
 .info-title {
     font-size: 12px;
-    color: #5F6164;
+    color: var(--txt-color);
 }
 
 .info-text {

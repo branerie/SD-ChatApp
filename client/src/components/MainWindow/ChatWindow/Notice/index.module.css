@@ -11,17 +11,17 @@
 }
 
 .online {
-    background-color: springgreen;
+    background-color: var(--bg-color-sys-online);
 }
 
 .offline {
-    background-color: salmon;
+    background-color: var(--bg-color-sys-offline);
 }
 
 .joined {
-    background-color: cyan;
+    background-color: var(--bg-color-sys-joined);
 }
 
 .system {
-    background-color: darkkhaki;
+    background-color: var(--bg-color-sys);
 }

@@ -529,6 +529,12 @@ module.exports = io => {
             callback(true, userDetails)
         })
 
+        socket.on('change-theme', async theme => {
+            const allowedThemes = ['light', 'dark']
+            if (!allowedThemes.includes(theme)) return // log attempt and return
+            await db.changeTheme(userData._id, theme)
+        })
+
         // socket.on('update-atime', async(gid, callback) => {
         //     const atime = await db.updateAccessTime(userData._id, gid)
         //     callback()

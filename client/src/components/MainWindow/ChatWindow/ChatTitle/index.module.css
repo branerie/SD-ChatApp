@@ -1,16 +1,16 @@
 .container {
     display: flex;
     align-items: center;
-    border-top: 2px solid #C2C2C2;
-    border-bottom: 2px solid #C2C2C2;
+    border-top: 2px solid var(--separator-color);
+    border-bottom: 2px solid var(--separator-color);
     padding: 15px 0;
     margin: 0 15px;
 }
 
 .title {
     font-size: 20px;
-    color: whitesmoke;
-    margin-left: 10px;
+    color: var(--txt-color);
+    margin-left: 5px;
     white-space: nowrap;
 }
 
@@ -18,7 +18,7 @@
     margin-left: auto;
     border: 1px solid;
     border-radius: 3px;
-    color: #C2C2C2;
+    color: var(--txt-color);
     padding-left: 15px;
     display: flex;
     height: 32px;

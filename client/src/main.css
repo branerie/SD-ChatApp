@@ -2,9 +2,9 @@
 
 :root {
 	--color-alert: maroon;
-	--color-a: #7F8C7B;
-	--color-b: #7F8C7B;
-	--background-color: #e6e9ff;
+	--background-color: #7F8C7B;
+	--btn-color: #e6e9ff;
+	--border-color: #e6e9ff;
 }
 
 * {

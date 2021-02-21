@@ -1,7 +1,6 @@
 .menu {
     display: flex;
     flex-direction: column;
-    background-color: #707070;
     padding: 10px 30px;
     overflow-y: auto;
 }

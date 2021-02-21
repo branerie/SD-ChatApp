@@ -1,27 +1,22 @@
 import { useState } from 'react'
-import styles from './index.module.css'
-import favouriteStar from '../../../../../images/favouriteStar.svg'
-import favouriteStarFilled from '../../../../../images/facvouriteStarFilled.svg'
-
+import css from './index.module.css'
+import { ReactComponent as StarEmpty } from '../../../../../images/favouriteStar.svg'
+import { ReactComponent as StarFull } from '../../../../../images/facvouriteStarFilled.svg'
 
 const FavIcon = () => {
-    const [favStarSrc, setFavStarSrc] = useState(favouriteStar)
-    const [favStarState, setFavStarState] = useState(false)
+    const [starred, setStarred] = useState(false)
+
+    function toggleStarred() { //to do subscribe
+        setStarred(!starred)
+    }
 
     return (
-        <img
-            alt=''
-            src={favStarSrc}
-            className={styles['fav-star']}
-            onClick={() => {
-                if (favStarState) {
-                    setFavStarSrc(favouriteStar)
-                } else {
-                    setFavStarSrc(favouriteStarFilled)
-                }
-                setFavStarState(!favStarState)
-            }}
-        />
+        <div>
+            { starred 
+                ? <StarFull className={`${css.star} ${css.full}`} onClick={toggleStarred} /> 
+                : <StarEmpty className={`${css.star} ${css.empty}`} onClick={toggleStarred}/>}
+        </div>
+
     )
 }
 

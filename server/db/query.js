@@ -433,6 +433,10 @@ const getUserDetails = async (uid) => {
     }
 }
 
+const changeTheme = async (uid, theme) => {
+    await User.findByIdAndUpdate(uid, { theme })
+}
+
 // const updateAccessTime = async (uid, gid) => {
 //     const atime = await User.updateOne({_id: uid, 'groups.gid': gid}, { $set: { 'groups.$.atime': new Date() } })
 //     console.log(atime)
@@ -464,5 +468,6 @@ module.exports = {
     searchProjects,
     searchPeople,
     updateProfileData,
+    changeTheme
     // updateAccessTime
 }

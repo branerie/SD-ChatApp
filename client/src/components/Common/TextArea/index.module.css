@@ -1,15 +1,15 @@
 .text-area {
     border: none;
-    color: white;
+    color: var(--txt-color);
     width: 155px;
     outline: none;
     width:100%;
     resize: none;
-    background-color: #707070;
+    background-color: var(--bg-color);
 }
 
 .text-area::placeholder {
-    color: lightgray;
+    color: var(--txt-color);
     font-style: italic;
   }
 

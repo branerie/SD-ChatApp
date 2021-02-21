@@ -2,12 +2,20 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 11px;
-    width: 100%;
+    background-color: var(--bg-color-chat);
+    margin: 2px 10px;
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
 }
 
 .member {
     display: flex;
+}
+
+.container:hover {
+    background-color: var(--bg-color-sel);
+    color: var(--txt-color-sel);
 }
 
 .status {
@@ -17,13 +25,14 @@
 
 .name {
     margin-left: 10px;
-    font-size: 14px;
-    color: #B5B5B5;
+    font-size: 16px;
+    color: var(--txt-color-chat);
     display: flex;
     align-items: center;
 }
 
 .info {
     max-width: 1.2rem;
+    margin-right: 10px;
 }
 

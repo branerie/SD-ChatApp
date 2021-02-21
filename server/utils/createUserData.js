@@ -11,7 +11,8 @@ const createUserData = (userData, messagePool) => {
             username: userData.username,
             company: userData.company,
             position: userData.position,
-            picture: userData.picture
+            picture: userData.picture,
+            theme: userData.theme || 'light' //patch for current users
         },
         associatedUsers: {
             [userData._id]: {

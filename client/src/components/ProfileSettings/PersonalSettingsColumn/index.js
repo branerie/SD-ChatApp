@@ -47,9 +47,7 @@ const PersonalSettingsColumn = () => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.title}>
-                <u>Personal Settings</u>
-            </div>
+            <div className={styles.title}>Personal Settings</div>
             <form className={styles.form} onSubmit={(e) => updateProfile(e)}>
                 {Object.entries(data).map(([key, value]) => {
                     return (
