@@ -12,20 +12,17 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                activeMenu: 'projects',
-                personal: {
-                    ...action.payload.userData.personal,
-                    theme: 'dark' // dummy. take this from db
-                }
+                activeMenu: 'projects'
             }
         }
 
         case 'change-theme': {
+            const { theme } = action.payload
             return {
                 ...userData,
                 personal: {
                     ...userData.personal,
-                    theme: userData.personal.theme === 'light' ? 'dark' : 'light'
+                    theme
                 }
             }
 
@@ -37,7 +34,7 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                activeMenu: 'projects' 
+                activeMenu: 'projects'
             }
         }
 
@@ -47,7 +44,7 @@ export default function UserDataReducer(userData, action) {
                 // activeSite: false,
                 // activeGroup: false,
                 // activeChat: false,
-                activeMenu: 'settings' 
+                activeMenu: 'settings'
             }
         }
 
@@ -142,17 +139,17 @@ export default function UserDataReducer(userData, action) {
             return {
                 ...userData,
                 chats,
-                ...(chat === userData.activeChat) ? { 
-                    activeSite, 
+                ...(chat === userData.activeChat) ? {
+                    activeSite,
                     activeGroup,
                     details: null,
                     activeChat: false
                 } : {
-                    // activeSite, 
-                    // activeGroup, 
-                    // activeChat,
-                    // activeMenu
-                },
+                        // activeSite, 
+                        // activeGroup, 
+                        // activeChat,
+                        // activeMenu
+                    },
             }
         }
 
@@ -558,9 +555,9 @@ export default function UserDataReducer(userData, action) {
         }
 
         case "show-details": {
-            return { 
-                ...userData, 
-                details: { id: action.id, isShown: action.show } 
+            return {
+                ...userData,
+                details: { id: action.id, isShown: action.show }
             }
         }
 

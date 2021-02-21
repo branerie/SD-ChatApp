@@ -62,7 +62,11 @@ const UserSchema = new mongoose.Schema({
     chats: [{
         type: 'ObjectId',
         ref: 'User'
-    }]
+    }],
+    theme: {
+        type: String,
+        default: 'light'
+    }
 }, {
     timestamps: {
         updatedAt: false
