@@ -1,5 +1,5 @@
-import PageWrapper from '../../components/PageWrapper'
-import PageHeader from '../../components/PageHeader'
+import PageWrapper from '../../layouts/PageWrapper'
+import PageHeader from '../../layouts/PageHeader'
 import RegisterMain from '../../components/RegisterMain'
 
 const RegisterPage = () => {

@@ -1,13 +1,13 @@
 import { useContext } from 'react'
 import theme from './theme.module.css'
 import styles from './index.module.css'
-import LeftSidebar from '../LeftSidebar'
-import ProjectSidebar from '../ProjectSidebar'
-import MainWindow from '../MainWindow'
-import ProfileInfoBox from '../ProfileInfoBox'
+import LeftSidebar from '../../components/LeftSidebar'
+import ProjectSidebar from '../../components/ProjectSidebar'
+import ChatMain from '../../components/ChatMain'
+import ProfileInfoBox from '../../components/ProfileInfoBox'
 import { MessagesContext } from '../../context/MessagesContext'
 
-const MainPageParent = () => {
+const ChatPageWrapper = () => {
     const { userData } = useContext(MessagesContext)
     if (!userData) return null
     
@@ -16,11 +16,11 @@ const MainPageParent = () => {
             <div className={styles.container}>
                 {Object.keys(userData.sites).length > 0 && <LeftSidebar />}
                 {userData.activeSite && <ProjectSidebar />}
-                <MainWindow />
+                <ChatMain />
                 <ProfileInfoBox />
             </div>
         </div>
     )
 }
 
-export default MainPageParent
+export default ChatPageWrapper
