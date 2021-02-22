@@ -6,10 +6,8 @@ import { MessagesContext } from '../../../context/MessagesContext'
 const GroupsList = () => {
     const { userData } = useContext(MessagesContext)
 
-    if (!userData || !userData.activeSite) return null //<div>Loading...</div>
-
     let groups = Object.entries(userData.sites[userData.activeSite].groups).sort((A, B) => {
-        // default sort: Group "General" on top and the rest alphabetical
+        // Sort: Group "General" on top and the rest alphabetical
         return (B[1].name === 'General') - (A[1].name === 'General') || A[1].name.localeCompare(B[1].name)
     })
 

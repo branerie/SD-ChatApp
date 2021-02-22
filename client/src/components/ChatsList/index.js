@@ -54,8 +54,8 @@ const ChatsList = ({ isSmallList }) => {
 
     }
 
-    if (!userData) return null //<div>Loading...</div>
     const chats = userData.chats
+    // Sort: Non. Default is in the order they are opened
 
     return (
         <div className={styles.container}>

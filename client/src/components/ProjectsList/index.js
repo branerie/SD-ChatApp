@@ -13,9 +13,8 @@ const ProjectsList = ({ isSmallList }) => {
         dispatchUserData({ type: "load-site", payload: { site } })
     }
 
-    if (!userData) return null //<div>Loading...</div>
     const sites = Object.entries(userData.sites).sort((A, B) => {
-        // default sort: user sites first, then alphabetically
+        // Sort: own projects alphabetically first, then the rest alphabetically
         return (B[1].creator === userData.personal._id) - (A[1].creator === userData.personal._id) || A[1].name.localeCompare(B[1].name)
     })
 

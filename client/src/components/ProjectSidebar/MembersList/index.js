@@ -6,17 +6,13 @@ import { MessagesContext } from '../../../context/MessagesContext'
 const MembersList = () => {
     const { userData } = useContext(MessagesContext)
 
-    function handleClick(member) {
-        // TODO
-        // context.updateChats(user, "open")
-        // context.changeWindow(user, false)
-    }
-
-    if (!userData || !userData.activeSite) return null
-    let members = userData.sites[userData.activeSite].groups[userData.activeGroup].members//.sort((A, B) => {
-    //     // default sort: alphabetical with online users on top and offline on bottom
-    //     return userData.associatedUsers[B._id].online - userData.associatedUsers[A._id].online || A.name.localeCompare(B.name)
-    // })
+    let owner = userData.sites[userData.activeSite].creator
+    let members = userData.sites[userData.activeSite].groups[userData.activeGroup].members.sort((a, b) => {
+        // SORT: owner on top, then online members alphabetical, then offline members alphabetical
+        let A = userData.associatedUsers[a]
+        let B = userData.associatedUsers[b]
+        return (b === owner) - (a === owner) || B.online - A.online || A.name.localeCompare(B.name)
+    })
     let membersCount = members.length
 
     return (
@@ -24,10 +20,8 @@ const MembersList = () => {
             <div className={styles.header}>{membersCount} MEMBER{membersCount > 1 && 'S'}</div>
             <ul>
                 {members.map(member => {
-                    return <li
-                        key={member}
-                        onDoubleClick={() => handleClick(member)}
-                    >
+                    return (
+                    <li key={member}>
                         <Member
                             name={userData.associatedUsers[member].name}
                             id={member}
@@ -35,7 +29,7 @@ const MembersList = () => {
                             isOnline={userData.associatedUsers[member].online}
                         />
                     </li>
-                })}
+                )})}
             </ul>
         </div>
     )
