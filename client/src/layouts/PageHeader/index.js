@@ -1,7 +1,7 @@
 import { useHistory } from 'react-router-dom'
 import styles from './index.module.css'
 import logo from '../../images/logo.svg'
-import NavButton from '../Buttons/NavButton'
+import NavButton from '../../components/Buttons/NavButton'
 
 const PageHeader = () => {
     const history = useHistory()

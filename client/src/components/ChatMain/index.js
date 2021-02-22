@@ -13,7 +13,7 @@ const menu = {
     settings: <ProjectSettings />
 }
 
-const MainWindow = () => {
+const ChatMain = () => {
     const { userData: { activeMenu } } = useContext(MessagesContext)
 
     return (
@@ -24,4 +24,4 @@ const MainWindow = () => {
     )
 }
 
-export default MainWindow
+export default ChatMain

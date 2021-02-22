@@ -1,13 +1,13 @@
 import SocketContextProvider from '../../context/SocketContext'
 import MessagesContextProvider from '../../context/MessagesContext'
-import MainPageParent from '../../components/MainPageParent'
+import ChatPageWrapper from '../../layouts/ChatPageWrapper'
 
 const MainPage = () => {
 
     return (
         <SocketContextProvider>
             <MessagesContextProvider>
-                <MainPageParent />
+                <ChatPageWrapper />
             </MessagesContextProvider>
         </SocketContextProvider>
     )

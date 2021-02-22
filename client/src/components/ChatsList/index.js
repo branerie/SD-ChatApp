@@ -1,7 +1,6 @@
-import { useContext, useRef, useEffect } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../context/MessagesContext'
-import CloseButton from '../MainWindow/ChatWindow/ChatTitle/CloseButton'
 import NewMessageLight from '../Common/NewMessageLight'
 import UserAvatar from '../Common/UserAvatar'
 import StatusLight from '../Common/StatusLight'
@@ -10,13 +9,7 @@ const colors = [styles.red, styles.green, styles.blue, styles.orange]
 
 const ChatsList = ({ isSmallList }) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
-    const prevActive = useRef()
     let colorIndex = 0
-
-    useEffect(() => {
-        let { activeSite, activeGroup, activeChat } = userData
-        prevActive.current = { activeSite, activeGroup, activeChat }
-    })  //TODO: useEffect to check for dependency
 
     function handleClick(e, chat) {
         if (e.target.nodeName === 'BUTTON') return
@@ -95,7 +88,6 @@ const ChatsList = ({ isSmallList }) => {
                                     {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null}
                                     <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
                                 </div>
-                                {/* <CloseButton chat={chat} prevActive={prevActive.current} /> */}
                             </div>
                         )
                     })
