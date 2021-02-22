@@ -12,10 +12,10 @@ const MainPageParent = () => {
     if (!userData) return null
     
     return (
-        <div>
-            <div className={`${theme[userData.personal.theme]} ${styles.container}`}>
-                <LeftSidebar />
-                <ProjectSidebar />
+        <div className={theme[userData.personal.theme]}>
+            <div className={styles.container}>
+                {Object.keys(userData.sites).length > 0 && <LeftSidebar />}
+                {userData.activeSite && <ProjectSidebar />}
                 <MainWindow />
                 <ProfileInfoBox />
             </div>
