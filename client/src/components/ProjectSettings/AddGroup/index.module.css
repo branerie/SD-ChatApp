@@ -13,6 +13,10 @@
     outline: none;
 }
 
+.menu-field {
+	border-bottom: 2px solid black;
+}
+
 .menu-field button {
 	float: right;
 	margin-bottom: 10px;

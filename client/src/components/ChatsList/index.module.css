@@ -43,7 +43,7 @@
 
 .list {
     background-color: var(--bg-color-chat);
-    color: var(--txt-color-chat);
+    color: black;
     display: flex;
     align-items: center;
     cursor: pointer;

@@ -3,6 +3,8 @@ import styles from './index.module.css'
 import SmallButton from '../../Buttons/SmallButton'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
+import MenuInput from '../../MenuInput'
+import MenuButton from '../../Buttons/MenuButton'
 
 const SearchProjects = () => {
     const limit = 5
@@ -76,9 +78,13 @@ const SearchProjects = () => {
         <div className={styles['menu-field']}>
             <h3>Find project</h3>
             <div className={styles['form-control']}>
-                <input className={styles.input} type="text" placeholder='Project name...' onChange={e => changeSearch(e)} />
+                {/* <input className={styles.input} type="text" placeholder='Project name...' onChange={e => changeSearch(e)} /> */}
+                <MenuInput disable={page >= 1} onChange={e => changeSearch(e)} placeholder='Project name...' />
             </div>
-            <button disabled={page >= 1} className={styles['form-btn']} onClick={searchProjects}>Search</button>
+            {/* <button disabled={page >= 1} className={styles['form-btn']} onClick={searchProjects}>Search</button> */}
+            <div className={styles.searchbtn}>
+                <MenuButton title='Search' onClick={searchProjects} disabled={!site} btnType='submit' />
+            </div>
             {error && <p><small>{error}</small></p>}
             {page > 0 &&
                 <ul>

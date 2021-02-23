@@ -51,3 +51,10 @@
 .errors li {
 	padding: 0;
 }
+
+.btn-search {
+	float: right;
+	width: 10%;
+	min-width: 100px;
+	margin-bottom: 10px;
+}

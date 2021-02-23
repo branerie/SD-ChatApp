@@ -1,0 +1,31 @@
+.button {
+    padding: 0.6rem 0.6rem;
+    border: 1px solid black;
+    border-radius: 0.6rem;
+    width: 100%;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.button:disabled {
+    background-color: var(--bg-color-btn-disabled);
+    color: var(--txt-color);
+    cursor: default;
+}
+
+.button:hover:enabled {
+    background-color: var(--bg-color-btn-hover);
+    color: var(--txt-color-hover)
+}
+
+.default {
+    background-color: var(--btn-color);
+}
+
+.cancel {
+    background-color: var(--bg-color-btn-cancel);
+}
+
+.submit {
+    background-color: var(--bg-color-btn-submit);
+}

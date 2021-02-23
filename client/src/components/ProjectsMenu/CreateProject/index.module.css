@@ -4,16 +4,17 @@
 }
 
 .input {
-	font-size: 16px;
+	/* font-size: 16px;
 	padding: 5px;
 	height: 40px;
 	width: 100%;
-	/* border: none; */
+	border: none;
     border-radius: 15px;
-    outline: none;
+    outline: none;  */
+	border: 1px solid black;
 }
 
-.menu-field button {
+.menu-field .createbtn {
 	float: right;
 }
 
@@ -24,4 +25,8 @@
 
 .errors li {
 	padding: 0;
+}
+
+.createbtn {
+	width: 10%;
 }

@@ -1,8 +1,9 @@
 .send-msg-box {
     display: flex;
-    height: 70px;
+    min-height: 70px;
     border-top: 1px solid var(--separator-color);
     align-items: center;
+    background-color: white;
 }
 
 .send-file {

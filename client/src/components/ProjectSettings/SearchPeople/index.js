@@ -4,12 +4,15 @@ import SmallButton from '../../Buttons/SmallButton'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 import UserAvatar from '../../Common/UserAvatar'
+import MenuInput from '../../MenuInput'
+import MenuButton from '../../Buttons/MenuButton'
+
+const LIMIT = 5
 
 const SearchPeople = () => {
     const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
-    const limit = 5
     const [name, setName] = useState()
     const [page, setPage] = useState(0)
     const [names, setNames] = useState([])
@@ -42,11 +45,11 @@ const SearchPeople = () => {
             socket.emit('search-people', { name, page }, (success, data) => {
                 success ? setNames([...names, ...data]) : setError("No more results")
                 setPage(page + 1)
-                setCursor(cursor + limit)
+                setCursor(cursor + LIMIT)
             })
         } else {
             setPage(page + 1)
-            setCursor(cursor + limit)
+            setCursor(cursor + LIMIT)
         }
     }
 
@@ -54,7 +57,7 @@ const SearchPeople = () => {
         setError(false)
         if (page > 1) {
             setPage(page - 1)
-            setCursor(cursor - limit)
+            setCursor(cursor - LIMIT)
         }
     }
 
@@ -75,14 +78,21 @@ const SearchPeople = () => {
     return (
         <div className={styles['menu-field']}>
             <div className={styles['form-control']} >
-                <p>Search for people and send invitations</p>
-                <input
-                    className={styles.input}
-                    type='text'
+                Search for people and send invitations
+                <MenuInput
+                    value={name}
+                    onChange={e => changeSearch(e)}
                     placeholder='Search by username, full name or email...'
-                    onChange={e => changeSearch(e)} />
+                />
             </div>
-            <button disabled={page >= 1} className={styles['form-btn']} onClick={searchPeople}>Search</button>
+            <div className={styles['btn-search']}>
+                <MenuButton
+                    title='Search'
+                    disabled={page >= 1}
+                    onClick={searchPeople}
+                    disabled={!name}
+                />
+            </div>
             {error && <p><small>{error}</small></p>}
             {page > 0 &&
                 <ul>
@@ -92,7 +102,7 @@ const SearchPeople = () => {
                             <button disabled={!!error} onClick={nextPage}>&gt;&gt;</button>
                         </div>
                     }
-                    {names.slice(cursor, cursor + limit).map(name => {
+                    {names.slice(cursor, cursor + LIMIT).map(name => {
                         return (
                             <div key={name._id}>
                                 <li className={styles['list-item']}>
@@ -101,8 +111,8 @@ const SearchPeople = () => {
                                         <span>{name.name}</span>
                                     </div>
                                     <div>
-                                        <SmallButton onClick={() => inviteMember(name.username)} title='Invite'/>
-                                        <SmallButton onClick={() => showMemberInfo(name)} title={showInfo[name._id] ? 'Less' : 'More'}/>
+                                        <SmallButton onClick={() => inviteMember(name.username)} title='Invite' />
+                                        <SmallButton onClick={() => showMemberInfo(name)} title={showInfo[name._id] ? 'Less' : 'More'} />
                                     </div>
                                 </li>
                                 {showInfo[name._id] &&
@@ -118,7 +128,6 @@ const SearchPeople = () => {
 
                 </ul>
             }
-            <hr />
         </div>
     )
 }

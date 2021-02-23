@@ -1,6 +1,6 @@
 .group {
     background-color: var(--bg-color-group);
-    color: var(--txt-color-group);
+    color: black;
     margin: 1px 10px;
     padding: 10px;
     border-radius: 5px;

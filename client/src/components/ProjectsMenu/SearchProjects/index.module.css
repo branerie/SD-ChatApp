@@ -25,7 +25,15 @@
 	margin-left: 5px;
 }
 
+.menu-field .searchbtn {
+	float: right;
+}
+
 .row {
 	display: flex;
 	justify-content: space-between;
+}
+
+.searchbtn {
+	width: 10%;
 }

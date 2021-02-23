@@ -43,17 +43,20 @@ const RegisterMain = () => {
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 label='Username'
+                placeholder='Username...'
             />
             <Input
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 label='Password'
+                placeholder='Password...'
                 type='password'
             />
             <Input
                 value={rePassword}
                 onChange={e => setRePassword(e.target.value)}
                 label='Repeat password'
+                placeholder='Repeat password...'
                 type='password'
             />
             {errors.length > 0 && <Alert alerts={errors} />}

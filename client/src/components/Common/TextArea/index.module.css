@@ -1,17 +1,15 @@
 .text-area {
     border: none;
-    color: var(--txt-color);
     width: 155px;
     outline: none;
     width:100%;
     resize: none;
-    background-color: var(--bg-color);
 }
 
 .text-area::placeholder {
-    color: var(--txt-color);
+    color: black;
     font-style: italic;
-  }
+}
 
 .emoji {
     position: absolute;

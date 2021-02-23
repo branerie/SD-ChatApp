@@ -4,7 +4,8 @@ import StatusLight from '../../Common/StatusLight'
 import UserAvatar from '../../Common/UserAvatar'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
-import infoButton from '../../../images/informationButton.svg'
+
+import { ReactComponent as InfoButton } from '../../../images/informationButton.svg'
 
 const Member = ({ id, name, picturePath, isOnline }) => {
     const { dispatchUserData } = useContext(MessagesContext)
@@ -27,10 +28,9 @@ const Member = ({ id, name, picturePath, isOnline }) => {
                     {name}
                 </div>
             </div>
-            <img 
-                src={infoButton} 
+            <InfoButton 
                 className={styles.info} 
-                alt='Link to user info'
+                alt='Link to user info' 
                 onClick={() => dispatchUserData({ type: 'show-details', id, show: true })}
             />
         </div>

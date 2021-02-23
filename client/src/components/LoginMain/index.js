@@ -40,11 +40,13 @@ const LoginMain = () => {
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 label='Username'
+                placeholder='Username...'
             />
             <Input
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 label='Password'
+                placeholder='Password...'
                 type="password"
             />
             {errors.length > 0 && <Alert alerts={errors} />}

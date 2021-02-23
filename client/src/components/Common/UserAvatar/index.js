@@ -6,7 +6,7 @@ const UserAvatar = ({ picturePath }) => {
     return (
         <div className={styles['avatar']}>
             <img
-                alt=''
+                alt='User Avatar'
                 src={picturePath ? getFaceCroppedImageUrl(picturePath) : emptyProfilePic}
                 className={`${styles['profile-pic']} ${!picturePath && styles['pic-rounded']}`}
             />

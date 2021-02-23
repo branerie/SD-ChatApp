@@ -41,7 +41,7 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    color: var(--txt-color-project);
+    color: black;
     margin: 1px 0;
     padding: 10px;
     cursor: pointer;

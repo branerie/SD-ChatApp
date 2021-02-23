@@ -59,7 +59,7 @@ const TextArea = (props) => {
                 onChange={e => setMsg(replaceEmojis(e.target.value))}
                 onKeyPress={e => getKey(e)}
                 autoFocus
-                maxRows={2}
+                maxRows={3}
             />
             <div onClick={() => setIsVisible(!isVisible)} className={styles['link-emoji']}>
                 <img src={emotIcon} alt=''/>

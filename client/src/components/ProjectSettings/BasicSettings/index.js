@@ -1,6 +1,8 @@
 import { useContext, useState } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../../context/MessagesContext'
+import MenuInput from '../../MenuInput'
+import MenuButton from '../../Buttons/MenuButton'
 
 const BasicSettings = () => {
     const { userData } = useContext(MessagesContext)
@@ -12,21 +14,23 @@ const BasicSettings = () => {
 
     return (
         <div className={styles['menu-field']}>
-            <div className={styles['form-control']} >
-                <label htmlFor="a">Update project description</label>
-                <input
-                    className={styles.input}
-                    type='text'
+            <label className={styles['form-control']}>
+                Update project description
+                <MenuInput
                     value={description}
+                    onChange={e => setDescription(e.target.value)}
                     placeholder='Project description...'
-                    onChange={e => setDescription(e.target.value)} />
+                />
+            </label>
+            <div className={styles.update}>
+                <MenuButton
+                    title='Update'
+                    btnType='submit'
+                    onClick={updateDescription}
+                    disabled={description === userData.sites[userData.activeSite].description}
+                />
             </div>
-            <button
-                className={styles['form-btn']}
-                onClick={updateDescription}
-                disabled={description === userData.sites[userData.activeSite].description}
-            >Update</button>
-            <hr />
+            {/* <hr /> */}
         </div>
     )
 }

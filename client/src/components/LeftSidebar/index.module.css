@@ -10,17 +10,3 @@
 .project-small-list {
     width: 71px;
 }
-
-.info-arrow {
-    min-width: 1rem;
-    max-width: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    margin: 5px 2px;
-}
-
-.arrow-img {
-    width: 100%;
-}

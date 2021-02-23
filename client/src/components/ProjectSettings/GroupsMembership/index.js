@@ -3,6 +3,9 @@ import styles from './index.module.css'
 import { MessagesContext } from "../../../context/MessagesContext"
 import { SocketContext } from "../../../context/SocketContext"
 
+import addArrow from '../../../images/arrowLeft.png'
+import SeparatingLine from "../../SeparatingLine"
+
 const GroupsMembership = () => {
     const { userData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
@@ -29,11 +32,10 @@ const GroupsMembership = () => {
 
     return (
         <div className={styles['form-control']}>
-            <p>Membership</p>
+            <p className={styles.title}>Membership</p>
             <div className={styles.container}>
-                <div className={styles.group}>
-                    <p>Select group:</p>
-                    <hr/>
+                <div className={`${styles.column} ${styles.group}`}>
+                    <p className={styles['column-title']}>Select group:</p>
                     {
                         siteGroups.map(gid => {
                             let { name } = userData.sites[userData.activeSite].groups[gid]
@@ -42,36 +44,40 @@ const GroupsMembership = () => {
                                 <div
                                     key={gid}
                                     onClick={() => loadGroup(gid)}
-                                    className={gid === activeGroup ? styles.selected : undefined}
-                                >{name}</div>
+                                    className={`${styles.name} ${gid === activeGroup && styles.selected}`}
+                                >
+                                    {name}
+                                </div>
                             )
                         })
                     }
                 </div>
-                <div>
-                    <p>Group members:</p>
-                    <hr/>
+                <div className={styles.column}>
+                    <p className={styles['column-title']}>Group members:</p>
                     {activeGroup &&
                         groupMembers.map(m => {
                             if (m === userData.personal._id) return null
                             return (
                                 <div
                                     key={m}
-                                    onClick={() => { }}
-                                >{userData.associatedUsers[m].name}</div>
+                                    className={styles.name}
+                                >
+                                    {userData.associatedUsers[m].name}
+                                </div>
                             )
                         })
                     }
                 </div>
-                <div>
-                    <p>Rest members:</p>
-                    <hr/>
+                <div className={styles.column}>
+                    <p className={styles['column-title']}>Other members:</p>
                     {activeGroup &&
                         restMembers.map(m => {
                             if (m === userData.personal._id) return null
                             return (
-                                <div key={m} className={styles['add-member']}>
-                                    <button onClick={() => addMember(m)}>&lt;&lt;</button>
+                                <div key={m} className={`${styles.name} ${styles['add-member']}`}>
+                                    <button onClick={() => addMember(m)} className={styles['add-btn']}>
+                                        <img src={addArrow} className={styles.arrow} />
+                                    </button>
                                     <div>{userData.associatedUsers[m].name}</div>
                                 </div>
                             )
@@ -79,7 +85,6 @@ const GroupsMembership = () => {
                     }
                 </div>
             </div>
-            <hr/>
         </div>
     )
 }
