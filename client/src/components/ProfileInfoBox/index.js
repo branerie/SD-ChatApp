@@ -1,4 +1,4 @@
-import { useContext, useMemo } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { MessagesContext } from '../../context/MessagesContext'
 import styles from './index.module.css'
 import ProfilePic from './ProfilePic'
@@ -9,20 +9,24 @@ import PersonalInfoBox from './PersonalInfoBox'
 
 import expandArrow from '../../images/arrowLeft.png'
 import shrinkArrow from '../../images/arrowRight.png'
+import { SocketContext } from '../../context/SocketContext'
 
 const ProfileInfoBox = () => {
+    const [userDetails, setUserDetails] = useState(null)
     const { userData, dispatchUserData } = useContext(MessagesContext)
+    const { socket } = useContext(SocketContext)
 
-    const [data, isShown] = useMemo(() => {
-        if (userData.details && userData.details.id) {
-            const userToShow = userData.associatedUsers[userData.details.id]
-            return [userToShow, userData.details.isShown]
-        }
+    useEffect(() => {
+        if (!userData.details) return
 
-        return [null, null]
-    }, [userData.details, userData.associatedUsers])
+        socket.emit('get-user-details', userData.details.id, (details) => {
+            setUserDetails(details)
+        })
+    }, [socket, userData.details])
 
-    if (!data) return null
+    if (!userData.details) return null
+
+    const isShown = userData.details && userData.details.isShown
 
     const toggleInfo = () => {
         userData.activeChat === userData.details.id 
@@ -41,19 +45,19 @@ const ProfileInfoBox = () => {
             </div>
             { isShown &&
                 <div className={styles['profile-info-box']}>
-                    <ProfilePic picturePath={data.picture} />
+                    <ProfilePic picturePath={userDetails.picture} />
                     <div className={styles['text-container']}>
                         <Name 
-                            isOnline={data.online} 
-                            name={data.name} 
-                            position={data.position} 
+                            isOnline={userData.associatedUsers[userData.details.id].online} 
+                            name={userDetails.name} 
+                            position={userDetails.position} 
                         />
                         <SocialMediaBox />
-                        <SendMsgButtonsBox userId={data.userId} name={data.name} />
+                        <SendMsgButtonsBox userId={userDetails.userId} name={userDetails.name} />
                         <PersonalInfoBox
-                            username={data.username}
-                            email={data.email}
-                            company={data.company}
+                            username={userDetails.username}
+                            email={userDetails.email}
+                            company={userDetails.company}
                         />
                     </div>
                 </div>
