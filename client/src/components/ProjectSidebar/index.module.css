@@ -1,10 +1,11 @@
 .container {
     display: flex; 
     flex-direction: column;
-    flex-basis: 225px;
-    flex-grow: 0;
-    flex-shrink: 0;
+    width: 225px;
     overflow-y: auto;
     scrollbar-width: none;
-    padding-top: 10px;
 }
+
+.container::-webkit-scrollbar {
+    display: none;
+  }

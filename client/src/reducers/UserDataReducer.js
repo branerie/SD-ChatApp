@@ -124,9 +124,9 @@ export default function UserDataReducer(userData, action) {
                         unread: false
                     }
                 },
-                activeSite: false,
-                activeGroup: false,
-                activeChat: id,
+                // activeSite: false,
+                // activeGroup: false,
+                // activeChat: id,
                 details: { id: id, isShown: false },
                 activeMenu: false
             }

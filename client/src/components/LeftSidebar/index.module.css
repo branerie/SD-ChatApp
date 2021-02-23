@@ -1,26 +1,23 @@
-.projects-list {
-    width: 225px;
-    height: 100%;
+.container {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    padding-top: 10px;
 }
 
-.project-small-list {
-    width: 71px;
+.expand {
+    min-width: 225px;
 }
 
-.info-arrow {
+.shrink {
+    min-width: 75px;
+}
+
+.arrow {
     min-width: 1rem;
     max-width: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     cursor: pointer;
     margin: 5px 2px;
 }
 
-.arrow-img {
+.img {
     width: 100%;
 }

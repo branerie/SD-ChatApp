@@ -1,11 +1,6 @@
 .container {
     display: flex;
-    box-sizing: border-box;
     flex-direction: column;
-    width: 100%;
-    padding-top: 10px;
-    flex-grow: 20;
-    min-height: 55vh;
 }
 
 .chats-container::-webkit-scrollbar {
