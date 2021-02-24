@@ -43,16 +43,17 @@ const AddGroup = () => {
             </div>
             <MenuButton 
                 title='Add &amp; Open'
+                btnSize='medium'
                 onClick={() => addGroup(true)}
                 disabled={isDisabled}
-                style={{ width: '10%', minWidth: '110px', marginLeft: '0.5rem' }}
+                style={{ marginLeft: '0.5rem' }}
             />
             <MenuButton 
                 title='Add'
                 btnType='submit'
+                btnSize='small'
                 onClick={() => addGroup(false)}
                 disabled={isDisabled}
-                style={{ width: '10%', minWidth: '80px' }}
             />
             {errors.length > 0 &&
                 <ul className={styles.errors}>

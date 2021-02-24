@@ -32,8 +32,19 @@
 .row {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
+	margin: 10px 0;
 }
 
-.searchbtn {
-	width: 10%;
+.nav-buttons {
+	display: flex;
+	margin: 0.5rem 0;
+}
+
+.results {
+	padding: 5px 0;
+}
+
+.buttons { 
+	display: flex;
 }

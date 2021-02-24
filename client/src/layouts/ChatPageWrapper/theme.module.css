@@ -1,7 +1,7 @@
 .light {
     --bg-color: whitesmoke;
     --txt-color: black;
-    --txt-color-hover: #707070;
+    --txt-color-hover: whitesmoke;
     --bg-color-sel: #c0c0c0;
     --bg-color-hover: #c0c0c0;
     --bg-color-separator: #c0c0c0;

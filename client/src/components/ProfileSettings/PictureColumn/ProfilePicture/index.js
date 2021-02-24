@@ -54,7 +54,7 @@ const ProfilePicture = () => {
             >
                 Change Picture
             </button> */}
-            <MenuButton title='Change Picture' onClick={showWidget} />
+            <MenuButton title='Change Picture' onClick={showWidget} btnSize='full' />
         </div>
     )
 }

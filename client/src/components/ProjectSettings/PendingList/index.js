@@ -1,6 +1,5 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
-import SmallButton from '../../Buttons/SmallButton'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 import StatusLight from '../../Common/StatusLight'
@@ -46,7 +45,7 @@ const PendingList = () => {
                             <div key={user} className={styles.row}>
                                 <li className={styles['list-item']}>
                                     <div className={styles.card}>
-                                        <StatusLight isOnline={userData.associatedUsers[user].online} size='small' />
+                                        {/* <StatusLight isOnline={userData.associatedUsers[user].online} size='small' /> */}
                                         <UserAvatar picturePath={userData.associatedUsers[user].picture} />
                                         <span className={styles.name}>{userData.associatedUsers[user].name}</span>
                                     </div>
@@ -54,13 +53,14 @@ const PendingList = () => {
                                         <MenuButton 
                                             onClick={() => showInfo(user)} 
                                             title='Info'
-                                            style={{ minWidth: '60px' }}
+                                            btnSize='small'
                                         />
                                         <MenuButton 
                                             onClick={() => cancelInvitation(user)} 
                                             title='Cancel'
                                             btnType='cancel'
-                                            style={{ minWidth: '100px', marginLeft: '0.5rem' }} 
+                                            btnSize='medium'
+                                            style={{ marginLeft: '0.5rem' }} 
                                         />
                                     </div>
                                 </li>
@@ -79,17 +79,33 @@ const PendingList = () => {
                 <ul><span>Requests</span>
                     {userData.sites[userData.activeSite].requests.map(user => {
                         return (
-                            <div key={user}>
+                            <div key={user} className={styles.row}>
                                 <li className={styles['list-item']}>
                                     <div className={styles.card}>
-                                        <StatusLight isOnline={userData.associatedUsers[user].online} size='small' />
+                                        {/* <StatusLight isOnline={userData.associatedUsers[user].online} size='small' /> */}
                                         <UserAvatar picturePath={userData.associatedUsers[user].picture} />
                                         <span className={styles.name}>{userData.associatedUsers[user].name}</span>
                                     </div>
-                                    <div>
-                                        <SmallButton onClick={() => showInfo(user)} title='Info' />
-                                        <SmallButton onClick={() => acceptRequest(user)} title='Accept' />
-                                        <SmallButton onClick={() => rejectRequest(user)} title='Reject' />
+                                    <div className={styles.buttons}>
+                                        <MenuButton 
+                                            onClick={() => acceptRequest(user)} 
+                                            title='Accept'
+                                            btnType='submit'
+                                            btnSize='medium'
+                                        />
+                                        <MenuButton 
+                                            onClick={() => rejectRequest(user)} 
+                                            title='Reject'
+                                            btnType='cancel'
+                                            btnSize='medium'
+                                            style={{ marginLeft: '0.5rem' }} 
+                                        />
+                                        <MenuButton 
+                                            onClick={() => showInfo(user)} 
+                                            title='Info' 
+                                            btnSize='medium'
+                                            style={{ marginLeft: '0.5rem' }}
+                                        />
                                     </div>
                                 </li>
                                 {userData.associatedUsers[user].info && <span>({userData.associatedUsers[user].username})</span>}

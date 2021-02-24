@@ -14,17 +14,19 @@
     outline: none;
 }
 
-.menu-field button {
-	float: right;
+.menu-field {
+	padding: 0 30px;
 	margin-bottom: 10px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+
+.menu-field button {
+	/* float: right; */
+	/* margin-bottom: 10px; */
 }
 
 .menu-field hr {
 	clear: right;
-}
-
-.update {
-	float: right;
-	width: 10%;
-	min-width: 100px;
 }

@@ -1,5 +1,4 @@
 import styles from './index.module.css'
-import SmallButton from '../../Buttons/SmallButton'
 import { useContext } from 'react'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
@@ -46,7 +45,7 @@ const PendingProjects = () => {
                 <div>
                     <h3>Invitations</h3>
                     <small>A list of projects you have been invited to join</small><br />
-                    <small>You must accept invitation to become part of the project</small>
+                    <small>You must accept an invitation to become part of the project</small>
                     <ul className={styles.invitations}>
                         {userData.invitations.map(site => {
                             return (
@@ -81,16 +80,25 @@ const PendingProjects = () => {
             {userData.requests && userData.requests.length > 0 && (
                 <div>
                     <h3>Requests</h3>
-                    <small>A list of projects you have sent request to join</small><br />
-                    <small>Project administator must accept your request to become a member</small>
+                    <small>A list of projects for which you have sent a request to join</small><br />
+                    <small>Project administrator must accept your request for you to become a member</small>
                     <ul>
                         {userData.requests.map(site => {
                             return (
                                 <li className={styles.row} key={site._id}>
                                     <span>{site.name}</span>
-                                    <div>
-                                        <SmallButton onClick={() => cancelRequest(site._id)} title='Cancel' />
-                                        <SmallButton onClick={() => showRequestInfo(site._id)} title='Info' />
+                                    <div className={styles.buttons}>
+                                        <MenuButton 
+                                            onClick={() => showRequestInfo(site._id)} 
+                                            title='Info'
+                                            style={{ minWidth: '60px' }}
+                                        />
+                                        <MenuButton 
+                                            onClick={() => cancelRequest(site._id)} 
+                                            title='Cancel'
+                                            btnType='cancel'
+                                            style={{ minWidth: '100px', marginLeft: '0.5rem' }} 
+                                        />
                                     </div>
                                 </li>
                             )

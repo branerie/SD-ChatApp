@@ -47,9 +47,14 @@ const CreateProject = () => {
                 />
             </div>
             {/* <button onClick={createSite}>Create</button> */}
-            <div className={styles.createbtn}>
-                <MenuButton title='Create' onClick={createSite} disabled={!site} btnType='submit' />
-            </div>
+            <MenuButton 
+                title='Create' 
+                onClick={createSite} 
+                disabled={!site} 
+                btnType='submit'
+                btnSize='medium'
+                style={{ float: 'right' }}
+            />
             {errors.length > 0 &&
                 <ul className={styles.errors}>
                     {errors.map((error, index) => {

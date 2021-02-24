@@ -24,7 +24,7 @@ const ProfileInfoBox = () => {
         })
     }, [socket, userData.details])
 
-    if (!userData.details) return null
+    if (!userData.details || !userDetails) return null
 
     const isShown = userData.details && userData.details.isShown
 

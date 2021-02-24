@@ -5,6 +5,7 @@ import { SocketContext } from "../../../context/SocketContext"
 
 import addArrow from '../../../images/arrowLeft.png'
 import SeparatingLine from "../../SeparatingLine"
+import UserAvatar from "../../Common/UserAvatar"
 
 const GroupsMembership = () => {
     const { userData } = useContext(MessagesContext)
@@ -30,7 +31,10 @@ const GroupsMembership = () => {
         })
     }
 
+    if (siteGroups.length < 2) return null
+
     return (
+        <>
         <div className={styles['form-control']}>
             <p className={styles.title}>Membership</p>
             <div className={styles.container}>
@@ -76,9 +80,14 @@ const GroupsMembership = () => {
                             return (
                                 <div key={m} className={`${styles.name} ${styles['add-member']}`}>
                                     <button onClick={() => addMember(m)} className={styles['add-btn']}>
-                                        <img src={addArrow} className={styles.arrow} />
+                                        <img alt='Add Link' src={addArrow} className={styles.arrow} />
+                                        <span className={styles.member}>
+                                            <UserAvatar picturePath={userData.associatedUsers[m].picture} />
+                                            <span style={{ marginLeft: '5px' }}>
+                                                {userData.associatedUsers[m].name}
+                                            </span>
+                                        </span>
                                     </button>
-                                    <div>{userData.associatedUsers[m].name}</div>
                                 </div>
                             )
                         })
@@ -86,6 +95,8 @@ const GroupsMembership = () => {
                 </div>
             </div>
         </div>
+        <SeparatingLine horizontal={true} />
+        </>
     )
 }
 

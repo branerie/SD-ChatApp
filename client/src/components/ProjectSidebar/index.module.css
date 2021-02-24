@@ -1,14 +1,15 @@
 .container {
     display: flex;
-    flex-basis: 225px;
+    min-width: 200px;
+    max-width: 265px;
+    /* flex-basis: 225px; */
 }
 
 .inner {
     display: flex; 
     flex-direction: column;
+    flex-grow: 1;
     overflow-y: auto;
     scrollbar-width: none;
     padding-top: 10px;
-    flex-grow: 1;
-    flex-shrink: 0;
 }

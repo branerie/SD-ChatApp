@@ -59,17 +59,18 @@ const PersonalSettingsColumn = () => {
                 <div className={styles.buttons}>
                     <MenuButton
                         btnType='default'
+                        btnSize='medium'
                         title='Revert'
                         onClick={() => setData(initState)}
                         disabled={!isModified}
-                        style={{ width: '10%', minWidth: '100px' }}
                     />
                     <MenuButton
                         btnType='submit'
+                        btnSize='large'
                         title='Save Changes'
                         onClick={updateProfile}
                         disabled={!isModified}
-                        style={{ width: '15%', minWidth: '120px', marginLeft: '0.5rem' }}
+                        style={{ marginLeft: '0.5rem' }}
                         isSubmit={true}
                     />
                 </div>

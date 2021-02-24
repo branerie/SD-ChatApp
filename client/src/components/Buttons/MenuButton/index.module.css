@@ -29,3 +29,22 @@
 .submit {
     background-color: var(--bg-color-btn-submit);
 }
+
+.small {
+    min-width: 60px;
+    max-width: 80px;
+}
+
+.medium {
+    min-width: 80px;
+    max-width: 100px;
+}
+
+.large {
+    min-width: 100px;
+    max-width: 125px;
+}
+
+.full {
+    width: 100%;
+}

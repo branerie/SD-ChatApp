@@ -34,6 +34,10 @@
 .info {
     max-width: 1.2rem;
     margin-right: 10px;
-    fill: var(--bg-color-separator);
+    fill: black;
+}
+
+.info:hover {
+    fill: var(--txt-color-hover)
 }
 

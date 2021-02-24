@@ -3,6 +3,7 @@ import styles from './index.module.css'
 import { MessagesContext } from '../../../context/MessagesContext'
 import MenuInput from '../../MenuInput'
 import MenuButton from '../../Buttons/MenuButton'
+import SeparatingLine from '../../SeparatingLine'
 
 const BasicSettings = () => {
     const { userData } = useContext(MessagesContext)
@@ -13,6 +14,7 @@ const BasicSettings = () => {
     }
 
     return (
+        <>
         <div className={styles['menu-field']}>
             <label className={styles['form-control']}>
                 Update project description
@@ -22,16 +24,16 @@ const BasicSettings = () => {
                     placeholder='Project description...'
                 />
             </label>
-            <div className={styles.update}>
-                <MenuButton
-                    title='Update'
-                    btnType='submit'
-                    onClick={updateDescription}
-                    disabled={description === userData.sites[userData.activeSite].description}
-                />
-            </div>
-            {/* <hr /> */}
+            <MenuButton
+                title='Update'
+                btnType='submit'
+                btnSize='small'
+                onClick={updateDescription}
+                disabled={description === userData.sites[userData.activeSite].description}
+            />
         </div>
+        <SeparatingLine horizontal={true} />
+        </>
     )
 }
 
