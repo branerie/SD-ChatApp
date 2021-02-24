@@ -127,7 +127,7 @@ const createUserData = (userData, messagePool) => {
         }
     })
 
-    return { clientData, siteCache }
+    return clientData
 }
 
 module.exports = createUserData

@@ -16,13 +16,13 @@ const registerUser = async (username, password) => {
 }
 
 const loginUser = async (username) => {
-        const userObject = await User.findOne({ username })
-        return userObject
+    const userObject = await User.findOne({ username })
+    return userObject
 }
 
 const verifyUser = async (id) => {
-        const user = await User.findById(id)
-        return user
+    const user = await User.findById(id)
+    return user
 }
 
 const getUserData = async (id) => {
@@ -413,7 +413,8 @@ const searchPeople = async (pattern, page) => {
 
 const updateProfileData = async (uid, data) => {
     const newData = await User.findByIdAndUpdate(uid, data, { new: true })
-    return newData
+    // console.log(newData);
+    return { name: newData.name, username: newData.username, picture: newData.picture }
 }
 
 const getUserDetails = async (uid) => {
