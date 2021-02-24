@@ -10,14 +10,3 @@
 .shrink {
     min-width: 75px;
 }
-
-.arrow {
-    min-width: 1rem;
-    max-width: 1rem;
-    cursor: pointer;
-    margin: 5px 2px;
-}
-
-.img {
-    width: 100%;
-}

@@ -2,11 +2,8 @@ import { useContext } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../context/MessagesContext'
 
-const colors = [styles.red, styles.green, styles.blue, styles.orange]
-
 const ProjectsList = ({ isSmallList }) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
-    let colorIndex = 0
 
     function handleClick(e, site) {
         if (e.target.nodeName === 'BUTTON') return
@@ -30,28 +27,19 @@ const ProjectsList = ({ isSmallList }) => {
     }
 
     function addClasses(site) {
-        const classList = [styles.list]
-        if (site[0] === userData.activeSite) classList.push(styles.selected)
-        if (site[1].creator === userData.personal._id) classList.push(styles.owner)
-        if (classList.length === 1) {
-            const currentColorIndex = colorIndex % colors.length
-            const currentColor = colors[currentColorIndex]
-            classList.push(currentColor)
-        }
-
-        classList.push(isSmallList ? styles['small-list'] : styles['large-list'])
-
-        colorIndex++
-
+        const classList = [styles.project]
+        classList.push(site[1].creator === userData.personal._id ?  styles.owner : styles.guest)
+        classList.push(isSmallList ? styles.small : styles.large)
+        site[0] === userData.activeSite && classList.push(styles.selected)
         return classList.join(' ')
     }
 
     return (
-        <div className={`${styles['project-box']} ${isSmallList ? styles['project-box-sm'] : styles['project-box-lg']}`}>
-            <div className={styles['project-title']}>Projects</div>
+        <div className={`${styles.container} ${isSmallList ? styles.shrink : styles.expand}`}>
+            <div className={styles.title}>Projects</div>
             { isSmallList
                 ?
-                <div className={styles['project-container']}>
+                <div className={styles.list}>
                     {sites.map(site => {
                         return (
                             <div
@@ -64,7 +52,7 @@ const ProjectsList = ({ isSmallList }) => {
                     })}
                 </div>
                 :
-                <div className={styles['project-container']}>
+                <div className={styles.list}>
                     {sites.map(site => {
                         return (
                             <div
