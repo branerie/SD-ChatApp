@@ -17,6 +17,10 @@
 	float: right;
 }
 
+.menu-field {
+	padding: 0 30px;
+}
+
 .menu-field ul {
 	clear: right;
 }
@@ -28,10 +32,10 @@
 
 .list-item {
 	display: flex;
-	margin-top: 5px;
-	height: 32px;
 	justify-content: space-between;
-	align-items: baseline;
+	align-items: center;
+	margin-top: 5px;
+	margin-bottom: 10px;	
 }
 
 .card { 
@@ -50,4 +54,16 @@
 
 .errors li {
 	padding: 0;
+}
+
+.btn-search {
+	float: right;
+}
+
+.nav-buttons {
+	margin-bottom: 0.5rem;
+}
+
+.buttons {
+	display: flex;
 }

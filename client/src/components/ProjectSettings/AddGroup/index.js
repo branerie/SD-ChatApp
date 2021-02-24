@@ -1,13 +1,23 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useMemo } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from "../../../context/MessagesContext"
 import { SocketContext } from "../../../context/SocketContext"
+import MenuInput from '../../MenuInput'
+import MenuButton from '../../Buttons/MenuButton'
 
 const AddGroup = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
     const [group, setGroup] = useState()
     const [errors, setErrors] = useState([])
+
+    const currentGroups = useMemo(() => {
+        return Object.values(userData.sites[userData.activeSite].groups).map(g => g.name)
+    }, [userData.sites])
+
+    const isDisabled = useMemo(() => {
+        return !group || currentGroups.includes(group)
+    }, [group, currentGroups])
 
     function addGroup(open) {
         let site = userData.activeSite
@@ -25,15 +35,26 @@ const AddGroup = () => {
         <div className={styles['menu-field']}>
             <div className={styles['form-control']} >
                 <p>Add new group</p>
-                <input
-                    className={styles.input}
-                    type='text'
-                    placeholder='Group name...'
+                <MenuInput
+                    value={group} 
                     onChange={e => setGroup(e.target.value)}
+                    placeholder='Group name...'
                 />
             </div>
-            <button onClick={() => addGroup(false)}>Add</button>
-            <button onClick={() => addGroup(true)}>Add &amp; Open</button>
+            <MenuButton 
+                title='Add &amp; Open'
+                btnSize='medium'
+                onClick={() => addGroup(true)}
+                disabled={isDisabled}
+                style={{ marginLeft: '0.5rem' }}
+            />
+            <MenuButton 
+                title='Add'
+                btnType='submit'
+                btnSize='small'
+                onClick={() => addGroup(false)}
+                disabled={isDisabled}
+            />
             {errors.length > 0 &&
                 <ul className={styles.errors}>
                     {errors.map((error, index) => {
@@ -41,7 +62,6 @@ const AddGroup = () => {
                     })}
                 </ul>
             }
-            <hr />
         </div>
     )
 }

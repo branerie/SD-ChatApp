@@ -1,9 +1,7 @@
 .list-item {
 	display: flex;
-	margin-top: 5px;
-	height: 32px;
 	justify-content: space-between;
-	align-items: baseline;
+	align-items: center;
 }
 
 .card { 
@@ -13,4 +11,22 @@
 
 .name {
 	margin-left: 15px;
+}
+
+.buttons {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.info {
+	display: inline-block;
+	margin-top: 8px;
+}
+
+.row {
+	margin: 10px 0;
+}
+
+.pending {
+	padding: 10px 30px;
 }

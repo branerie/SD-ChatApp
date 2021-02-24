@@ -25,7 +25,26 @@
 	margin-left: 5px;
 }
 
+.menu-field .searchbtn {
+	float: right;
+}
+
 .row {
 	display: flex;
 	justify-content: space-between;
+	align-items: center;
+	margin: 10px 0;
+}
+
+.nav-buttons {
+	display: flex;
+	margin: 0.5rem 0;
+}
+
+.results {
+	padding: 5px 0;
+}
+
+.buttons { 
+	display: flex;
 }

@@ -1,10 +1,10 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
-import SmallButton from '../../Buttons/SmallButton'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 import StatusLight from '../../Common/StatusLight'
 import UserAvatar from '../../Common/UserAvatar'
+import MenuButton from '../../Buttons/MenuButton'
 
 const PendingList = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
@@ -32,26 +32,43 @@ const PendingList = () => {
         dispatchUserData({ type: 'show-info', payload: { user } })
     }
 
+    const hasInvitations = userData.sites[userData.activeSite].invitations && 
+                           userData.sites[userData.activeSite].invitations.length > 0
+
     return (
-        <div>
+        <div className={styles.pending}>
             <p>Pending</p>
-            {userData.sites[userData.activeSite].invitations && userData.sites[userData.activeSite].invitations.length > 0 && (
+            {hasInvitations && (
                 <ul><span>Invitations</span>
                     {userData.sites[userData.activeSite].invitations.map(user => {
                         return (
-                            <div key={user}>
+                            <div key={user} className={styles.row}>
                                 <li className={styles['list-item']}>
                                     <div className={styles.card}>
-                                        <StatusLight isOnline={userData.associatedUsers[user].online} size='small' />
+                                        {/* <StatusLight isOnline={userData.associatedUsers[user].online} size='small' /> */}
                                         <UserAvatar picturePath={userData.associatedUsers[user].picture} />
                                         <span className={styles.name}>{userData.associatedUsers[user].name}</span>
                                     </div>
-                                    <div>
-                                        <SmallButton onClick={() => showInfo(user)} title='Info' />
-                                        <SmallButton onClick={() => cancelInvitation(user)} title='Cancel' />
+                                    <div className={styles.buttons}>
+                                        <MenuButton 
+                                            onClick={() => showInfo(user)} 
+                                            title='Info'
+                                            btnSize='small'
+                                        />
+                                        <MenuButton 
+                                            onClick={() => cancelInvitation(user)} 
+                                            title='Cancel'
+                                            btnType='cancel'
+                                            btnSize='medium'
+                                            style={{ marginLeft: '0.5rem' }} 
+                                        />
                                     </div>
                                 </li>
-                                {userData.associatedUsers[user].info && <span>({userData.associatedUsers[user].username})</span>}
+                                {userData.associatedUsers[user].info &&
+                                    <span className={styles.info}>
+                                        ({userData.associatedUsers[user].username})
+                                    </span>
+                                }
                             </div>
                         )
                     })}
@@ -62,17 +79,33 @@ const PendingList = () => {
                 <ul><span>Requests</span>
                     {userData.sites[userData.activeSite].requests.map(user => {
                         return (
-                            <div key={user}>
+                            <div key={user} className={styles.row}>
                                 <li className={styles['list-item']}>
                                     <div className={styles.card}>
-                                        <StatusLight isOnline={userData.associatedUsers[user].online} size='small' />
+                                        {/* <StatusLight isOnline={userData.associatedUsers[user].online} size='small' /> */}
                                         <UserAvatar picturePath={userData.associatedUsers[user].picture} />
                                         <span className={styles.name}>{userData.associatedUsers[user].name}</span>
                                     </div>
-                                    <div>
-                                        <SmallButton onClick={() => showInfo(user)} title='Info' />
-                                        <SmallButton onClick={() => acceptRequest(user)} title='Accept' />
-                                        <SmallButton onClick={() => rejectRequest(user)} title='Reject' />
+                                    <div className={styles.buttons}>
+                                        <MenuButton 
+                                            onClick={() => acceptRequest(user)} 
+                                            title='Accept'
+                                            btnType='submit'
+                                            btnSize='medium'
+                                        />
+                                        <MenuButton 
+                                            onClick={() => rejectRequest(user)} 
+                                            title='Reject'
+                                            btnType='cancel'
+                                            btnSize='medium'
+                                            style={{ marginLeft: '0.5rem' }} 
+                                        />
+                                        <MenuButton 
+                                            onClick={() => showInfo(user)} 
+                                            title='Info' 
+                                            btnSize='medium'
+                                            style={{ marginLeft: '0.5rem' }}
+                                        />
                                     </div>
                                 </li>
                                 {userData.associatedUsers[user].info && <span>({userData.associatedUsers[user].username})</span>}
@@ -81,7 +114,6 @@ const PendingList = () => {
                     })}
                 </ul>
             )}
-
         </div>
     )
 }

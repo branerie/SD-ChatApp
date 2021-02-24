@@ -1,14 +1,20 @@
 import React from 'react'
 import styles from './index.module.css'
 
-const Input = ({ label, value, onChange, type }) => {
+const Input = ({ label, value, onChange, type, placeholder }) => {
 
     return (
         <div className={styles['form-control']}>
             <label>
                 {label}
                 <div>
-                    <input type={type || 'text'} className={styles.input} value={value} onChange={onChange} placeholder={`${label}...`}/>
+                    <input 
+                        type={type || 'text'}
+                        className={styles.input} 
+                        value={value} 
+                        onChange={onChange} 
+                        placeholder={placeholder}
+                    />
                 </div>
             </label>
         </div>

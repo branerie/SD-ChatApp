@@ -525,7 +525,7 @@ module.exports = io => {
 
         socket.on('get-user-details', async (userId, callback) => {
             const userDetails = await db.getUserDetails(userId)
-            callback(true, userDetails)
+            callback(userDetails)
         })
 
         socket.on('change-theme', async theme => {

@@ -11,6 +11,11 @@ const replaceEmojis = (text) => {
                .replace('<3', '\u{1f497}')
 }
 
+const capitalizeFirstLetter = (text) => {
+    return `${text[0].toUpperCase()}${text.slice(1)}`
+}
+
 export {
+    capitalizeFirstLetter,
     replaceEmojis
 }

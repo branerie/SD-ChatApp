@@ -26,7 +26,7 @@
 .name {
     margin-left: 10px;
     font-size: 16px;
-    color: var(--txt-color-chat);
+    color: black;
     display: flex;
     align-items: center;
 }
@@ -34,5 +34,10 @@
 .info {
     max-width: 1.2rem;
     margin-right: 10px;
+    fill: black;
+}
+
+.info:hover {
+    fill: var(--txt-color-hover)
 }
 

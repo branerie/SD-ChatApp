@@ -1,0 +1,18 @@
+.checkbox {
+    width: 20px;
+    height: 20px;
+    border: 1px solid black;
+    border-radius: 50%;
+    margin: 0 5px;
+}
+
+.select {
+    margin: 10px 0;
+}
+
+.title {
+    color: var(--txt-color);
+    margin-top: 10px;
+    font-size: 18px;
+    text-decoration: underline;
+}

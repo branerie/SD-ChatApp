@@ -5,10 +5,12 @@ import Input from '../../../Common/Input'
 import FavIcon from './FavIcon'
 import NotificationIcon from './NotificationIcon'
 import CloseButton from './CloseButton'
+import SeparatingLine from '../../../SeparatingLine'
 
 const ChatTitle = ({ title, privChat }) => {
 
     return (
+        <>
         <div className={styles.container}>
             <div>
                 <FavIcon />
@@ -32,6 +34,8 @@ const ChatTitle = ({ title, privChat }) => {
                 </div>
             }
         </div>
+        <SeparatingLine horizontal={true} />
+        </>
     )
 }
 

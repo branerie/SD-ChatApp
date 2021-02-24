@@ -1,20 +1,18 @@
 .section {
 	margin: 10px 0px;
+	padding: 0 30px;
 	width: 100%;
 }
 .container {
 	display: flex;
 	justify-content: space-between;
+	align-items: stretch;
 	margin-bottom: 10px;
 }
 
 .addmember {
 	display: flex;
-}
-
-.addmember button {
-	height: 18px;
-	font-size: 8px;
+	align-items: center;
 }
 
 .group div {
@@ -22,5 +20,59 @@
 }
 
 .selected {
-	color: var(--bg-color-sel);
+	background-color: var(--bg-color-hover);
+}
+
+.name {
+	margin: 8px 5px 8px 0;
+	padding: 3px 0;
+	border-top: 1px solid transparent;
+	border-bottom: 1px solid transparent;
+}
+
+.group > .name:hover {
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+.title {
+	margin-bottom: 10px;
+	font-weight: bold;
+}
+
+.arrow {
+	width: 20px;
+	height: 20px;
+	padding: 2px;
+}
+
+.add-btn {
+	width: 100%;
+	margin-right: 6px;
+	padding: 5px 8px;
+	background-color: var(--btn-color);
+	border: 1px solid black;
+	border-radius: 0.5rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+}
+
+.add-btn:hover {
+	background-color: var(--bg-color-hover);
+}
+
+.column {
+	flex-grow: 1;
+}
+
+.column-title {
+	border-bottom: 2px solid black;
+}
+
+.member {
+	display: flex;
+	align-items: center;
+	font-family: "Balsamiq Sans", cursive;
+	font-size: 1rem;
 }

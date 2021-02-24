@@ -6,10 +6,9 @@ import GroupsMembership from './GroupsMembership'
 import PendingList from './PendingList'
 
 const ProjectSettings = () => {
-
     return (
         <div className={styles.menu}>
-            <h3>Project Settings</h3>
+            <h3 className={styles.title}>Project Settings</h3>
             <BasicSettings />
             <AddGroup />
             <SearchPeople />

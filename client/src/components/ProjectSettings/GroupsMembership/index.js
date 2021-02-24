@@ -1,7 +1,11 @@
 import { useState, useContext } from "react"
-import css from './index.module.css'
+import styles from './index.module.css'
 import { MessagesContext } from "../../../context/MessagesContext"
 import { SocketContext } from "../../../context/SocketContext"
+
+import addArrow from '../../../images/arrowLeft.png'
+import SeparatingLine from "../../SeparatingLine"
+import UserAvatar from "../../Common/UserAvatar"
 
 const GroupsMembership = () => {
     const { userData } = useContext(MessagesContext)
@@ -30,56 +34,72 @@ const GroupsMembership = () => {
         })
     }
 
+    if (siteGroups.length < 2) return null
+
     return (
-        <div className={css.section}>
-            <p>Membership</p>
-            <div className={css.container}>
-                <div className={css.group}>
-                    <p>Select group:</p>
-                    <hr />
-                    {groups.map(([gid, group]) => {
-                        if (group.name === 'General') return null // sort of continue in map
-                        return (
-                            <div
-                                key={gid}
-                                onClick={() => loadGroup(gid)}
-                                className={gid === activeGroup ? css.selected : undefined}
-                            >{group.name}</div>
-                        )
-                    })
+        <>
+        <div className={styles.section}>
+            <p className={styles.title}>Membership</p>
+            <div className={styles.container}>
+                <div className={`${styles.column} ${styles.group}`}>
+                    <p className={styles['column-title']}>Select group:</p>
+                    {
+                        siteGroups.map(gid => {
+                            let { name } = userData.sites[userData.activeSite].groups[gid]
+                            if (name === 'General') return null
+                            return (
+                                <div
+                                    key={gid}
+                                    onClick={() => loadGroup(gid)}
+                                    className={`${styles.name} ${gid === activeGroup && styles.selected}`}
+                                >
+                                    {name}
+                                </div>
+                            )
+                        })
                     }
                 </div>
-                <div>
-                    <p>Group members:</p>
-                    <hr />
-                    {activeGroup && groupMembers.map(m => {
-                        if (m === userData.personal._id) return null
-                        return (
-                            <div
-                                key={m}
-                                onClick={() => { }}
-                            >{userData.associatedUsers[m].name}</div>
-                        )
-                    })
+                <div className={styles.column}>
+                    <p className={styles['column-title']}>Group members:</p>
+                    {activeGroup &&
+                        groupMembers.map(m => {
+                            if (m === userData.personal._id) return null
+                            return (
+                                <div
+                                    key={m}
+                                    className={styles.name}
+                                >
+                                    {userData.associatedUsers[m].name}
+                                </div>
+                            )
+                        })
                     }
                 </div>
-                <div>
-                    <p>Rest members:</p>
-                    <hr />
-                    {activeGroup && restMembers.map(m => {
-                        if (m === userData.personal._id) return null
-                        return (
-                            <div key={m} className={css.addmember}>
-                                <button onClick={() => addMember(m)}>&lt;&lt;</button>
-                                <div>{userData.associatedUsers[m].name}</div>
-                            </div>
-                        )
-                    })
+                <div className={styles.column}>
+                    <p className={styles['column-title']}>Other members:</p>
+                    {activeGroup &&
+                        restMembers.map(m => {
+                            if (m === userData.personal._id) return null
+                            return (
+                                <div key={m} className={`${styles.name} ${styles.addmember}`}>
+                                    <button onClick={() => addMember(m)} className={styles['add-btn']}>
+                                        <img alt='Add Link' src={addArrow} className={styles.arrow} />
+                                        <span className={styles.member}>
+                                            <UserAvatar picturePath={userData.associatedUsers[m].picture} />
+                                            <span style={{ marginLeft: '5px' }}>
+                                                {userData.associatedUsers[m].name}
+                                            </span>
+                                        </span>
+                                    </button>
+                                </div>
+                            )
+                        })
                     }
                 </div>
             </div>
-            <hr />
         </div>
+        <SeparatingLine horizontal={true} />
+        </>
     )
 }
 

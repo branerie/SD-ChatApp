@@ -1,7 +1,14 @@
 .container {
+    display: flex;
+    min-width: 200px;
+    max-width: 265px;
+    /* flex-basis: 225px; */
+}
+
+.inner {
     display: flex; 
     flex-direction: column;
-    width: 225px;
+    flex-grow: 1;
     overflow-y: auto;
     scrollbar-width: none;
 }

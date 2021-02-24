@@ -4,6 +4,7 @@ import emptyProfilePic from '../../../../images/emptyProfilePic.png'
 import { SocketContext } from '../../../../context/SocketContext'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import { getFullImageUrl } from '../../../../utils/image'
+import MenuButton from '../../../Buttons/MenuButton'
 
 const ProfilePicture = () => {
     const { socket } = useContext(SocketContext)
@@ -41,13 +42,14 @@ const ProfilePicture = () => {
                     : emptyProfilePic}
                 className={styles['profile-picture']}
             />
-            <button
+            {/* <button
                 type='button'
                 className={styles['btn-change']}
                 onClick={showWidget}
             >
                 Change Picture
-            </button>
+            </button> */}
+            <MenuButton title='Change Picture' onClick={showWidget} btnSize='full' />
         </div>
     )
 }

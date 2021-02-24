@@ -7,13 +7,20 @@
 
 .title{
     color: var(--txt-color);
-    margin-top: 50px;
+    margin-top: 10px;
     font-size: 18px;
     text-decoration: underline;
 }
 
 .form {
     margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.form .btn-container {
+    float: right;
 }
 
 .btn {
@@ -35,4 +42,18 @@
 
 .revert {
     background-color: #dd3c5c;
+}
+
+.input {
+    color: var(--txt-color);
+    margin-bottom: 0.8rem;
+}
+
+.button {
+    width: 15%;
+}
+
+.buttons {
+    display: flex; 
+    justify-content: flex-end;
 }

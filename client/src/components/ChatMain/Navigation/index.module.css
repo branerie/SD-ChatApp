@@ -13,3 +13,7 @@
 .nav button {
     margin: 10px;
 }
+
+.buttons {
+    display: flex;
+}

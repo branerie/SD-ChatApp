@@ -1,7 +1,10 @@
 .light {
     --bg-color: whitesmoke;
     --txt-color: black;
+    --txt-color-hover: whitesmoke;
     --bg-color-sel: #c0c0c0;
+    --bg-color-hover: #c0c0c0;
+    --bg-color-separator: #c0c0c0;
     --txt-color-sel: black;
     --bg-color-own-project: #707070;
     --bg-color-message: #bababa;
@@ -15,18 +18,24 @@
     --offline-color: tomato;
     --notification-color: red;
     --starred-color: orange;
-    --separator-color: #707070;
+    --separator-color: black;
     --bg-color-sys: darkkhaki;
     --bg-color-sys-online: springgreen;
     --bg-color-sys-offline: salmon;
     --bg-color-sys-joined: cyan;
     --bg-color-btn-disabled: lightgray;
+    --bg-color-btn-submit: #5fb457;
+    --bg-color-btn-cancel: #ce4242;
+    --bg-color-btn-hover: black;
 }
 
 .dark {
     --bg-color: #707070;
     --txt-color: whitesmoke;
+    --txt-color-hover: black;
     --bg-color-sel: #7bf4f8;
+    --bg-color-hover: #646262;
+    --bg-color-separator: #514e4e;
     --txt-color-sel: black;
     --bg-color-own-project: #65c2c5;
     --bg-color-message: #f0f0f0;
@@ -40,10 +49,13 @@
     --offline-color: orangered;
     --notification-color: tomato;
     --starred-color: gold;
-    --separator-color: #65c2c5;
+    --separator-color: black;
     --bg-color-sys: darkkhaki;
     --bg-color-sys-online: springgreen;
     --bg-color-sys-offline: salmon;
     --bg-color-sys-joined: cyan;
     --bg-color-btn-disabled: gray;
+    --bg-color-btn-submit: #5fb457;
+    --bg-color-btn-cancel: #ce4242;
+    --bg-color-btn-hover: whitesmoke;
 }

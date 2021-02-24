@@ -1,6 +1,11 @@
 .menu {
     display: flex;
     flex-direction: column;
-    padding: 10px 30px;
+    padding: 10px 0;
     overflow-y: auto;
+    color: var(--txt-color);
+}
+
+.title {
+    padding: 0 30px;
 }

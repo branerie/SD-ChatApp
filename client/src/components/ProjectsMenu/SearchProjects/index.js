@@ -1,8 +1,9 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useMemo } from 'react'
 import styles from './index.module.css'
-import SmallButton from '../../Buttons/SmallButton'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
+import MenuInput from '../../MenuInput'
+import MenuButton from '../../Buttons/MenuButton'
 
 const SearchProjects = () => {
     const limit = 5
@@ -13,7 +14,17 @@ const SearchProjects = () => {
     const [cursor, setCursor] = useState(0)
     const [showInfo, setShowInfo] = useState({})
     const { socket } = useContext(SocketContext)
-    const { dispatchUserData } = useContext(MessagesContext)
+    const { userData, dispatchUserData } = useContext(MessagesContext)
+
+    const ineligibleSites = useMemo(() => {
+        const ineligibleSet = new Set([
+            ...Object.keys(userData.sites),
+            ...(userData.requests) && userData.requests.map(r => r._id),
+            ...(userData.invitations) && userData.invitations.map(i => i._id)
+        ])
+
+            return Array.from(ineligibleSet)
+    }, [userData.sites, userData.invitations, userData.requests])
 
 
     function searchProjects() {
@@ -76,26 +87,59 @@ const SearchProjects = () => {
         <div className={styles['menu-field']}>
             <h3>Find project</h3>
             <div className={styles['form-control']}>
-                <input className={styles.input} type="text" placeholder='Project name...' onChange={e => changeSearch(e)} />
+                <MenuInput disable={page >= 1} onChange={e => changeSearch(e)} placeholder='Project name...' />
             </div>
-            <button disabled={page >= 1} className={styles['form-btn']} onClick={searchProjects}>Search</button>
+
+            <MenuButton 
+                title='Search' 
+                onClick={searchProjects} 
+                disabled={!site} 
+                btnType='submit'
+                btnSize='medium'
+                style={{ float: 'right' }}
+            />
+
             {error && <p><small>{error}</small></p>}
             {page > 0 &&
-                <ul>
+                <ul className={styles.results}>
                     {sites.length >= 5 &&
-                        <div>
-                            <button disabled={page <= 1} onClick={prevPage}>&lt;&lt;</button>
-                            <button disabled={!!error} onClick={nextPage}>&gt;&gt;</button>
+                        <div className={styles['nav-buttons']}>
+                            <MenuButton 
+                                disabled={page <= 1} 
+                                onClick={prevPage} 
+                                title='Previous Page' 
+                                btnSize='large'
+                            />
+                            <MenuButton 
+                                disabled={!!error} 
+                                onClick={nextPage} 
+                                title='Next Page' 
+                                btnSize='medium'
+                                style={{ marginLeft: '0.5rem' }}
+                            />
                         </div>
                     }
                     {sites.slice(cursor, cursor + limit).map(site => {
+                        const cannotJoin = ineligibleSites.includes(site._id)
+
                         return (
                             <div key={site._id}>
                                 <li className={styles.row}>
                                     <span>{site.name}</span>
-                                    <div>
-                                        <SmallButton onClick={() => sendRequest(site.name)} title='Join' />
-                                        <SmallButton onClick={() => showProjectInfo(site)} title={showInfo[site._id] ? 'Less' : 'More'} />
+                                    <div className={styles.buttons}>
+                                        <MenuButton 
+                                            onClick={() => sendRequest(site.name)} 
+                                            title='Join'
+                                            btnType='submit'
+                                            btnSize='medium'
+                                            disabled={cannotJoin}
+                                        />
+                                        <MenuButton 
+                                            onClick={() => showProjectInfo(site)} 
+                                            title={showInfo[site._id] ? 'Less' : 'More'}
+                                            btnSize='medium'
+                                            style={{ marginLeft: '0.5rem' }}
+                                         />
                                     </div>
                                 </li>
                                 {showInfo[site._id] &&

@@ -3,6 +3,9 @@ import styles from './index.module.css'
 import InputField from './InputField'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
+import MenuInput from '../../MenuInput'
+import { capitalizeFirstLetter } from '../../../utils/text'
+import MenuButton from '../../Buttons/MenuButton'
 
 const PersonalSettingsColumn = () => {
 
@@ -22,13 +25,6 @@ const PersonalSettingsColumn = () => {
         return Object.entries(data).some(([key, value]) => initState[key] !== value)
     }, [data, initState])
 
-    function updateData(key, value) {
-        setData({
-            ...data,
-            [key]: value
-        })
-    }
-
     function updateProfile(e) {
         e.preventDefault()
         socket.emit('update-profile-data', data, newData => {
@@ -42,29 +38,34 @@ const PersonalSettingsColumn = () => {
             <form className={styles.form} onSubmit={(e) => updateProfile(e)}>
                 {Object.entries(data).map(([key, value]) => {
                     return (
-                        <InputField
-                            key={key}
-                            input={key}
-                            value={value}
-                            updateData={updateData}
-                            isChanged={initState[key] !== value}
-                        />
+                        <label className={styles.input}>
+                            {capitalizeFirstLetter(key)}:
+                            <MenuInput
+                                value={value}
+                                onChange={(e) => setData({ ...data, [key]: e.target.value })}
+                                placeholder={`Enter new ${key}...`}
+                            />
+                        </label>
                     )
                 })}
-                <button type="button"
-                    onClick={() => setData(initState)}
-                    className={`${styles.revert} ${styles.btn}`}
-                    disabled={!isModified}
-                >
-                    Revert
-                </button>
-                <button
-                    type="submit"
-                    className={`${styles.save} ${styles.btn}`}
-                    disabled={!isModified}
-                >
-                    Save Changes
-                </button>
+                <div className={styles.buttons}>
+                    <MenuButton
+                        btnType='default'
+                        btnSize='medium'
+                        title='Revert'
+                        onClick={() => setData(initState)}
+                        disabled={!isModified}
+                    />
+                    <MenuButton
+                        btnType='submit'
+                        btnSize='large'
+                        title='Save Changes'
+                        onClick={updateProfile}
+                        disabled={!isModified}
+                        style={{ marginLeft: '0.5rem' }}
+                        isSubmit={true}
+                    />
+                </div>
             </form>
         </div>
     )

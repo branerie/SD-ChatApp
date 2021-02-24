@@ -1,15 +1,18 @@
 import { useContext, useState } from 'react'
 import styles from './index.module.css'
-import SmallButton from '../../Buttons/SmallButton'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 import UserAvatar from '../../Common/UserAvatar'
+import MenuInput from '../../MenuInput'
+import MenuButton from '../../Buttons/MenuButton'
+import SeparatingLine from '../../SeparatingLine'
+
+const LIMIT = 5
 
 const SearchPeople = () => {
     const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
-    const limit = 5
     const [name, setName] = useState()
     const [page, setPage] = useState(0)
     const [names, setNames] = useState([])
@@ -42,11 +45,11 @@ const SearchPeople = () => {
             socket.emit('search-people', { name, page }, (success, data) => {
                 success ? setNames([...names, ...data]) : setError("No more results")
                 setPage(page + 1)
-                setCursor(cursor + limit)
+                setCursor(cursor + LIMIT)
             })
         } else {
             setPage(page + 1)
-            setCursor(cursor + limit)
+            setCursor(cursor + LIMIT)
         }
     }
 
@@ -54,14 +57,20 @@ const SearchPeople = () => {
         setError(false)
         if (page > 1) {
             setPage(page - 1)
-            setCursor(cursor - limit)
+            setCursor(cursor - LIMIT)
         }
     }
 
     function inviteMember(user) {
         let site = userData.activeSite
         socket.emit("send-invitation", { user, site }, (success, user) => {
-            if (success) dispatchUserData({ type: 'add-user-to-site-invitations', payload: { user, site } })
+            console.log(success)
+            if (!success) return
+            
+            dispatchUserData({ type: 'add-user-to-site-invitations', payload: { user, site } })
+
+            const newNames = names.filter(n => n.username !== user)
+            setNames(newNames)
         })
     }
 
@@ -72,39 +81,74 @@ const SearchPeople = () => {
         })
     }
 
+    const activeSite = userData.sites[userData.activeSite]
+
     return (
+        <>
         <div className={styles['menu-field']}>
             <div className={styles['form-control']} >
-                <p>Search for people and send invitations</p>
-                <input
-                    className={styles.input}
-                    type='text'
+                Search for people and send invitations
+                <MenuInput
+                    value={name}
+                    onChange={e => changeSearch(e)}
                     placeholder='Search by username, full name or email...'
-                    onChange={e => changeSearch(e)} />
+                />
             </div>
-            <button disabled={page >= 1} className={styles['form-btn']} onClick={searchPeople}>Search</button>
+            <MenuButton
+                title='Search'
+                btnSize='medium'
+                disabled={!name}
+                onClick={searchPeople}
+                style={{ float: 'right', marginBottom: '10px' }}
+            />
             {error && <p><small>{error}</small></p>}
             {page > 0 &&
                 <ul>
                     {names.length >= 5 &&
-                        <div>
-                            <button disabled={page <= 1} onClick={prevPage}>&lt;&lt;</button>
-                            <button disabled={!!error} onClick={nextPage}>&gt;&gt;</button>
+                        <div className={styles['nav-buttons']}>
+                            <MenuButton 
+                                btnSize='large'
+                                disabled={page <= 1} 
+                                onClick={prevPage} 
+                                title='Previous Page'
+                            />
+                            <MenuButton 
+                                btnSize='medium'
+                                disabled={!!error} 
+                                onClick={nextPage}
+                                title='Next Page'
+                                style={{ marginLeft: '0.5rem' }} 
+                            />
                         </div>
                     }
-                    {names.slice(cursor, cursor + limit).map(name => {
+                    {names.slice(cursor, cursor + LIMIT).map(name => {
+                        const cannotInvite = name._id === userData.personal._id ||
+                                             (Object.values(activeSite.groups).some(g => g.members.includes(name._id))) || 
+                                             (activeSite.invitations && activeSite.invitations.includes(name._id))
+
                         return (
                             <div key={name._id}>
-                                <li className={styles['list-item']}>
+                                <div className={styles['list-item']}>
                                     <div className={styles.card}>
                                         <UserAvatar picturePath={name.picture} />
                                         <span>{name.name}</span>
                                     </div>
-                                    <div>
-                                        <SmallButton onClick={() => inviteMember(name.username)} title='Invite'/>
-                                        <SmallButton onClick={() => showMemberInfo(name)} title={showInfo[name._id] ? 'Less' : 'More'}/>
+                                    <div className={styles.buttons}>
+                                        <MenuButton 
+                                            onClick={() => inviteMember(name.username)} 
+                                            title='Invite'
+                                            btnType='submit'
+                                            btnSize='medium'
+                                            disabled={cannotInvite}
+                                        />
+                                        <MenuButton 
+                                            onClick={() => showMemberInfo(name)} 
+                                            title={showInfo[name._id] ? 'Less' : 'More'}
+                                            btnSize='medium'
+                                            style={{ marginLeft: '0.5rem' }}
+                                         />
                                     </div>
-                                </li>
+                                </div>
                                 {showInfo[name._id] &&
                                     <div>
                                         <p><small>Username: {name.username}</small></p>
@@ -118,8 +162,9 @@ const SearchPeople = () => {
 
                 </ul>
             }
-            <hr />
         </div>
+        <SeparatingLine horizontal={true} />
+        </>
     )
 }
 
