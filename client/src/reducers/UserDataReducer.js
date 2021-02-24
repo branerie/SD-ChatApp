@@ -1,12 +1,9 @@
 export default function UserDataReducer(userData, action) {
     switch (action.type) {
-        // case "connect-message":
+        // case 'connect-message':
         //     break
 
-        case "welcome-message": {
-            // let activeSite = Object.keys(action.payload.userData.sites)[0] || false
-            // let activeGroup = activeSite ? Object.keys(action.payload.userData.sites[activeSite].groups)[0] : false
-            // load home page with search for projects and users?
+        case 'welcome-message': {
             return {
                 ...action.payload.userData,
                 activeSite: false,
@@ -28,7 +25,7 @@ export default function UserDataReducer(userData, action) {
 
         }
 
-        case "load-projects": {
+        case 'load-projects': {
             return {
                 ...userData,
                 activeSite: false,
@@ -38,7 +35,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "load-project-settings": {
+        case 'load-project-settings': {
             return {
                 ...userData,
                 // activeSite: false,
@@ -48,7 +45,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "load-profile": {
+        case 'load-profile': {
             return {
                 ...userData,
                 activeSite: false,
@@ -58,7 +55,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "load-site": { // load selected site data
+        case 'load-site': { // load selected site data
             let activeSite = action.payload.site
             let activeGroup = Object.keys(userData.sites[activeSite].groups)[0]
             return {
@@ -71,7 +68,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "load-group": { // load selected group data
+        case 'load-group': { // load selected group data
             const { activeGroup } = action.payload
             return {
                 ...userData,
@@ -94,7 +91,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "load-chat": { // load selected chat data
+        case 'load-chat': { // load selected chat data
             const { chat } = action.payload
             return {
                 ...userData,
@@ -113,7 +110,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "open-chat": {
+        case 'open-chat': {
             const { id, chat } = action.payload
             return {
                 ...userData,
@@ -146,7 +143,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "create-group": { // create group
+        case 'create-group': { // create group
             let { site, groupData, activeConnection } = action.payload
             let activeGroup = Object.keys(groupData)[0]
             return {
@@ -167,7 +164,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "create-site": { // create site and join general group
+        case 'create-site': { // create site and join general group
             let { siteData, activeConnection } = action.payload
             let activeSite = Object.keys(siteData)[0]
             let activeGroup = Object.keys(siteData[activeSite].groups)[0]
@@ -177,7 +174,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.sites,
                     ...siteData
                 },
-                ...(activeConnection) && { 
+                ...(activeConnection) && {
                     activeSite,
                     activeGroup,
                     activeMenu: 'settings'
@@ -185,7 +182,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "group-chat-message": {
+        case 'group-chat-message': {
             let timestamp = new Date().toUTCString()
             let { src, site, group, msg } = action.payload
             return {
@@ -210,7 +207,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "single-chat-message": {
+        case 'single-chat-message': {
             let timestamp = new Date().toUTCString()
             let { src, chat, msg } = action.payload
             return {
@@ -236,32 +233,11 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "online-message": {
-            let timestamp = new Date().toUTCString()
-            let { user, site, group } = action.payload
+        case 'online-message': {
+            let { user } = action.payload
             return {
                 ...userData,
-                sites: {
-                    ...userData.sites,
-                    [site]: {
-                        ...userData.sites[site],
-                        groups: {
-                            ...userData.sites[site].groups,
-                            [group]: {
-                                ...userData.sites[site].groups[group],
-                                messages: [
-                                    ...userData.sites[site].groups[group].messages,
-                                    {
-                                        notice: true,
-                                        event: 'online',
-                                        msg: `${user.name} is online`,
-                                        timestamp
-                                    }
-                                ],
-                            }
-                        }
-                    }
-                },
+                sites: addNotice(user, 'online'),
                 associatedUsers: {
                     ...userData.associatedUsers,
                     [user._id]: {
@@ -272,7 +248,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "join-message": {
+        case 'join-message': {
             let timestamp = new Date().toUTCString()
             let { user, site, group } = action.payload
             return {
@@ -316,32 +292,11 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "quit-message": {
-            let timestamp = new Date().toUTCString()
-            let { user, site, group } = action.payload
+        case 'quit-message': {
+            let { user } = action.payload
             return {
                 ...userData,
-                sites: {
-                    ...userData.sites,
-                    [site]: {
-                        ...userData.sites[site],
-                        groups: {
-                            ...userData.sites[site].groups,
-                            [group]: {
-                                ...userData.sites[site].groups[group],
-                                messages: [
-                                    ...userData.sites[site].groups[group].messages,
-                                    {
-                                        notice: true,
-                                        event: 'offline',
-                                        msg: `${user.name} is offline`,
-                                        timestamp
-                                    }
-                                ],
-                            }
-                        }
-                    }
-                },
+                sites: addNotice(user, 'offline'),
                 associatedUsers: {
                     ...userData.associatedUsers,
                     [user._id]: {
@@ -352,7 +307,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "add-user-to-site-invitations": {
+        case 'add-user-to-site-invitations': {
             let { user, site } = action.payload
             return {
                 ...userData,
@@ -378,7 +333,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "remove-user-from-site-invitations": {
+        case 'remove-user-from-site-invitations': {
             let { user, site } = action.payload
             return {
                 ...userData,
@@ -393,7 +348,7 @@ export default function UserDataReducer(userData, action) {
         }
 
 
-        case "remove-user-from-site-requests": {
+        case 'remove-user-from-site-requests': {
             let { user, site } = action.payload
             return {
                 ...userData,
@@ -408,7 +363,7 @@ export default function UserDataReducer(userData, action) {
         }
 
 
-        case "request-accepted": {
+        case 'request-accepted': {
             let { site, associatedUsers } = action.payload
             return {
                 ...userData,
@@ -442,7 +397,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "add-site-to-invitations": {
+        case 'add-site-to-invitations': {
             return {
                 ...userData,
                 invitations: [
@@ -452,7 +407,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "add-site-to-requests": {
+        case 'add-site-to-requests': {
             return {
                 ...userData,
                 requests: [
@@ -462,21 +417,21 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "remove-site-from-requests": {
+        case 'remove-site-from-requests': {
             return {
                 ...userData,
                 requests: userData.requests.filter(r => r._id !== action.payload.site)
             }
         }
 
-        case "remove-site-from-invitations": {
+        case 'remove-site-from-invitations': {
             return {
                 ...userData,
                 invitations: userData.invitations.filter(i => i._id !== action.payload.site)
             }
         }
 
-        case "add-user-to-site-requests": {
+        case 'add-user-to-site-requests': {
             let { site, user } = action.payload
             return {
                 ...userData,
@@ -503,7 +458,7 @@ export default function UserDataReducer(userData, action) {
         }
 
 
-        case "invitation-accepted": {
+        case 'invitation-accepted': {
             let { siteData, associatedUsers, activeConnection } = action.payload
             let activeSite = Object.keys(siteData)[0]
             let activeGroup = Object.keys(siteData[activeSite].groups)[0]
@@ -524,17 +479,39 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "update-profile-data": {
+        case 'update-profile-data': {
+            const { newData } = action.payload
             return {
                 ...userData,
                 personal: {
                     ...userData.personal,
-                    ...action.payload.newData
+                    ...newData
+                },
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [userData.personal._id]: {
+                        ...userData.associatedUsers[userData.personal._id],
+                        ...newData
+                    }
                 }
             }
         }
 
-        case "show-info": {
+        case 'profile-update': {
+            const { user } = action.payload
+            return {
+                ...userData,
+                associatedUsers: {
+                    ...userData.associatedUsers,
+                    [user._id]: {
+                        ...userData.associatedUsers[user._id],
+                        ...user.data,
+                    }
+                }
+            }
+        }
+
+        case 'show-info': {
             const { user } = action.payload
             return {
                 ...userData,
@@ -548,14 +525,14 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "show-details": {
+        case 'show-details': {
             return {
                 ...userData,
                 details: { id: action.id, isShown: action.show }
             }
         }
 
-        case "toggle-details": {
+        case 'toggle-details': {
             const currentDetails = userData.details
             return {
                 ...userData,
@@ -563,27 +540,44 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case "clear-details": {
+        case 'clear-details': {
             return { ...userData, details: null }
         }
 
-        case "disconnect-message": {
+        case 'disconnect-message': {
             return false
         }
 
-        // case "reconnect-attempt-message":
+        // case 'reconnect-attempt-message':
         //     break
 
-        // case "reconnect-error-message":
+        // case 'reconnect-error-message':
         //     break
 
-        // case "reconnect-failed-message":
+        // case 'reconnect-failed-message':
         //     break
 
-        // case "reconnect-message":
+        // case 'reconnect-message':
         //     break
 
         default:
             return userData
+    }
+
+    function addNotice(member, event) {
+        let timestamp = new Date().toUTCString()
+        for (const site in userData.sites) {
+            for (const group in userData.sites[site].groups) {
+                if (userData.sites[site].groups[group].members.includes(member._id)) {
+                    userData.sites[site].groups[group].messages.push({
+                        notice: true,
+                        event,
+                        msg: `${member.name} is ${event}`,
+                        timestamp
+                    })
+                }
+            }
+        }
+        return userData.sites
     }
 }

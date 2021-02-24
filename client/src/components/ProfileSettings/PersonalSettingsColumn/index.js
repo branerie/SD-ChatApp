@@ -1,7 +1,6 @@
 import { useContext, useMemo, useState } from 'react'
 import styles from './index.module.css'
 import InputField from './InputField'
-
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 
@@ -9,21 +8,20 @@ const PersonalSettingsColumn = () => {
 
     const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
-    let initState
-    if (userData) initState = {
+    const initState = {
         name: userData.personal.name || '',
         company: userData.personal.company || '',
         position: userData.personal.position || '',
         email: userData.personal.email || '',
         mobile: userData.personal.mobile || '',
     }
-    
+
     const [data, setData] = useState(initState)
-    
+
     const isModified = useMemo(() => {
         return Object.entries(data).some(([key, value]) => initState[key] !== value)
     }, [data, initState])
-    
+
     function updateData(key, value) {
         setData({
             ...data,
@@ -33,15 +31,8 @@ const PersonalSettingsColumn = () => {
 
     function updateProfile(e) {
         e.preventDefault()
-        // fetch post or socket emit? that is the question
-        // if (instant update for other users is necessary); then use socket; else use fetch; fi
         socket.emit('update-profile-data', data, newData => {
-            dispatchUserData({
-                type: 'update-profile-data',
-                payload: {
-                    newData
-                }
-            })
+            dispatchUserData({ type: 'update-profile-data', payload: { newData } })
         })
     }
 
@@ -51,23 +42,23 @@ const PersonalSettingsColumn = () => {
             <form className={styles.form} onSubmit={(e) => updateProfile(e)}>
                 {Object.entries(data).map(([key, value]) => {
                     return (
-                        <InputField 
-                            key={key} 
+                        <InputField
+                            key={key}
                             input={key}
-                            value={value} 
+                            value={value}
                             updateData={updateData}
                             isChanged={initState[key] !== value}
                         />
                     )
                 })}
-                <button type="button" 
-                    onClick={() => setData(initState)} 
+                <button type="button"
+                    onClick={() => setData(initState)}
                     className={`${styles.revert} ${styles.btn}`}
                     disabled={!isModified}
                 >
                     Revert
                 </button>
-                <button 
+                <button
                     type="submit"
                     className={`${styles.save} ${styles.btn}`}
                     disabled={!isModified}

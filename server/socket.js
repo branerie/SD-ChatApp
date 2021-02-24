@@ -1,19 +1,17 @@
 const jwt = require('./utils/jwt')
-const vsd = require('./utils/validate-socket-data')
+const validate = require('./utils/validate-socket-data')
 const db = require('./db/query')
-const cookie = require("cookie")
-const createUserData = require('./utils/createUserData')
+const cookie = require('cookie')
+const createUserData = require('./utils/create-user-data')
 
 module.exports = io => {
     // cache keeps track of connected users by id and their assigned socket id
     // it is updated on every connect and disconnect 
     let userIDToSocketIDCache = {}
-    let groupToSiteCache = {}
-
     let socketsCount = 0
     let clientsCount = 0
 
-    io.on("connect", async (socket) => {
+    io.on('connect', async (socket) => {
         const cookies = cookie.parse(socket.request.headers.cookie || '')
         let token = cookies['x-auth-token'] || ''
         let data = await jwt.verifyToken(token)
@@ -34,41 +32,38 @@ module.exports = io => {
         let messagePool = await db.getMessages(userData)
 
         userIDToSocketIDCache[userData._id] = [...userIDToSocketIDCache[userData._id] || [], socket.id]
-        if (userIDToSocketIDCache[userData._id].length === 1) clientsCount++
+        const firstConnection = userIDToSocketIDCache[userData._id].length === 1
+        firstConnection && clientsCount++
         socketsCount++
         sysLog(`Connect @ ${socket.id} (${userData.username}). Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
 
+        const clientData = createUserData(userData, messagePool)
 
-        const { clientData, siteCache } = createUserData(userData, messagePool)
-        groupToSiteCache = { ...groupToSiteCache, ...siteCache }
-
-        userData.groups.forEach(({ _id, site }) => {
-            _id = _id.toString()
-            socket.join(_id)
-            // send online status if first connection 
-            if (userIDToSocketIDCache[userData._id].length === 1) {
-                socket.to(_id).emit("online-message", {
-                    user: {
-                        _id: userData._id,
-                        name: userData.name,
-                        username: userData.username,
-                        online: true
-                    },
-                    site: site._id,
-                    group: _id
-                })
-            }
-        })
+        userData.groups.forEach(({ _id }) => socket.join(_id.toString()))
 
         for (const user in clientData.associatedUsers) {
-            clientData.associatedUsers[user].online = Boolean(userIDToSocketIDCache[user])
+            let userIsOnline = Boolean(userIDToSocketIDCache[user])
+            clientData.associatedUsers[user].online = userIsOnline
+            if (user !== userData._id.toString() && firstConnection && userIsOnline) {
+                userIDToSocketIDCache[user].forEach(sid => {
+                    io.to(sid).emit('online-message', {
+                        user: {
+                            _id: userData._id,
+                            name: userData.name,
+                            username: userData.username,
+                            picture: userData.picture,
+                            online: true
+                        }
+                    })
+                })
+            }
         }
-        // console.log(JSON.stringify(clientData, null, 4),"\n","clientData END")
-        socket.emit("welcome-message", { userData: clientData })
+        // console.log(JSON.stringify(clientData, null, 4),'\n','clientData END')
+        socket.emit('welcome-message', { userData: clientData })
 
         // EVENT LISTENERS SECTION
         // Notify users on disconnect
-        socket.on("disconnecting", (reason) => {
+        socket.on('disconnecting', (reason) => {
             userIDToSocketIDCache[userData._id] = userIDToSocketIDCache[userData._id].filter(s => s !== socket.id)
             socketsCount--
 
@@ -76,17 +71,19 @@ module.exports = io => {
             if (userIDToSocketIDCache[userData._id].length === 0) {
                 delete userIDToSocketIDCache[userData._id]
                 clientsCount--
-                socket.rooms.forEach(group => {
-                    socket.to(group).emit("quit-message", {
+                const onlineUsers = new Set()
+                socket.rooms.forEach(room => {
+                    io.sockets.adapter.rooms.get(room).forEach(sid => {
+                        onlineUsers.add(sid)
+                    })
+                })
+                onlineUsers.delete(socket.id)
+                onlineUsers.forEach(sid => {
+                    io.to(sid).emit('quit-message', {
                         user: {
                             _id: userData._id,
                             name: userData.name,
-                            username: userData.username,
-                            online: false
-                        },
-                        reason,
-                        group,
-                        site: groupToSiteCache[group]
+                        }
                     })
                 })
             }
@@ -98,15 +95,15 @@ module.exports = io => {
         })
 
         // Get message from client and send to rest clients
-        socket.on("group-chat-message", async ({ msg, recipient, site }, callback) => {
+        socket.on('group-chat-message', async ({ msg, recipient, site }, callback) => {
             let newMessage = await db.createPublicMessage(userData._id, recipient, msg)
             if (!newMessage) return // validate query
             sysLog(`Message (group): ${userData.username} >> ${recipient}`)
-            socket.to(recipient).emit("group-chat-message", { src: userData._id.toString(), msg, group: recipient, site })
+            socket.to(recipient).emit('group-chat-message', { src: userData._id.toString(), msg, group: recipient, site })
             callback()
         })
 
-        socket.on("single-chat-message", async ({ msg, recipient }, callback) => {
+        socket.on('single-chat-message', async ({ msg, recipient }, callback) => {
             let src = userData._id.toString()
             let newMessage = await db.createPrivateMessage(src, recipient, msg)
             if (!newMessage) return // validate query            
@@ -115,17 +112,17 @@ module.exports = io => {
             if (userIDToSocketIDCache[recipient]) {
                 sysLog(`Message (private): ${src} >> ${recipient}`)
                 userIDToSocketIDCache[recipient].forEach(socketID => {
-                    io.to(socketID).emit("single-chat-message", {src, chat: src, msg })
+                    io.to(socketID).emit('single-chat-message', {src, chat: src, msg })
                 })
             } else {
                 // send offline msg to DB if not in blacklist
                 sysLog(`Message (offline): ${src} >> ${recipient}`)
             }
-            if (recipient !== src) restSocketsUpdate(src, socket.id, "single-chat-message", { src, chat: recipient, msg })
+            if (recipient !== src) restSocketsUpdate(src, socket.id, 'single-chat-message', { src, chat: recipient, msg })
             callback()
         })
 
-        socket.on("close-chat", async chat => {
+        socket.on('close-chat', async chat => {
             await db.removeChat(userData._id, chat)
         })
 
@@ -134,15 +131,14 @@ module.exports = io => {
             let { site = '', description = '' } = socketData
             site = String(site).trim()
             description = String(description).trim()
-            const check = vsd.siteData(site, description)
-            if (check.failed) {
-                callback(false, check.errors)
+            const validation = validate.siteData(site, description)
+            if (validation.failed) {
+                callback(false, validation.errors)
                 return
             }
             const data = await db.createSite(site, description, userData._id)
             if (data.success) {
                 let groupID = data.groupID.toString()
-                groupToSiteCache[groupID] = data.siteID
                 socket.join(groupID)
                 const siteData = {
                     [data.siteID]: {
@@ -164,7 +160,7 @@ module.exports = io => {
                 }
                 callback(true, siteData)
                 restSocketsJoin(userData._id, socket.id, groupID)
-                restSocketsUpdate(userData._id, socket.id, "create-site", siteData)
+                restSocketsUpdate(userData._id, socket.id, 'create-site', siteData)
             } else {
                 callback(false, data.errors)
             }
@@ -188,7 +184,6 @@ module.exports = io => {
             const data = await db.createGroup(site, group, userData._id)
             if (data.success) {
                 let groupID = data._id.toString()
-                groupToSiteCache[groupID] = site
                 socket.join(groupID)
                 const groupData = {
                     [groupID]: {
@@ -204,13 +199,13 @@ module.exports = io => {
                 }
                 callback(true, groupData)
                 restSocketsJoin(userData._id, socket.id, groupID)
-                restSocketsUpdate(userData._id, socket.id, "create-group", { site, groupData })
+                restSocketsUpdate(userData._id, socket.id, 'create-group', { site, groupData })
             } else {
                 callback(false, [data.message])
             }
         })
 
-        socket.on("send-invitation", async ({ user, site }, callback) => { //admin
+        socket.on('send-invitation', async ({ user, site }, callback) => { //admin
             const data = await db.inviteUser(user, site, userData._id)
             if (data.success) {
                 data.userData.online = Boolean(userIDToSocketIDCache[data.userData._id])
@@ -221,13 +216,13 @@ module.exports = io => {
                 }
                 sysLog(`${userData.username} invited ${user} to join ${site}`)
                 callback(true, data.userData)
-                restSocketsUpdate(userData._id, socket.id, "add-user-to-site-invitations", { site, user: data.userData })
+                restSocketsUpdate(userData._id, socket.id, 'add-user-to-site-invitations', { site, user: data.userData })
             } else {
                 sysLog(`Invitation from ${userData.username} to ${user} for ${site} failed: ${data}`)
             }
         })
 
-        socket.on("send-request", async (site, callback) => { // user
+        socket.on('send-request', async (site, callback) => { // user
             const data = await db.sendRequest(site, userData._id)
             let user = {
                 picture: userData.picture,
@@ -262,9 +257,8 @@ module.exports = io => {
                     online: true
                 }
                 let group = data.generalGroup._id.toString()
-                groupToSiteCache[group] = site
                 socket.join(group)
-                socket.to(group).emit("join-message", {
+                socket.to(group).emit('join-message', {
                     user,
                     site,
                     group
@@ -294,7 +288,7 @@ module.exports = io => {
                 sysLog(`${userData.username} accepted invitation and joined ${data.site.name}`)
                 callback(true, { siteData, associatedUsers })
                 restSocketsJoin(userData._id, socket.id, group)
-                restSocketsUpdate(userData._id, socket.id, "invitation-accepted", { siteData, associatedUsers })
+                restSocketsUpdate(userData._id, socket.id, 'invitation-accepted', { siteData, associatedUsers })
             }
             else {
                 sysLog(`Join attempt from ${userData.username} to ${site} failed: ${data}`)
@@ -313,8 +307,7 @@ module.exports = io => {
                     online
                 }
                 let group = data.generalGroup._id.toString()
-                groupToSiteCache[group] = site
-                io.to(group).emit("join-message", {
+                io.to(group).emit('join-message', {
                     user: userData,
                     site,
                     group
@@ -365,7 +358,7 @@ module.exports = io => {
                     picture: data.userData.picture,
                     online
                 }
-                io.to(group).emit("join-message", {
+                io.to(group).emit('join-message', {
                     user,
                     site,
                     group
@@ -484,26 +477,32 @@ module.exports = io => {
             }
         })
 
-        socket.on('update-profile-data', async (data, callback) => {
-            //move this to middleware
-            if (!data || data.constructor.name !== 'Object') {
-                sysLog(`Invalid data from ${userData._id} Expected Object - got ${data.constructor.name}.`)
+        socket.on('update-profile-data', async (socketData, callback) => {
+            // add timing validaton ?
+            const validation = validate.profileData(userData._id, socketData)
+            if (validation.failed) {
+                // callback() // send validation.errors if applicable
                 return
             }
-            const allowedFields = ['name', 'company', 'position', 'email', 'mobile', 'picture']
-            const ignoredData = {}
-            let invalidData = false
-            for (const field in data) {
-                if (!allowedFields.includes(field)) {
-                    ignoredData[field] = data[field]
-                    invalidData = true
-                    delete data[field]
-                }
-            }
-            invalidData && sysLog(`Unexpected data from ${userData._id}.\nIgnored data: ${JSON.stringify(ignoredData)}.`)
-            const newProfileData = await db.updateProfileData(userData._id, data)
-            callback(data)
-            // if name is changed send newProfileData.name to connected rooms and users via socket? 
+            const data = await db.updateProfileData(userData._id, validation.data)
+            const onlineUsers = new Set()
+            socket.rooms.forEach(room => {
+                io.sockets.adapter.rooms.get(room).forEach(sid => {
+                    onlineUsers.add(sid)
+                })
+            })
+
+            userIDToSocketIDCache[userData._id].forEach(sid => onlineUsers.delete(sid))
+            onlineUsers.forEach(sid => {
+                io.to(sid).emit('profile-update', {
+                    user: {
+                        _id: userData._id,
+                        data
+                    }
+                })
+            })            
+            callback(validation.data)
+            restSocketsUpdate(userData._id, socket.id, 'update-profile-data', validation.data)
         })
 
         socket.on('get-chat-history', async(id, callback) => {

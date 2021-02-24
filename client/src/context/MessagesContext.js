@@ -177,8 +177,8 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('online-message', ({ user, site, group }) => {
-            dispatchUserData({ type: 'online-message', payload: { user, site, group } })
+        socket.on('online-message', ({ user }) => {
+            dispatchUserData({ type: 'online-message', payload: { user } })
         })
         return () => socket.off('online-message')
     }, [socket])
@@ -186,10 +186,28 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('quit-message', ({ user, site, group, reason }) => {
-            dispatchUserData({ type: 'quit-message', payload: { user, site, group, reason } })
+        socket.on('quit-message', ({ user }) => {
+            dispatchUserData({ type: 'quit-message', payload: { user } })
         })
         return () => socket.off('quit-message')
+    }, [socket])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('update-profile-data', newData => {
+            dispatchUserData({ type: 'update-profile-data', payload: { newData } })
+        })
+        return () => socket.off('update-profile-data')
+    }, [socket])
+
+
+    useEffect(() => {
+        if (!socket) return
+        socket.on('profile-update', ({ user }) => {
+            dispatchUserData({ type: 'profile-update', payload: { user } })
+        })
+        return () => socket.off('profile-update')
     }, [socket])
 
 
