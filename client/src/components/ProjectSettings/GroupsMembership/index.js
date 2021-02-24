@@ -34,71 +34,67 @@ const GroupsMembership = () => {
         })
     }
 
-    if (siteGroups.length < 2) return null
+    if (groups.length < 2) return null
 
     return (
         <>
-        <div className={styles.section}>
-            <p className={styles.title}>Membership</p>
-            <div className={styles.container}>
-                <div className={`${styles.column} ${styles.group}`}>
-                    <p className={styles['column-title']}>Select group:</p>
-                    {
-                        siteGroups.map(gid => {
-                            let { name } = userData.sites[userData.activeSite].groups[gid]
-                            if (name === 'General') return null
+            <div className={styles.section}>
+                <p className={styles.title}>Membership</p>
+                <div className={styles.container}>
+                    <div className={`${styles.column} ${styles.group}`}>
+                        <p className={styles['column-title']}>Select group:</p>
+                        {groups.map(([gid, group]) => {
+                            if (group.name === 'General') return null // sort of continue in map
                             return (
                                 <div
                                     key={gid}
                                     onClick={() => loadGroup(gid)}
-                                    className={`${styles.name} ${gid === activeGroup && styles.selected}`}
-                                >
-                                    {name}
-                                </div>
+                                    className={gid === activeGroup ? styles.selected : undefined}
+                                >{group.name}</div>
                             )
                         })
-                    }
-                </div>
-                <div className={styles.column}>
-                    <p className={styles['column-title']}>Group members:</p>
-                    {activeGroup &&
-                        groupMembers.map(m => {
-                            if (m === userData.personal._id) return null
-                            return (
-                                <div
-                                    key={m}
-                                    className={styles.name}
-                                >
-                                    {userData.associatedUsers[m].name}
-                                </div>
-                            )
-                        })
-                    }
-                </div>
-                <div className={styles.column}>
-                    <p className={styles['column-title']}>Other members:</p>
-                    {activeGroup &&
-                        restMembers.map(m => {
-                            if (m === userData.personal._id) return null
-                            return (
-                                <div key={m} className={`${styles.name} ${styles.addmember}`}>
-                                    <button onClick={() => addMember(m)} className={styles['add-btn']}>
-                                        <img alt='Add Link' src={addArrow} className={styles.arrow} />
-                                        <span className={styles.member}>
-                                            <UserAvatar picturePath={userData.associatedUsers[m].picture} />
-                                            <span style={{ marginLeft: '5px' }}>
-                                                {userData.associatedUsers[m].name}
+                        }
+                    </div>
+                    <div className={styles.column}>
+                        <p className={styles['column-title']}>Group members:</p>
+                        {activeGroup &&
+                            groupMembers.map(m => {
+                                if (m === userData.personal._id) return null
+                                return (
+                                    <div
+                                        key={m}
+                                        className={styles.name}
+                                    >
+                                        {userData.associatedUsers[m].name}
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                    <div className={styles.column}>
+                        <p className={styles['column-title']}>Other members:</p>
+                        {activeGroup &&
+                            restMembers.map(m => {
+                                if (m === userData.personal._id) return null
+                                return (
+                                    <div key={m} className={`${styles.name} ${styles.addmember}`}>
+                                        <button onClick={() => addMember(m)} className={styles['add-btn']}>
+                                            <img alt='Add Link' src={addArrow} className={styles.arrow} />
+                                            <span className={styles.member}>
+                                                <UserAvatar picturePath={userData.associatedUsers[m].picture} />
+                                                <span style={{ marginLeft: '5px' }}>
+                                                    {userData.associatedUsers[m].name}
+                                                </span>
                                             </span>
-                                        </span>
-                                    </button>
-                                </div>
-                            )
-                        })
-                    }
+                                        </button>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
                 </div>
             </div>
-        </div>
-        <SeparatingLine horizontal={true} />
+            <SeparatingLine horizontal={true} />
         </>
     )
 }

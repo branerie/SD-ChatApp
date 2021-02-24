@@ -7,6 +7,8 @@
     --bg-color-separator: #c0c0c0;
     --txt-color-sel: black;
     --bg-color-own-project: #707070;
+    --bg-color-guest-project: slategray;
+    --bg-color-guest-sel: lightslategray;
     --bg-color-message: #bababa;
     --bg-color-own-message: #b5d19f;
     --bg-color-group: #707070;
@@ -38,6 +40,8 @@
     --bg-color-separator: #514e4e;
     --txt-color-sel: black;
     --bg-color-own-project: #65c2c5;
+    --bg-color-guest-project: slategray;
+    --bg-color-guest-sel: lightslategray;
     --bg-color-message: #f0f0f0;
     --bg-color-own-message: #e5f1db;
     --bg-color-group: #65c2c5;

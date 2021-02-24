@@ -23,8 +23,8 @@ const createUserData = (userData, messagePool) => {
             }
         }
     }
-    if (userData.invitations) clientData.invitations = userData.invitations
-    if (userData.requests) clientData.requests = userData.requests
+    clientData.invitations = userData.invitations || []
+    clientData.requests = userData.requests || []
 
     userData.chats.forEach(chat => {
         clientData.associatedUsers[chat._id] = {

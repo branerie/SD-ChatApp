@@ -1,18 +1,26 @@
-.project-box {
+.container {
     display: flex;
     flex-direction: column;
     overflow-y: hidden;
 }
 
-.project-box-sm {
+.shrink {
     align-items: center;
 }
 
-.project-box-lg {
-    padding: 0 5px;;
+.expand {
+    padding: 0 5px;
 }
 
-.project-container {
+.title {
+    color: var(--txt-color);
+    text-align: center;
+    text-transform: uppercase;
+    font-size: small;
+    padding: 5px 0;
+}
+
+.list {
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
@@ -20,22 +28,11 @@
     scrollbar-width: none;
 }
 
-.project-container::-webkit-scrollbar {
+.list::-webkit-scrollbar {
     width: 0px;            
-  }
+}
 
-.project-container::-webkit-scrollbar-track {
-    box-shadow: inset 0 0 5px grey; 
-    border-radius: 10px;      
-  }
-
-.project-container::-webkit-scrollbar-thumb {
-    background-color: rgb(34, 34, 37);   
-    border-radius: 20px;       
-    border: 3px solid rgb(116, 116, 116);  
-  }
-
-.list {
+.project {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -45,18 +42,13 @@
     cursor: pointer;
 }
 
-.list:hover {
-    background-color: var(--bg-color-sel);
-    color: var(--txt-color-sel);
-}
-
-.small-list {
+.small {
     border-radius: 50%;
     width: 40px;
     height: 40px;
 }
 
-.large-list {    
+.large {    
     border-radius: 5px;
 }
 
@@ -64,31 +56,25 @@
     background-color: var(--bg-color-own-project);
 }
 
-.selected {
+.owner:hover {
+    background-color: var(--bg-color-sel);
+    color: var(--txt-color-sel);
+}
+.owner.selected {
     background-color: var(--bg-color-sel);
     color: var(--txt-color-sel);
 }
 
-.red {
-    background-color: #28817d;
+.guest {
+    background-color: var(--bg-color-guest-project);
 }
 
-.green {
-    background-color: #51879c;
+.guest:hover {
+    background-color: var(--bg-color-guest-sel);
+    color: var(--txt-color-sel);
 }
 
-.blue {
-    background-color: #6188d1;
-}
-
-.orange {
-    background-color: #72b5f3;
-}
-
-.project-title {
-    color: var(--txt-color);
-    text-align: center;
-    text-transform: uppercase;
-    font-size: small;
-    padding-bottom: 5px;
+.guest.selected {
+    background-color: var(--bg-color-guest-sel);
+    color: var(--txt-color-sel);
 }
