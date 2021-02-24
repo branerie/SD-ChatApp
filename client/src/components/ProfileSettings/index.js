@@ -1,4 +1,3 @@
-import React from 'react'
 import styles from './index.module.css'
 import PictureColumn from './PictureColumn'
 import PersonalSettingsColumn from './PersonalSettingsColumn'

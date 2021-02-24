@@ -19,12 +19,7 @@ const ProfilePicture = () => {
                 const imagePath = result.info.path
 
                 socket.emit('update-profile-data', { picture: imagePath }, newData => {
-                    dispatchUserData({
-                        type: 'update-profile-data',
-                        payload: {
-                            newData
-                        }
-                    })
+                    dispatchUserData({ type: 'update-profile-data', payload: { newData } })
                 })
             }
 

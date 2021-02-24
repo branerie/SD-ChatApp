@@ -11,5 +11,8 @@
     flex-grow: 1;
     overflow-y: auto;
     scrollbar-width: none;
-    padding-top: 10px;
 }
+
+.container::-webkit-scrollbar {
+    display: none;
+  }

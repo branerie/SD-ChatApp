@@ -1,9 +1,7 @@
 .project-box {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    flex-grow: 1;
-    min-height: 10vh;
+    overflow-y: hidden;
 }
 
 .project-box-sm {

@@ -14,7 +14,10 @@ const GroupsMembership = () => {
     const [groupMembers, setGroupMembers] = useState([])
     const [restMembers, setRestMembers] = useState([])
 
-    const siteGroups = Object.keys(userData.sites[userData.activeSite].groups)
+    let groups = Object.entries(userData.sites[userData.activeSite].groups).sort((A, B) => {
+        // Sort: Alphabetical
+        return A[1].name.localeCompare(B[1].name)
+    })
     const siteMembers = Object.values(userData.sites[userData.activeSite].groups).find(({ name }) => name === "General").members
 
     function loadGroup(gid) {
@@ -35,7 +38,7 @@ const GroupsMembership = () => {
 
     return (
         <>
-        <div className={styles['form-control']}>
+        <div className={styles.section}>
             <p className={styles.title}>Membership</p>
             <div className={styles.container}>
                 <div className={`${styles.column} ${styles.group}`}>
@@ -78,7 +81,7 @@ const GroupsMembership = () => {
                         restMembers.map(m => {
                             if (m === userData.personal._id) return null
                             return (
-                                <div key={m} className={`${styles.name} ${styles['add-member']}`}>
+                                <div key={m} className={`${styles.name} ${styles.addmember}`}>
                                     <button onClick={() => addMember(m)} className={styles['add-btn']}>
                                         <img alt='Add Link' src={addArrow} className={styles.arrow} />
                                         <span className={styles.member}>

@@ -1,4 +1,4 @@
-.form-control {
+.section {
 	margin: 10px 0px;
 	padding: 0 30px;
 	width: 100%;
@@ -10,7 +10,7 @@
 	margin-bottom: 10px;
 }
 
-.add-member {
+.addmember {
 	display: flex;
 	align-items: center;
 }

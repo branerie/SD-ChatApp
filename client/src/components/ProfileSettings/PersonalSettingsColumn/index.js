@@ -1,6 +1,6 @@
 import { useContext, useMemo, useState } from 'react'
 import styles from './index.module.css'
-
+import InputField from './InputField'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 import MenuInput from '../../MenuInput'
@@ -11,8 +11,7 @@ const PersonalSettingsColumn = () => {
 
     const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
-    let initState
-    if (userData) initState = {
+    const initState = {
         name: userData.personal.name || '',
         company: userData.personal.company || '',
         position: userData.personal.position || '',
@@ -28,15 +27,8 @@ const PersonalSettingsColumn = () => {
 
     function updateProfile(e) {
         e.preventDefault()
-        // fetch post or socket emit? that is the question
-        // if (instant update for other users is necessary); then use socket; else use fetch; fi
         socket.emit('update-profile-data', data, newData => {
-            dispatchUserData({
-                type: 'update-profile-data',
-                payload: {
-                    newData
-                }
-            })
+            dispatchUserData({ type: 'update-profile-data', payload: { newData } })
         })
     }
 
