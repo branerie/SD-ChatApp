@@ -5,3 +5,9 @@
 .alert::before {
     content: "* ";
 }
+
+@media (max-width: 480px) {
+    .alert {
+        font-size: small;
+    }
+}

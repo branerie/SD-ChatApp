@@ -38,7 +38,7 @@ const RegisterMain = () => {
     }, [username, password, rePassword])
 
     return (
-        <form className={styles['register-main']} onSubmit={e => handleSubmit(e)}>
+        <form className={styles.container} onSubmit={e => handleSubmit(e)}>
             <Input
                 value={username}
                 onChange={e => setUsername(e.target.value)}

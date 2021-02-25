@@ -10,10 +10,10 @@ const PageHeader = () => {
         <header className={styles.header}>
             <img src={logo} alt="Smart chat logo" onClick={() => history.push('/')}/>
             <nav className={styles.nav}>
-                <NavButton handleClick={() => history.push('/about')} title='Product' />
+                {/* <NavButton handleClick={() => history.push('/about')} title='Product' /> */}
                 <NavButton handleClick={() => history.push('/login')} title='Login' />
                 <NavButton handleClick={() => history.push('/register')} title='Register' />
-                <NavButton handleClick={() => history.push('/try')} title='Try It Free' />
+                {/* <NavButton handleClick={() => history.push('/try')} title='Try It Free' /> */}
             </nav>
         </header>
     )

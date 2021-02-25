@@ -4,7 +4,7 @@ import styles from './index.module.css'
 const Input = ({ label, value, onChange, type, placeholder }) => {
 
     return (
-        <div className={styles['form-control']}>
+        <div className={styles.container}>
             <label>
                 {label}
                 <div>
