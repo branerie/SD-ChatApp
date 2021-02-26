@@ -35,7 +35,7 @@ const LoginMain = () => {
     }, [username, password])
 
     return (
-        <form className={styles['login-main']} onSubmit={e => handleSubmit(e)}>
+        <form className={styles.container} onSubmit={e => handleSubmit(e)}>
             <Input
                 value={username}
                 onChange={e => setUsername(e.target.value)}

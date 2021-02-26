@@ -32,3 +32,14 @@
     margin: 0 20px;
 }
 
+@media (max-width: 480px) {
+    .container {
+        padding: 5px;
+    }
+    .more, .notification, .input-box {
+        display: none;
+    }
+    .title {
+        font-size: 16px;
+    }
+}

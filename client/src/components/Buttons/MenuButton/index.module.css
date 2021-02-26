@@ -48,3 +48,25 @@
 .full {
     width: 100%;
 }
+
+@media (max-width: 480px) {
+    .button {
+        padding: 0.3rem 0.3rem;
+        font-size: 10px;
+    }
+
+    .small {
+        min-width: 30px;
+        max-width: 40px;
+    }
+    
+    .medium {
+        min-width: 40px;
+        max-width: 50px;
+    }
+    
+    .large {
+        min-width: 50px;
+        max-width: 64px;
+    }
+}

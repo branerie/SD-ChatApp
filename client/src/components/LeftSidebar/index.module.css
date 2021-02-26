@@ -10,3 +10,9 @@
 .shrink {
     min-width: 75px;
 }
+
+/* @media (max-width: 480px) {
+    .container {
+        display: none;
+    }
+} */

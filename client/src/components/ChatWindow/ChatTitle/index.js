@@ -1,11 +1,11 @@
 import styles from './index.module.css'
-import searchIcon from '../../../../images/searchIcon.svg'
-import moreIcon from '../../../../images/moreIcon.svg'
-import Input from '../../../Common/Input'
+import searchIcon from '../../../images/searchIcon.svg'
+import moreIcon from '../../../images/moreIcon.svg'
+import Input from '../../Common/Input'
 import FavIcon from './FavIcon'
 import NotificationIcon from './NotificationIcon'
 import CloseButton from './CloseButton'
-import SeparatingLine from '../../../SeparatingLine'
+import SeparatingLine from '../../SeparatingLine'
 
 const ChatTitle = ({ title, privChat }) => {
 
@@ -22,7 +22,7 @@ const ChatTitle = ({ title, privChat }) => {
                 <Input placeholder='Search...' />
                 <img src={searchIcon} className={styles['search-icon']} alt='' />
             </div>
-            <div>
+            <div className={styles.notification}>
                 <NotificationIcon />
             </div>
             <div>

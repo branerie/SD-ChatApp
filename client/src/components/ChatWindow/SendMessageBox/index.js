@@ -1,7 +1,7 @@
 import styles from './index.module.css'
-import sendFile from '../../../../images/sendFile.svg'
-import voiceMsg from '../../../../images/voiceMsg.svg'
-import TextArea from '../../../Common/TextArea'
+import sendFile from '../../../images/sendFile.svg'
+import voiceMsg from '../../../images/voiceMsg.svg'
+import TextArea from '../../Common/TextArea'
 
 
 const SendMessageBox = () => {

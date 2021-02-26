@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import css from './index.module.css'
-import { ReactComponent as StarEmpty } from '../../../../../images/favouriteStar.svg'
-import { ReactComponent as StarFull } from '../../../../../images/facvouriteStarFilled.svg'
+import { ReactComponent as StarEmpty } from '../../../../images/favouriteStar.svg'
+import { ReactComponent as StarFull } from '../../../../images/facvouriteStarFilled.svg'
 
 const FavIcon = () => {
     const [starred, setStarred] = useState(false)

@@ -7,12 +7,13 @@ const HomeMain = () => {
 
     return (
         <div className={styles.container}>
-            <div>
-                <h1>HAVE YOUR BEST SMART CHAT</h1>
+            <div className={styles.content}>
+                <h1 className={styles.title}>HAVE YOUR BEST SMART CHAT</h1>
                 <p>Chat with your teams fast, easy and unlimited.</p>
-                <button onClick={() => history.push('/try')} >Try It Now</button>
+                <button className={styles.login} onClick={() => history.push('/login')} >Login</button>
+                <button onClick={() => history.push('/register')} >Sign up</button>
             </div>
-            <div>
+            <div className={styles.img}>
                 <img src={picture} alt="Home page" />
             </div>
         </div>

@@ -1,12 +1,20 @@
 .container {
-    display: flex;    
-    align-items: stretch;
+    display: flex;
+    flex-direction: column;
     height: 100vh;
-    width: 100vw;
+    width: 100%;
     background-color: var(--bg-color);
+    align-items: stretch;
 }
 
-.info-bar {
+.main {
+    display: flex;
+    flex-grow: 1;
+    max-height: 100vh;
+    overflow-y: auto;
+}
+
+.resizer {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,6 +27,12 @@
     cursor: pointer;
 }
 
-.arrow-img {
+.arrow {
     width: 100%;
+}
+
+@media (max-width: 480px) {
+    .resizer {
+        display: none;
+    }
 }
