@@ -6,7 +6,7 @@ import Notice from './Notice'
 import DateSeparator from './DateSeparator'
 import SendMessageBox from './SendMessageBox'
 
-import { MessagesContext } from '../../../context/MessagesContext'
+import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatWindow = () => {
     const { userData } = useContext(MessagesContext)

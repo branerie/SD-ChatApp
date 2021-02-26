@@ -1,5 +1,5 @@
 import styles from './index.module.css'
-import UserAvatar from '../../../Common/UserAvatar'
+import UserAvatar from '../../Common/UserAvatar'
 
 const Message = ({ message }) => {
 

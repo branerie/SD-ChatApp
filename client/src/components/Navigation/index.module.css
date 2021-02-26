@@ -1,0 +1,34 @@
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    display: flex;
+    align-items: baseline;
+}
+
+.nav button {
+    margin: 10px;
+}
+
+.buttons {
+    display: flex;
+}
+
+.mobile {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .nav {
+        justify-content: space-between;
+    }
+    .nav button {
+        margin: 10px 5px;
+    }
+    .mobile {
+        display: inline;
+    }
+}

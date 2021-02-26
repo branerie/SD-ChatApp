@@ -7,3 +7,16 @@
     background-color: var(--btn-color);
     cursor: pointer;
 }
+
+.button i {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .button i {
+        display: inline;
+    }
+    .button span {
+        display: none;
+    }
+}

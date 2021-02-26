@@ -9,7 +9,9 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                activeMenu: 'projects'
+                activeMenu: 'projects',
+                activeWindow: 'projects',
+                device: setDevice()
             }
         }
 
@@ -25,7 +27,7 @@ export default function UserDataReducer(userData, action) {
 
         }
 
-        case 'load-projects': {
+        case 'search-project': {
             return {
                 ...userData,
                 activeSite: false,
@@ -42,6 +44,39 @@ export default function UserDataReducer(userData, action) {
                 // activeGroup: false,
                 // activeChat: false,
                 activeMenu: 'settings'
+            }
+        }
+
+        case 'load-projects-mobile': {
+            return {
+                ...userData,
+                activeSite: false,
+                activeGroup: false,
+                activeChat: false,
+                activeWindow: 'sites',
+                activeMenu: false
+            }
+        }
+
+        case 'load-chats-mobile': {
+            return {
+                ...userData,
+                activeSite: false,
+                activeGroup: false,
+                activeChat: false,
+                activeMenu: false,
+                activeWindow: 'chats',
+            }
+        }
+
+        case 'load-members-mobile': {
+            return {
+                ...userData,
+                // activeSite: false,
+                // activeGroup: false,
+                // activeChat: false,
+                activeMenu: false,
+                activeWindow: 'members',
             }
         }
 
@@ -64,6 +99,7 @@ export default function UserDataReducer(userData, action) {
                 activeGroup,
                 activeChat: false,
                 details: null,
+                activeWindow: 'groups',
                 activeMenu: false
             }
         }
@@ -86,6 +122,7 @@ export default function UserDataReducer(userData, action) {
                     },
                 },
                 activeGroup,
+                activeWindow: 'messages',
                 activeChat: false,
                 activeMenu: false
             }
@@ -105,6 +142,7 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: chat,
+                activeWindow: 'messages',
                 details: { id: chat, isShown: false },
                 activeMenu: false
             }
@@ -121,9 +159,10 @@ export default function UserDataReducer(userData, action) {
                         unread: false
                     }
                 },
-                // activeSite: false,
-                // activeGroup: false,
-                // activeChat: id,
+                activeSite: false,
+                activeGroup: false,
+                activeChat: id,
+                activeWindow: 'messages',
                 details: { id: id, isShown: false },
                 activeMenu: false
             }
@@ -528,6 +567,7 @@ export default function UserDataReducer(userData, action) {
         case 'show-details': {
             return {
                 ...userData,
+                activeWindow: 'details',
                 details: { id: action.id, isShown: action.show }
             }
         }
@@ -579,5 +619,11 @@ export default function UserDataReducer(userData, action) {
             }
         }
         return userData.sites
+    }
+
+    function setDevice() {
+        if (window.screen.width < 480) return 'mobile'
+        else if (window.screen.width < 1024) return 'tablet'
+        else return 'desktop'
     }
 }

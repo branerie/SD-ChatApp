@@ -4,6 +4,7 @@
     border-top: 1px solid var(--separator-color);
     align-items: center;
     background-color: white;
+    margin-bottom: 0;
 }
 
 .send-file {
@@ -34,4 +35,10 @@
 .emot-icon {
     margin-right: 15px;
     margin-left: 10px;
+}
+
+@media (max-width: 480px) {
+    .send-msg-box {
+        min-height: 50px;
+    }
 }

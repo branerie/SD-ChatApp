@@ -56,18 +56,18 @@ const PendingProjects = () => {
                                             onClick={() => acceptInvitation(site._id)} 
                                             title='Accept'
                                             btnType='submit'
-                                            style={{ width: '10%', minWidth: '100px' }} 
+                                            // style={{ width: '10%', minWidth: '100px' }} 
                                         />
                                         <MenuButton 
                                             onClick={() => rejectInvitation(site._id)} 
                                             title='Reject'
                                             btnType='cancel'
-                                            style={{ width: '10%', minWidth: '100px', marginLeft: '0.5rem' }} 
+                                            // style={{ width: '10%', minWidth: '100px', marginLeft: '0.5rem' }} 
                                         />
                                         <MenuButton 
                                             onClick={() => showInvitationInfo(site._id)} 
                                             title='Info' 
-                                            style={{ width: '10%', minWidth: '80px', marginLeft: '0.5rem' }}
+                                            // style={{ width: '10%', minWidth: '80px', marginLeft: '0.5rem' }}
                                         />
                                     </div>
                                 </li>
@@ -91,13 +91,13 @@ const PendingProjects = () => {
                                         <MenuButton 
                                             onClick={() => showRequestInfo(site._id)} 
                                             title='Info'
-                                            style={{ minWidth: '60px' }}
+                                            // style={{ minWidth: '60px' }}
                                         />
                                         <MenuButton 
                                             onClick={() => cancelRequest(site._id)} 
                                             title='Cancel'
                                             btnType='cancel'
-                                            style={{ minWidth: '100px', marginLeft: '0.5rem' }} 
+                                            // style={{ minWidth: '100px', marginLeft: '0.5rem' }} 
                                         />
                                     </div>
                                 </li>

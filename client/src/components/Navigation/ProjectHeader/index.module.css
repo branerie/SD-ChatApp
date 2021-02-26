@@ -2,7 +2,7 @@
     color: var(--txt-color);
     display: flex;
     align-items: baseline;
-    margin-left: 25px;
+    margin-left: 5px;
 }
 
 .title {
@@ -40,4 +40,10 @@
     height: 16px;
     line-height: 16px;
     font-size: x-small;
+}
+
+@media (max-width: 480px) {
+    .title {
+        font-size: 10px;
+    }
 }
