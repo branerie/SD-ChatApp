@@ -7,7 +7,7 @@ import { SocketContext } from '../../../context/SocketContext'
 import useDetectOutsideClick from '../../../utils/useDetectOutsideClick'
 import { replaceEmojis } from '../../../utils/text'
 
-import emotIcon from '../../../images/emotIcon.svg'
+import emotIcon from '../../../icons/emoticon.svg'
 
 const TextArea = (props) => {
     const [msg, setMsg] = useState('')
@@ -65,7 +65,7 @@ const TextArea = (props) => {
                 <img src={emotIcon} alt=''/>
             </div>
             { isVisible &&
-                <div class={styles.emoji} ref={ref}>
+                <div className={styles.emoji} ref={ref}>
                     <Picker onEmojiClick={(e, emojiObj) => setMsg(msg + emojiObj.emoji)} />
                 </div>
             }

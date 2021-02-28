@@ -1,6 +1,6 @@
 import styles from './index.module.css'
 import { getFaceCroppedImageUrl } from '../../../utils/image'
-import emptyProfilePic from '../../../images/emptyProfilePic.png'
+import emptyProfilePic from '../../../images/profile-picture.png'
 
 const UserAvatar = ({ picturePath }) => {
     return (

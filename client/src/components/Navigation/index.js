@@ -49,23 +49,23 @@ const Navigation = () => {
                     ?
                     <div className={styles.title}>
                         <div className={`${styles.buttons} ${styles.mobile}`}>
-                            <ChatNavButton onClick={loadPrevious} icon='&#xf359;' />
-                            {userData.activeGroup &&  userData.activeWindow === 'messages' && <ChatNavButton onClick={loadMembers} icon='&#xf0c0;' />}
+                            <ChatNavButton onClick={loadPrevious} icon='back' />
+                            {userData.activeGroup && userData.activeWindow === 'messages' && <ChatNavButton onClick={loadMembers} icon='projects' />}
                         </div>
                         <ProjectHeader />
                     </div>
                     :
                     <div>
                         <div className={`${styles.buttons} ${styles.mobile}`}>
-                            <ChatNavButton onClick={loadProjects} icon='&#xf0c0;' />
-                            <ChatNavButton onClick={loadChats} icon='&#xf406;' />
+                            <ChatNavButton onClick={loadProjects} icon='projects' />
+                            <ChatNavButton onClick={loadChats} icon='chats' />
                         </div>
                     </div>
                 }
                 <div className={styles.buttons}>
-                    <ChatNavButton onClick={searchProject} title='Search' icon='&#xf002;' />
-                    <ChatNavButton onClick={loadProfile} title='Profile' icon='&#xf013;' />
-                    <ChatNavButton onClick={logOut} title='Logout' icon='&#xf2f5;' />
+                    <ChatNavButton onClick={searchProject} title='Search' icon='search' />
+                    <ChatNavButton onClick={loadProfile} title='Profile' icon='profile' />
+                    <ChatNavButton onClick={logOut} title='Logout' icon='logout' />
                 </div>
             </div>
             <SeparatingLine horizontal={true} />

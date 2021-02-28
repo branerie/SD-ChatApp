@@ -5,7 +5,7 @@ import UserAvatar from '../../Common/UserAvatar'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 
-import { ReactComponent as InfoButton } from '../../../images/informationButton.svg'
+import { ReactComponent as InfoButton } from '../../../icons/info.svg'
 
 const Member = ({ id, name, picturePath, isOnline }) => {
     const { dispatchUserData } = useContext(MessagesContext)

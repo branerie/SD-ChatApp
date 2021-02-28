@@ -1,19 +1,19 @@
-import styles from './index.module.css'
-import sendFile from '../../../images/sendFile.svg'
-import voiceMsg from '../../../images/voiceMsg.svg'
+import css from './index.module.css'
+// import sendFile from '../../../icons/attach.svg'
+// import voiceMsg from '../../../icons/record.svg'
 import TextArea from '../../Common/TextArea'
 
 
 const SendMessageBox = () => {
     return (
-        <div className={styles['send-msg-box']}>
-            <div className={styles['send-file']}>
+        <div className={css.container}>
+            {/* <div className={css.file}>
                 <img src={sendFile} alt=''/>
             </div>
-            <div className={styles['voice-msg']}>
+            <div className={css.voice}>
                 <img src={voiceMsg} alt=''/>
-            </div>
-            <div className={styles['text-area-box']}>
+            </div> */}
+            <div className={css.text}>
                 <TextArea />
             </div>
         </div>

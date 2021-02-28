@@ -3,7 +3,7 @@ import styles from './index.module.css'
 import { MessagesContext } from "../../../context/MessagesContext"
 import { SocketContext } from "../../../context/SocketContext"
 
-import addArrow from '../../../images/arrowLeft.png'
+import addArrow from '../../../images/arrow-left.png'
 import SeparatingLine from "../../SeparatingLine"
 import UserAvatar from "../../Common/UserAvatar"
 

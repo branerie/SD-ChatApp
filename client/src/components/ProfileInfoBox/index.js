@@ -7,8 +7,8 @@ import SocialMediaBox from './SocialMediaBox'
 import SendMsgButtonsBox from './SendMsgButtonsBox'
 import PersonalInfoBox from './PersonalInfoBox'
 
-import expandArrow from '../../images/arrowLeft.png'
-import shrinkArrow from '../../images/arrowRight.png'
+import expandArrow from '../../images/arrow-left.png'
+import shrinkArrow from '../../images/arrow-right.png'
 import { SocketContext } from '../../context/SocketContext'
 
 const ProfileInfoBox = () => {

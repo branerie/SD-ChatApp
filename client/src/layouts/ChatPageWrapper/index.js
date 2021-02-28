@@ -8,8 +8,8 @@ import ChatMain from '../../components/ChatMain'
 import ChatMainMobile from '../../components/ChatMainMobile'
 import ProfileInfoBox from '../../components/ProfileInfoBox'
 import { MessagesContext } from '../../context/MessagesContext'
-import shrinkArrow from '../../images/arrowLeft.png'
-import expandArrow from '../../images/arrowRight.png'
+import shrinkArrow from '../../images/arrow-left.png'
+import expandArrow from '../../images/arrow-right.png'
 
 const ChatPageWrapper = () => {
     const [isSmallSiteList, setIsSmallSiteList] = useState(false)

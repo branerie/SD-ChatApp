@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
-import emptyProfilePic from '../../../../images/emptyProfilePic.png'
+import emptyProfilePic from '../../../../images/profile-picture.png'
 import { SocketContext } from '../../../../context/SocketContext'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import { getFullImageUrl } from '../../../../utils/image'

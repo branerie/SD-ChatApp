@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import styles from './index.module.css'
-import notificationIcon from '../../../../images/notificationIcon.svg'
-import notificationIconFilled from '../../../../images/notificationIconFilled.svg'
+import notificationIcon from '../../../../icons/bell-empty.svg'
+import notificationIconFilled from '../../../../icons/bell-full.svg'
 
 
 const CloseButton = (props) => {

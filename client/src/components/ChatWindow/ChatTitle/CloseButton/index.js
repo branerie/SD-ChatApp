@@ -1,12 +1,10 @@
-import { useState, useContext } from 'react'
+import { useContext } from 'react'
 import styles from './index.module.css'
-import closeButton from '../../../../images/closeButton.svg'
-import closeButtonHover from '../../../../images/closeButtonHover.svg'
+import closeButton from '../../../../icons/close-x.svg'
 import { MessagesContext } from '../../../../context/MessagesContext'
 import { SocketContext } from '../../../../context/SocketContext'
 
 const CloseButton = ({chat}) => {
-    const [closeButtonSrc, setCloseButtonSrc] = useState(closeButton)
     const { dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
 
@@ -18,9 +16,7 @@ const CloseButton = ({chat}) => {
     return (
             <img
                 className={styles.btn}
-                src={closeButtonSrc}
-                onMouseEnter={() => { setCloseButtonSrc(closeButtonHover) }}
-                onMouseOut={() => { setCloseButtonSrc(closeButton) }}
+                src={closeButton}
                 onClick={handleClick}
                 alt='Close chat'
             />

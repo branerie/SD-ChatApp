@@ -1,8 +1,8 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
-import { ReactComponent as Gear } from '../../../images/settings.svg'
-import { ReactComponent as BellEmpty } from '../../../images/notificationProjectIcon.svg'
-import { ReactComponent as BellFull } from '../../../images/notificationIconFilled.svg'
+import { ReactComponent as Gear } from '../../../icons/gear.svg'
+import { ReactComponent as BellEmpty } from '../../../icons/bell-empty.svg'
+import { ReactComponent as BellFull } from '../../../icons/bell-full.svg'
 import { MessagesContext } from '../../../context/MessagesContext'
 
 const ProjectHeader = () => {

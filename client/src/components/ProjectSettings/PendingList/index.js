@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
-import StatusLight from '../../Common/StatusLight'
+// import StatusLight from '../../Common/StatusLight'
 import UserAvatar from '../../Common/UserAvatar'
 import MenuButton from '../../Buttons/MenuButton'
 
