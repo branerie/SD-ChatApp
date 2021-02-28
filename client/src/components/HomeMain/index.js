@@ -1,6 +1,6 @@
 import styles from './index.module.css'
 import { useHistory } from 'react-router-dom'
-import picture from '../../images/homePagePicture.png'
+import picture from '../../images/home-page.png'
 
 const HomeMain = () => {
     const history = useHistory()

@@ -1,6 +1,5 @@
 import { useContext, useMemo, useState } from 'react'
 import styles from './index.module.css'
-import InputField from './InputField'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 import MenuInput from '../../MenuInput'

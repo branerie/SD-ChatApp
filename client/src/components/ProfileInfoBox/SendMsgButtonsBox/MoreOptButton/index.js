@@ -1,6 +1,5 @@
-import React from 'react'
 import styles from './index.module.css'
-import moreOptButton from '../../../../images/moreOptButton.svg'
+import moreOptButton from '../../../../icons/more.svg'
 
 const MoreOptButton = () => {
     return (
