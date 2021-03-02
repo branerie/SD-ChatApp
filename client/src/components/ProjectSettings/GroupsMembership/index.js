@@ -49,7 +49,7 @@ const GroupsMembership = () => {
                                 <div
                                     key={gid}
                                     onClick={() => loadGroup(gid)}
-                                    className={gid === activeGroup ? styles.selected : undefined}
+                                    className={gid === activeGroup ? styles.selected : styles.listed}
                                 >{group.name}</div>
                             )
                         })
@@ -63,9 +63,12 @@ const GroupsMembership = () => {
                                 return (
                                     <div
                                         key={m}
-                                        className={styles.name}
+                                        className={styles['added-user']}
                                     >
-                                        {userData.associatedUsers[m].name}
+                                        <UserAvatar picturePath={userData.associatedUsers[m].picture} />
+                                        <span style={{ marginLeft: '5px' }}>
+                                            {userData.associatedUsers[m].name}
+                                        </span>
                                     </div>
                                 )
                             })
@@ -77,8 +80,8 @@ const GroupsMembership = () => {
                             restMembers.map(m => {
                                 if (m === userData.personal._id) return null
                                 return (
-                                    <div key={m} className={`${styles.name} ${styles.addmember}`}>
-                                        <button onClick={() => addMember(m)} className={styles['add-btn']}>
+                                    <div key={m} className={styles.addmember}>
+                                        <div onClick={() => addMember(m)} className={styles['add-btn']}>
                                             <img alt='Add Link' src={addArrow} className={styles.arrow} />
                                             <span className={styles.member}>
                                                 <UserAvatar picturePath={userData.associatedUsers[m].picture} />
@@ -86,7 +89,7 @@ const GroupsMembership = () => {
                                                     {userData.associatedUsers[m].name}
                                                 </span>
                                             </span>
-                                        </button>
+                                        </div>
                                     </div>
                                 )
                             })
