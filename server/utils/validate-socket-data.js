@@ -15,6 +15,10 @@ function isString(string) {
     return typeof string === 'string' || string instanceof String
 }
 
+function isPosInt(number) {
+    return Number.isInteger(number) && number >= 0
+}
+
 function isObject(source, object) {
     if (object === null || object === undefined) {
         sysLog(`Invalid data from ${source} Expected Object - got ${object}`)
@@ -54,7 +58,20 @@ const siteData = (site, description, errors = []) => {
     return { failed: errors.length > 0, errors }
 }
 
+const siteSearch = (source, data) => {
+    if (!isObject(source, data)) return { failed: true }
+    if (!isString(data.site) || !isPosInt(data.page)) {
+        sysLog(`Invalid data type from ${source}.`)
+        return { failed: true }
+    }
+    data.site = trimAll(data.site)
+    if (!data.site) return { failed: true, error: 'Site is required' }
+    return { failed: false, data }
+    
+}
+
 module.exports = {
+    siteSearch,
     siteData,
     profileData,
 }

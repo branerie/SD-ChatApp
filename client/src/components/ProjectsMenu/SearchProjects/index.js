@@ -1,4 +1,4 @@
-import { useState, useContext, useMemo } from 'react'
+import { useState, useContext } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
@@ -11,29 +11,16 @@ const SearchProjects = () => {
     const [sites, setSites] = useState([])
     const [error, setError] = useState(false)
     const [page, setPage] = useState(0)
+    const [more, setMore] = useState(false)
     const [cursor, setCursor] = useState(0)
     const [showInfo, setShowInfo] = useState({})
     const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
-    const ineligibleSites = useMemo(() => {
-        const ineligibleSet = new Set([
-            ...Object.keys(userData.sites),
-            ...(userData.requests) && userData.requests.map(r => r._id),
-            ...(userData.invitations) && userData.invitations.map(i => i._id)
-        ])
-
-            return Array.from(ineligibleSet)
-    }, [userData.sites, userData.invitations, userData.requests])
-
-
     function searchProjects() {
-        socket.emit('search-projects', { site, page }, (success, data) => {
-            if (success) {
-                setSites(data)
-            } else {
-                setError("No results found")
-            }
+        socket.emit('search-projects', { site, page }, (success, more, data) => {
+            success ? setSites(data) : setError(data)
+            setMore(more)
             setPage(page + 1)
         })
     }
@@ -48,9 +35,10 @@ const SearchProjects = () => {
     }
 
     function nextPage() {
-        if (sites.length / page <= 5) {
-            socket.emit('search-projects', { site, page }, (success, data) => {
-                success ? setSites([...sites, ...data]) : setError("No more results")
+        if (more) {
+            socket.emit('search-projects', { site, page }, (success, more, data) => {
+                if (success) setSites([...sites, ...data])
+                setMore(more)
                 setPage(page + 1)
                 setCursor(cursor + limit)
             })
@@ -68,32 +56,32 @@ const SearchProjects = () => {
         }
     }
 
-    function sendRequest(siteID) {
-        socket.emit("send-request", siteID, (success, siteData) => {
+    function sendRequest(sid) {
+        socket.emit("send-request", 'sid', (success, siteData) => {
             if (success) {
                 dispatchUserData({ type: 'add-site-to-requests', payload: { siteData } })
             }
         })
     }
 
-    function showProjectInfo(site) {
+    function showProjectInfo(sid) {
         setShowInfo({
             ...showInfo,
-            [site._id]: !showInfo[site._id]
+            [sid]: !showInfo[sid]
         })
     }
 
     return (
-        <div className={styles['menu-field']}>
+        <div className={styles.container}>
             <h3>Find project</h3>
-            <div className={styles['form-control']}>
+            <div className={styles.input}>
                 <MenuInput disable={page >= 1} onChange={e => changeSearch(e)} placeholder='Project name...' />
             </div>
 
-            <MenuButton 
-                title='Search' 
-                onClick={searchProjects} 
-                disabled={!site} 
+            <MenuButton
+                title='Search'
+                onClick={searchProjects}
+                disabled={!site || sites.length || error}
                 btnType='submit'
                 btnSize='medium'
                 style={{ float: 'right' }}
@@ -102,44 +90,43 @@ const SearchProjects = () => {
             {error && <p><small>{error}</small></p>}
             {page > 0 &&
                 <ul className={styles.results}>
-                    {sites.length >= 5 &&
-                        <div className={styles['nav-buttons']}>
-                            <MenuButton 
-                                disabled={page <= 1} 
-                                onClick={prevPage} 
-                                title='Previous Page' 
+                    {(more || sites.length > limit) &&
+                        <div className={styles.buttons}>
+                            <MenuButton
+                                disabled={page <= 1}
+                                onClick={prevPage}
+                                title='Previous Page'
                                 btnSize='large'
                             />
-                            <MenuButton 
-                                disabled={!!error} 
-                                onClick={nextPage} 
-                                title='Next Page' 
+                            <MenuButton
+                                disabled={!more && sites.length / page <= limit}
+                                onClick={nextPage}
+                                title='Next Page'
                                 btnSize='medium'
                                 style={{ marginLeft: '0.5rem' }}
                             />
                         </div>
                     }
                     {sites.slice(cursor, cursor + limit).map(site => {
-                        const cannotJoin = ineligibleSites.includes(site._id)
 
                         return (
                             <div key={site._id}>
                                 <li className={styles.row}>
                                     <span>{site.name}</span>
                                     <div className={styles.buttons}>
-                                        <MenuButton 
-                                            onClick={() => sendRequest(site.name)} 
+                                        <MenuButton
+                                            onClick={() => sendRequest(site._id)}
                                             title='Join'
                                             btnType='submit'
                                             btnSize='medium'
-                                            disabled={cannotJoin}
+                                            disabled={userData.requests.find(r => r._id === site._id) || userData.sites[site._id]}
                                         />
-                                        <MenuButton 
-                                            onClick={() => showProjectInfo(site)} 
+                                        <MenuButton
+                                            onClick={() => showProjectInfo(site._id)}
                                             title={showInfo[site._id] ? 'Less' : 'More'}
                                             btnSize='medium'
                                             style={{ marginLeft: '0.5rem' }}
-                                         />
+                                        />
                                     </div>
                                 </li>
                                 {showInfo[site._id] &&

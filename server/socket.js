@@ -241,7 +241,7 @@ module.exports = io => {
                 callback(true, { _id: data.site._id, name: data.site.name })
                 restSocketsUpdate(userData._id, socket.id, 'add-site-to-requests', { _id: data.site._id, name: data.site.name })
             } else {
-                sysLog(`Join request from ${userData.username} to ${site} failed: ${data}`)
+                sysLog(`Join request from ${userData._id} to ${site} failed: ${data}`)
             }
 
         })
@@ -456,13 +456,16 @@ module.exports = io => {
         })
 
         socket.on('search-projects', async (socketData, callback) => {
-            if (!isValid(socketData, userData._id)) return
-            const { site = '', page = 0 } = socketData
-            const data = await db.searchProjects(site, page)
+            const validation = validate.siteSearch(userData._id, socketData)
+            if (validation.failed) {
+                callback(false, validation.error) // send validation.errors if applicable
+                return
+            }
+            const data = await db.searchProjects(userData._id, validation.data.site, validation.data.page)
             if (data.success) {
-                callback(true, data.projects)
+                callback(true, data.more, data.projects)
             } else {
-                callback(false)
+                callback(false, false, 'No results found')
             }
         })
 

@@ -1,32 +1,6 @@
-.form-control {
+.input {
 	margin: 10px 0;
 	width: 100%;
-}
-
-.input {
-	font-size: 16px;
-	padding: 5px;
-	height: 40px;
-	width: 100%;
-	/* border: none; */
-    border-radius: 15px;
-    outline: none;
-}
-
-.form-btn {
-	float: right;
-}
-
-.menu-field ul {
-	clear: right;
-}
-
-.menu-field ul li button{
-	margin-left: 5px;
-}
-
-.menu-field .searchbtn {
-	float: right;
 }
 
 .row {
@@ -36,12 +10,8 @@
 	margin: 10px 0;
 }
 
-.nav-buttons {
-	display: flex;
-	margin: 0.5rem 0;
-}
-
 .results {
+	clear: right;
 	padding: 5px 0;
 }
 
