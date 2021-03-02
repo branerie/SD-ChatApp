@@ -36,6 +36,7 @@ const createUserData = (userData, messagePool) => {
     })
 
     userData.groups.forEach(({ _id, name, site, members }) => {
+        if (!site) return // temporary hack for deleted projects
         let groupMembers = []
         members.map(member => {
             groupMembers.push(member._id)

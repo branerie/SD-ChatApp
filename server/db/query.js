@@ -274,10 +274,10 @@ const addUserToGroup = async (uid, sid, gid, aid) => {
     }
 }
 
-const sendRequest = async (siteName, uid) => {
+const sendRequest = async (sid, uid) => {
     try {
-        const site = await Site.findOne({ name: siteName })
-        if (site === null) throw new Error(`${siteName} doesn't exist.`)
+        const site = await Site.findById(sid)
+        if (site === null) throw new Error(`${sid} doesn't exist.`)
         const generalGroup = await Group.findOne({ site: site._id, name: "General" }, 'members')
         if (generalGroup.members.includes(uid)) throw new Error(`You are already a member.`)
         if (site.requests && site.requests.includes(uid)) throw new Error(`Request already exist.`)
@@ -376,11 +376,20 @@ const cancelInvitation = async (sid, uid, aid) => {
     }
 }
 
-const searchProjects = async (pattern, page) => {
+const searchProjects = async (uid, pattern, page) => {
     const limit = 5
     const skip = page * limit
+    const sites = await User.findById(uid, '-_id groups invitations requests').populate({
+        path: 'groups',
+        match: { name: 'General' },
+        select: '-_id site'
+    })
+    const excludedSites = sites.groups.map(m => m.site).concat(sites.invitations, sites.requests)
     const projects = await Site.find({
-        name: {
+        _id: {
+            $nin: excludedSites
+        },
+        name: {            
             $regex: pattern,
             $options: 'i'
         }
@@ -389,9 +398,13 @@ const searchProjects = async (pattern, page) => {
     ).populate({
         path: 'creator',
         select: 'name'
-    }).skip(skip).limit(limit)
+    }).skip(skip).limit(limit + 1) // +1 dummy sacrifice check for more projects
 
-    return { success: projects.length > 0, projects }
+    let success = projects.length > 0
+    let more = projects.length === 6 // save and send bool if more projects found (in the name of UX)
+    if (more) projects.pop()
+
+    return { success, more, projects }
 }
 
 const searchPeople = async (pattern, page) => {
