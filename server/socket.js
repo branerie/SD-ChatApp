@@ -224,24 +224,28 @@ module.exports = io => {
 
         socket.on('send-request', async (site, callback) => { // user
             const data = await db.sendRequest(site, userData._id)
-            let user = {
-                picture: userData.picture,
-                username: userData.username,
-                name: userData.name,
-                _id: userData._id,
-                online: true
-            }
             if (data.success) {
                 if (userIDToSocketIDCache[data.site.creator]) {
+                    const user = {
+                        picture: userData.picture,
+                        username: userData.username,
+                        name: userData.name,
+                        _id: userData._id,
+                        online: true
+                    }
                     userIDToSocketIDCache[data.site.creator].forEach(socket => {
-                        io.to(socket).emit('add-user-to-site-requests', { site: data.site._id, user })
+                        io.to(socket).emit('add-user-to-site-requests', { site, user })
                     })
                 }
-                sysLog(`${userData.username} request to join ${site}`)
-                callback(true, { _id: data.site._id, name: data.site.name })
-                restSocketsUpdate(userData._id, socket.id, 'add-site-to-requests', { _id: data.site._id, name: data.site.name })
+                const siteData = {
+                    _id: data.site._id, 
+                    name: data.site.name
+                }
+                sysLog(`${userData._id} request to join ${site}`)
+                callback(true, siteData)
+                restSocketsUpdate(userData._id, socket.id, 'add-site-to-requests', siteData)
             } else {
-                sysLog(`Join request from ${userData._id} to ${site} failed: ${data}`)
+                sysLog(`Join request from ${userData._id} to ${site} failed: ${data.error}`)
             }
 
         })

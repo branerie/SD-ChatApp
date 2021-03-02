@@ -289,7 +289,7 @@ const sendRequest = async (sid, uid) => {
         return { success: true, site }
 
     } catch (error) {
-        return error.message
+        return {error: error.message}
     }
 }
 
