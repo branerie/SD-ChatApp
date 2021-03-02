@@ -51,14 +51,16 @@ const PendingList = () => {
                                     </div>
                                     <div className={styles.buttons}>
                                         <MenuButton 
-                                            onClick={() => showInfo(user)} 
-                                            title='Info'
-                                            btnSize='small'
-                                        />
-                                        <MenuButton 
                                             onClick={() => cancelInvitation(user)} 
                                             title='Cancel'
+                                            icon='cancel'
                                             btnType='cancel'
+                                            btnSize='medium'
+                                        />
+                                        <MenuButton 
+                                            onClick={() => showInfo(user)} 
+                                            title='Info'
+                                            icon='info'
                                             btnSize='medium'
                                             style={{ marginLeft: '0.5rem' }} 
                                         />
@@ -90,19 +92,22 @@ const PendingList = () => {
                                         <MenuButton 
                                             onClick={() => acceptRequest(user)} 
                                             title='Accept'
+                                            icon='accept'
                                             btnType='submit'
                                             btnSize='medium'
                                         />
                                         <MenuButton 
                                             onClick={() => rejectRequest(user)} 
                                             title='Reject'
+                                            icon='cancel'
                                             btnType='cancel'
                                             btnSize='medium'
                                             style={{ marginLeft: '0.5rem' }} 
                                         />
                                         <MenuButton 
                                             onClick={() => showInfo(user)} 
-                                            title='Info' 
+                                            title='Info'
+                                            icon='info'
                                             btnSize='medium'
                                             style={{ marginLeft: '0.5rem' }}
                                         />

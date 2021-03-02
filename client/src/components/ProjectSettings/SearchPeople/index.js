@@ -99,6 +99,7 @@ const SearchPeople = () => {
                 btnSize='medium'
                 disabled={!name}
                 onClick={searchPeople}
+                icon='search'
                 style={{ float: 'right', marginBottom: '10px' }}
             />
             {error && <p><small>{error}</small></p>}

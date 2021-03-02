@@ -84,6 +84,7 @@ const SearchProjects = () => {
                 disabled={!site || sites.length || error}
                 btnType='submit'
                 btnSize='medium'
+                icon='search'
                 style={{ float: 'right' }}
             />
 

@@ -52,6 +52,7 @@ const PersonalSettingsColumn = () => {
                         btnType='default'
                         btnSize='medium'
                         title='Revert'
+                        icon='cancel'
                         onClick={() => setData(initState)}
                         disabled={!isModified}
                     />
@@ -59,6 +60,7 @@ const PersonalSettingsColumn = () => {
                         btnType='submit'
                         btnSize='large'
                         title='Save Changes'
+                        icon='save'
                         onClick={updateProfile}
                         disabled={!isModified}
                         style={{ marginLeft: '0.5rem' }}

@@ -18,6 +18,10 @@
 	justify-content: flex-end;
 }
 
+.buttons button {
+	margin-left: 0.5rem;
+}
+
 .info {
 	display: inline-block;
 	margin-top: 8px;
@@ -29,4 +33,10 @@
 
 .pending {
 	padding: 10px 30px;
+}
+
+@media (max-width: 480px) {
+	.buttons button {
+		margin: 5px 2px;
+	}
 }
