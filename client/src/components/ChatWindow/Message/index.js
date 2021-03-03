@@ -1,7 +1,16 @@
 import styles from './index.module.css'
 import UserAvatar from '../../Common/UserAvatar'
+import PlainMessage from './PlainMessage'
+import UriMessage from './UriMessage'
+import ImageMessage from './ImageMessage'
 
 const Message = ({ message }) => {
+
+    const msg = {
+        plain: <PlainMessage msg={message.msg}/>,
+        uri: <UriMessage msg={message.msg}/>,
+        image: <ImageMessage msg={message.msg}/>
+    }
 
     function getTime(timestamp) {
         return new Date(timestamp).toTimeString().split(':', 2).join(':')
@@ -18,7 +27,7 @@ const Message = ({ message }) => {
                     {getTime(message.timestamp)}
                 </div>
                 <div className={styles.message}>
-                    {message.msg}
+                    {msg[message.type]}
                 </div>
             </div>
         </div>

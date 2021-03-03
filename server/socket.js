@@ -95,30 +95,30 @@ module.exports = io => {
         })
 
         // Get message from client and send to rest clients
-        socket.on('group-chat-message', async ({ msg, recipient, site }, callback) => {
-            let newMessage = await db.createPublicMessage(userData._id, recipient, msg)
+        socket.on('group-chat-message', async ({ msg, msgType, recipient, site }, callback) => {
+            let newMessage = await db.createPublicMessage(userData._id, recipient, msg, msgType)
             if (!newMessage) return // validate query
             sysLog(`Message (group): ${userData.username} >> ${recipient}`)
-            socket.to(recipient).emit('group-chat-message', { src: userData._id.toString(), msg, group: recipient, site })
+            socket.to(recipient).emit('group-chat-message', { src: userData._id.toString(), msg,  type: msgType, group: recipient, site})
             callback()
         })
 
-        socket.on('single-chat-message', async ({ msg, recipient }, callback) => {
+        socket.on('single-chat-message', async ({ msg, msgType, recipient }, callback) => {
             let src = userData._id.toString()
-            let newMessage = await db.createPrivateMessage(src, recipient, msg)
+            let newMessage = await db.createPrivateMessage(src, recipient, msg, msgType)
             if (!newMessage) return // validate query            
 
             // send message to all sockets associated with recipient if any
             if (userIDToSocketIDCache[recipient]) {
                 sysLog(`Message (private): ${src} >> ${recipient}`)
                 userIDToSocketIDCache[recipient].forEach(socketID => {
-                    io.to(socketID).emit('single-chat-message', {src, chat: src, msg })
+                    io.to(socketID).emit('single-chat-message', {src, chat: src, msg, type: msgType })
                 })
             } else {
                 // send offline msg to DB if not in blacklist
                 sysLog(`Message (offline): ${src} >> ${recipient}`)
             }
-            if (recipient !== src) restSocketsUpdate(src, socket.id, 'single-chat-message', { src, chat: recipient, msg })
+            if (recipient !== src) restSocketsUpdate(src, socket.id, 'single-chat-message', { src, chat: recipient, msg, type: msgType })
             callback()
         })
 

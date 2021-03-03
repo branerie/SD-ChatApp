@@ -101,6 +101,7 @@ const createUserData = (userData, messagePool) => {
                 clientData.chats[partyID].messages.push({
                     src: msg.source._id,
                     msg: msg.content,
+                    type: msg.type || 'plain', // patch for current messages 
                     timestamp: msg.createdAt
                 })
                 break;
@@ -119,6 +120,7 @@ const createUserData = (userData, messagePool) => {
                 clientData.sites[siteCache[msg.destination._id]].groups[msg.destination._id].messages.push({                    
                     src: msg.source._id,
                     msg: msg.content,
+                    type: msg.type || 'plain', // patch for current messages
                     timestamp: msg.createdAt
                 })
                 break;

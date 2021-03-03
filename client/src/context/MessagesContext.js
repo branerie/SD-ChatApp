@@ -32,8 +32,8 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('group-chat-message', ({ src, msg, group, site }) => {
-            dispatchUserData({ type: 'group-chat-message', payload: { src, msg, site, group } })
+        socket.on('group-chat-message', ({ src, msg, type, group, site }) => {
+            dispatchUserData({ type: 'group-chat-message', payload: { src, msg, type, site, group } })
         })
         return () => socket.off('group-chat-message')
     }, [socket])
@@ -41,8 +41,8 @@ export default function MessagesContextProvider(props) {
 
     useEffect(() => {
         if (!socket) return
-        socket.on('single-chat-message', ({ src, chat, msg }) => {
-            dispatchUserData({ type: 'single-chat-message', payload: { src, chat, msg } })
+        socket.on('single-chat-message', ({ src, chat, msg, type }) => {
+            dispatchUserData({ type: 'single-chat-message', payload: { src, chat, msg, type } })
         })
         return () => socket.off('single-chat-message')
     }, [socket])
