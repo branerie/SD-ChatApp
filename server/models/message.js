@@ -15,6 +15,12 @@ const MessageSchema = new mongoose.Schema({
         required: true,
         enum: ['User', 'Group']
     },
+    type: {
+        type: String,
+        required: true,
+        default: 'plain',
+        enum: ['plain', 'uri', 'image']
+    },
     content: {
         type: String,
         required: true

@@ -9,7 +9,7 @@ import { replaceEmojis } from '../../../utils/text'
 
 import emotIcon from '../../../icons/emoticon.svg'
 
-const TextArea = (props) => {
+const TextArea = () => {
     const [msg, setMsg] = useState('')
     const { ref, isVisible, setIsVisible } = useDetectOutsideClick()
     const { userData, dispatchUserData } = useContext(MessagesContext)
@@ -22,7 +22,7 @@ const TextArea = (props) => {
     }
 
     function sendMessage() {
-        let recipientType, recipient, site
+        let recipientType, recipient, site, msgType = 'plain'
         if (userData.activeChat) {
             recipientType = 'single-chat-message'
             recipient = userData.activeChat
@@ -33,7 +33,8 @@ const TextArea = (props) => {
             site = userData.activeSite
         }
 
-        socket.emit(recipientType, { site, recipient, msg }, () => {
+        if (msg.startsWith('http://') || msg.startsWith('https://')) msgType = 'uri'
+        socket.emit(recipientType, { site, recipient, msg, msgType }, () => {
             setMsg('')
             if (recipient === userData.personal._id) return
             dispatchUserData({
@@ -41,6 +42,7 @@ const TextArea = (props) => {
                 payload: {
                     src: userData.personal._id,
                     msg,
+                    type: msgType,
                     site,
                     group: recipient,
                     chat: recipient

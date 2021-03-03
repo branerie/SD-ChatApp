@@ -88,14 +88,15 @@ const getPrivateMessages = async (id, uid) => {
     return { messages, username: party.name }
 }
 
-const createPublicMessage = async (sender, recipient, msg) => {
+const createPublicMessage = async (sender, recipient, msg, type) => {
     // check if group is valid and if user has access to it
     await Group.findById(recipient)
     let message = new Message({
         source: sender,
         destination: recipient,
         onModel: 'Group',
-        content: msg
+        content: msg,
+        type
     })
     try {
         let newMessage = await message.save()
@@ -114,14 +115,15 @@ const removeChat = async (id, chat) => {
     }
 }
 
-const createPrivateMessage = async (sender, recipient, msg) => {
+const createPrivateMessage = async (sender, recipient, msg, type) => {
     await User.findByIdAndUpdate(sender, { $addToSet: { chats: [recipient] } })
     await User.findByIdAndUpdate(recipient, { $addToSet: { chats: [sender] } })
     let message = new Message({
         source: sender,
         destination: recipient,
         onModel: 'User',
-        content: msg
+        content: msg,
+        type
     })
     try {
         let newMessage = await message.save()

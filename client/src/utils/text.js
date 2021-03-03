@@ -6,7 +6,7 @@ const replaceEmojis = (text) => {
                .replace(':(', '\u{1f641}')
                .replace(':o', '\u{1f62e}')
                .replace(';(', '\u{1f622}')
-               .replace(':/', '\u{1f615}')
+            //    .replace(':/', '\u{1f615}')
                .replace(':*', '\u{1f618}')
                .replace('<3', '\u{1f497}')
 }
