@@ -1,4 +1,4 @@
-import { useEffect, useContext, useRef } from 'react'
+import { useEffect, useContext, useRef, useState } from 'react'
 import styles from './index.module.css'
 import ChatTitle from './ChatTitle'
 import Message from './Message'
@@ -7,10 +7,14 @@ import DateSeparator from './DateSeparator'
 import SendMessageBox from './SendMessageBox'
 
 import { MessagesContext } from '../../context/MessagesContext'
+import useImageDragAndDrop from '../../hooks/useImageDragAndDrop'
 
 const ChatWindow = () => {
     const { userData } = useContext(MessagesContext)
+    const [filesToUpload, setFilesToUpload] = useState([])
     const messagesRef = useRef()
+    // TODO: Add image drag and drop
+    useImageDragAndDrop(messagesRef, (files) => setFilesToUpload(files))
 
     useEffect(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight, [userData])
 

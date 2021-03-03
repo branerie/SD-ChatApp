@@ -1,7 +1,7 @@
 import styles from './index.module.css'
 import Picker from 'emoji-picker-react'
 import TextareaAutosize from 'react-textarea-autosize'
-import useDetectOutsideClick from '../../../utils/useDetectOutsideClick'
+import useDetectOutsideClick from '../../../hooks/useDetectOutsideClick'
 import { replaceEmojis } from '../../../utils/text'
 
 import emotIcon from '../../../icons/emoticon.svg'
