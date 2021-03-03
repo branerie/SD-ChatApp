@@ -30,6 +30,8 @@
     --bg-color-btn-submit: #5fb457;
     --bg-color-btn-cancel: #ce4242;
     --bg-color-btn-hover: black;
+    --bg-color-member-list: #e6e9ff;
+    --bg-color-member-list-select:rgb(180, 179, 179);
 }
 
 .dark {
@@ -64,4 +66,6 @@
     --bg-color-btn-submit: #5fb457;
     --bg-color-btn-cancel: #ce4242;
     --bg-color-btn-hover: whitesmoke;
+    --bg-color-member-list: gray;
+    --bg-color-member-list-select:rgb(41, 41, 41);
 }

@@ -29,19 +29,20 @@ const ChatWindow = () => {
 
     return (
         <div className={styles.container}>
-            <ChatTitle title={title} privChat={userData.activeChat}/>
+            <ChatTitle title={title} privChat={userData.activeChat} />
             <div ref={messagesRef} className={styles.messages}>
-                {messages.map(({ src, msg, timestamp, notice, event }, i) => {
+                {messages.map(({ src, msg, type, timestamp, notice, event }, i) => {
                     let thisDate = new Date(timestamp).toDateString()
                     let prevDate = i > 0 ? new Date(messages[i - 1].timestamp).toDateString() : undefined
                     return (
                         <div key={i} >
                             {thisDate !== prevDate && <DateSeparator date={thisDate} />}
-                            {notice ?
-                                <Notice message={{ msg, event }} /> :
-                                <Message message={{
+                            {notice
+                                ? <Notice message={{ msg, event }} />
+                                : <Message message={{
                                     user: userData.associatedUsers[src] ? userData.associatedUsers[src].name : null,
                                     msg,
+                                    type,
                                     timestamp,
                                     own: src === userData.personal._id,
                                     avatar: userData.associatedUsers[src] ? userData.associatedUsers[src].picture : null

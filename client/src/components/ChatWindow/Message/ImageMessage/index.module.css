@@ -1,0 +1,6 @@
+.message {
+    overflow-x: hidden;
+    max-width: 50vw;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}

@@ -223,7 +223,7 @@ export default function UserDataReducer(userData, action) {
 
         case 'group-chat-message': {
             let timestamp = new Date().toUTCString()
-            let { src, site, group, msg } = action.payload
+            let { src, site, group, msg, type } = action.payload
             return {
                 ...userData,
                 sites: {
@@ -236,7 +236,7 @@ export default function UserDataReducer(userData, action) {
                                 ...userData.sites[site].groups[group],
                                 messages: [
                                     ...userData.sites[site].groups[group].messages,
-                                    { src, msg, timestamp }
+                                    { src, msg, type, timestamp }
                                 ],
                                 unread: group !== userData.activeGroup && src !== userData.personal._id
                             }
@@ -248,7 +248,7 @@ export default function UserDataReducer(userData, action) {
 
         case 'single-chat-message': {
             let timestamp = new Date().toUTCString()
-            let { src, chat, msg } = action.payload
+            let { src, chat, msg, type } = action.payload
             return {
                 ...userData,
                 chats: {
@@ -259,12 +259,12 @@ export default function UserDataReducer(userData, action) {
                                 ...userData.chats[chat],
                                 messages: [
                                     ...userData.chats[chat].messages || [],
-                                    { src, msg, timestamp }
+                                    { src, msg, type, timestamp }
                                 ],
                                 unread: chat !== userData.activeChat && src !== userData.personal._id
                             }
                             : {
-                                messages: [{ src, msg, timestamp }],
+                                messages: [{ src, msg, type, timestamp }],
                                 unread: true
                             }
                     }
