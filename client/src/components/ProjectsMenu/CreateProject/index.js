@@ -53,7 +53,6 @@ const CreateProject = () => {
                 disabled={!site} 
                 btnType='submit'
                 btnSize='medium'
-                icon='save'
                 style={{ float: 'right' }}
             />
             {errors.length > 0 &&

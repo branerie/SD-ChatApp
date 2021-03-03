@@ -18,3 +18,8 @@
 .buttons { 
 	display: flex;
 }
+
+.name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}

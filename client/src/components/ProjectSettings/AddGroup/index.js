@@ -44,7 +44,6 @@ const AddGroup = () => {
             <MenuButton 
                 title='Add &amp; Open'
                 btnSize='medium'
-                icon='open'
                 onClick={() => addGroup(true)}
                 disabled={isDisabled}
                 style={{ marginLeft: '0.5rem' }}
@@ -53,7 +52,6 @@ const AddGroup = () => {
                 title='Add'
                 btnType='submit'
                 btnSize='small'
-                icon='accept'
                 onClick={() => addGroup(false)}
                 disabled={isDisabled}
             />

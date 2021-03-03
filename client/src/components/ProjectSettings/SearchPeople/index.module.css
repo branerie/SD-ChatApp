@@ -67,3 +67,9 @@
 .buttons {
 	display: flex;
 }
+
+.name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	margin-right: 0.5rem;
+}

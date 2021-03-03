@@ -84,7 +84,6 @@ const SearchProjects = () => {
                 disabled={!site || sites.length || error}
                 btnType='submit'
                 btnSize='medium'
-                icon='search'
                 style={{ float: 'right' }}
             />
 
@@ -98,12 +97,14 @@ const SearchProjects = () => {
                                 onClick={prevPage}
                                 title='Previous Page'
                                 btnSize='large'
+                                icon='back'
                             />
                             <MenuButton
                                 disabled={!more && sites.length / page <= limit}
                                 onClick={nextPage}
                                 title='Next Page'
                                 btnSize='medium'
+                                icon='forward'
                                 style={{ marginLeft: '0.5rem' }}
                             />
                         </div>
@@ -113,19 +114,21 @@ const SearchProjects = () => {
                         return (
                             <div key={site._id}>
                                 <li className={styles.row}>
-                                    <span>{site.name}</span>
+                                    <span className={styles.name}>{site.name}</span>
                                     <div className={styles.buttons}>
                                         <MenuButton
                                             onClick={() => sendRequest(site._id)}
                                             title='Join'
                                             btnType='submit'
                                             btnSize='medium'
+                                            icon='accept'
                                             disabled={userData.requests.find(r => r._id === site._id) || userData.sites[site._id]}
                                         />
                                         <MenuButton
                                             onClick={() => showProjectInfo(site._id)}
                                             title={showInfo[site._id] ? 'Less' : 'More'}
                                             btnSize='medium'
+                                            icon='info'
                                             style={{ marginLeft: '0.5rem' }}
                                         />
                                     </div>

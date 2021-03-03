@@ -28,7 +28,6 @@ const BasicSettings = () => {
                 title='Update'
                 btnType='submit'
                 btnSize='small'
-                icon='save'
                 onClick={updateDescription}
                 disabled={description === userData.sites[userData.activeSite].description || !description}
             />

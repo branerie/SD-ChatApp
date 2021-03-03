@@ -3,6 +3,7 @@
     --txt-color: black;
     --txt-color-hover: whitesmoke;
     --bg-color-sel: #c0c0c0;
+    --bg-color-input: #c0c0c0;
     --bg-color-hover: #c0c0c0;
     --bg-color-separator: #c0c0c0;
     --txt-color-sel: black;
@@ -36,6 +37,7 @@
     --txt-color: whitesmoke;
     --txt-color-hover: black;
     --bg-color-sel: #7bf4f8;
+    --bg-color-input: #646262;
     --bg-color-hover: #646262;
     --bg-color-separator: #514e4e;
     --txt-color-sel: black;

@@ -10,7 +10,10 @@
 }
 
 .name {
+	display: inline-block;
 	margin-left: 15px;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .buttons {
