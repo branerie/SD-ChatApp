@@ -13,26 +13,40 @@
 .addmember {
 	display: flex;
 	align-items: center;
+	margin: 4px;
 }
 
-.group div {
+.listed {
+	min-width: 140px;
+	margin: 4px;
+	padding: 0 8px;
+	min-height: 44px;
+	background-color: var(--bg-color-member-list);
+	border: 1px solid black;
+	border-radius: 0.5rem;
+	display: flex;
+	align-items: center;
 	cursor: pointer;
 }
 
 .selected {
-	background-color: var(--bg-color-hover);
+	background-color: var(--bg-color-member-list-select);
+    padding: 10px 30px;
+    border: solid 1px black;
+    border-right: double black;
+    border-radius: 5px;
+	margin: 4px;
 }
 
-.name {
-	margin: 8px 5px 8px 0;
-	padding: 3px 0;
-	border-top: 1px solid transparent;
-	border-bottom: 1px solid transparent;
-}
-
-.group > .name:hover {
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
+.added-user {
+	min-width: 140px;
+	margin: 4px;
+	padding: 5px 8px;
+	background-color: var(--bg-color-member-list);
+	border: 1px solid black;
+	border-radius: 0.5rem;
+	display: flex;
+	align-items: center;
 }
 
 .title {
@@ -48,9 +62,10 @@
 
 .add-btn {
 	width: 100%;
+	min-width: 140px;
 	margin-right: 6px;
 	padding: 5px 8px;
-	background-color: var(--btn-color);
+	background-color: var(--bg-color-member-list);
 	border: 1px solid black;
 	border-radius: 0.5rem;
 	cursor: pointer;
@@ -59,6 +74,10 @@
 }
 
 .add-btn:hover {
+	background-color: var(--bg-color-hover);
+}
+
+.listed:hover {
 	background-color: var(--bg-color-hover);
 }
 
@@ -75,4 +94,15 @@
 	align-items: center;
 	font-family: "Balsamiq Sans", cursive;
 	font-size: 1rem;
+}
+
+@media (max-width: 900px) {
+	.container {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.column {
+		margin-bottom: 10px;
+	}
 }

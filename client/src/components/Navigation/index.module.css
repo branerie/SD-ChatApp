@@ -6,7 +6,7 @@
 
 .title {
     display: flex;
-    align-items: baseline;
+    align-items: center;
 }
 
 .nav button {
@@ -29,6 +29,7 @@
         margin: 10px 5px;
     }
     .mobile {
-        display: inline;
+        display: flex;
+        flex-direction: column;
     }
 }
