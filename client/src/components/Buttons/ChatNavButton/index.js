@@ -3,7 +3,7 @@ import { ReactComponent as GroupChat } from '../../../icons/chat-group.svg'
 import { ReactComponent as PrivateChat } from '../../../icons/chat-private.svg'
 import { ReactComponent as Search } from '../../../icons/search-projects.svg'
 import { ReactComponent as Profile } from '../../../icons/gear2.svg'
-import { ReactComponent as Logout } from '../../../icons/logout.svg'
+// import { ReactComponent as Logout } from '../../../icons/logout.svg'
 import { ReactComponent as LeftArrow } from '../../../icons/back.svg'
 
 const icons = {
@@ -11,7 +11,7 @@ const icons = {
     chats: <PrivateChat />,
     search: <Search />,
     profile: <Profile />,
-    logout: <Logout />,
+    // logout: <Logout />,
     back: <LeftArrow />
 }
 
