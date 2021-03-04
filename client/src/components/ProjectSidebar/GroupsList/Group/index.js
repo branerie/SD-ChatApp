@@ -26,8 +26,8 @@ const Group = ({ title, gid }) => {
             <div className={css.title} onClick={() => loadGroup(gid)}>{title}</div>
             <div className={css.icons}>
                 {userData.sites[userData.activeSite].groups[gid].unread 
-                ? <MsgFull className={css.full} />
-                : <MsgEmpty className={css.empty}/>
+                ? <MsgFull onClick={() => loadGroup(gid)} className={css.full} />
+                : <MsgEmpty onClick={() => loadGroup(gid)} className={css.empty}/>
                 }
                 {userData.device === 'mobile' &&
                     <Members onClick={() => loadMembers(gid)}/>

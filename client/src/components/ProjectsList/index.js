@@ -12,8 +12,7 @@ import { ReactComponent as MsgFull } from '../../icons/msg-full.svg'
 const ProjectsList = ({ isSmallList }) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
-    function handleClick(e, site) {
-        if (e.target.nodeName === 'BUTTON') return
+    function loadProject(site) {
         dispatchUserData({ type: "load-site", payload: { site } })
     }
 
@@ -56,7 +55,7 @@ const ProjectsList = ({ isSmallList }) => {
                             <div
                                 key={site[0]}
                                 className={addClasses(site)}
-                                onClick={(e) => handleClick(e, site[0])}>
+                                onClick={() => loadProject(site[0])}>
                                 {avatarLetter(site[1].name)}
                             </div>
                         )
@@ -69,20 +68,19 @@ const ProjectsList = ({ isSmallList }) => {
                         return (
                             <div
                                 key={site[0]}
-                                className={addClasses(site)}
-                                
+                                className={addClasses(site)}                                
                             >
-                                <div onClick={(e) => handleClick(e, site[0])} className={styles.title}>{site[1].name}</div>
+                                <div onClick={() => loadProject(site[0])} className={styles.title}>{site[1].name}</div>
                                 <div className={styles.icons}>
                                     {Object.values(site[1].groups).some(group => group.unread === true)
-                                        ? <MsgFull className={styles.full} />
-                                        : <MsgEmpty className={styles.empty} />
+                                        ? <MsgFull onClick={() => loadProject(site[0])} className={styles.full} />
+                                        : <MsgEmpty onClick={() => loadProject(site[0])} className={styles.empty} />
                                     }
                                     {owner
                                         ? <>
                                             {site[1].requests && site[1].requests.length > 0
-                                                ? <BellFull className={styles.full} />
-                                                : <BellEmpty className={styles.empty} />}
+                                                ? <BellFull onClick={() => projectSettings(site[0])} className={styles.full} />
+                                                : <BellEmpty onClick={() => projectSettings(site[0])} className={styles.empty} />}
                                             <Gear onClick={() => projectSettings(site[0])} />
                                         </>
                                         : <Info />

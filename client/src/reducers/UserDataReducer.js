@@ -248,8 +248,8 @@ export default function UserDataReducer(userData, action) {
         case 'group-chat-message': {
             let timestamp = new Date().toUTCString()
             let { src, site, group, msg, type } = action.payload
-            const unread = (group !== userData.activeGroup && src !== userData.personal._id) || //desktop
-                            (group === userData.activeGroup && userData.activeWindow !== 'messages') //mobile
+            const unread = (userData.device === 'desktop' && group !== userData.activeGroup && src !== userData.personal._id) || //desktop
+                            (userData.device === 'mobile' && group === userData.activeGroup && userData.activeWindow !== 'messages') //mobile
             return {
                 ...userData,
                 sites: {

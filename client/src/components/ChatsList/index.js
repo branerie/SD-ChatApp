@@ -87,13 +87,12 @@ const ChatsList = ({ isSmallList }) => {
                                     onClick={(e) => handleClick(e, chat)}>
                                     <StatusLight isOnline={checkIsOnline(chat)} size='small' />
                                     <UserAvatar picturePath={checkForPicture(chat)} />
-                                    {/* {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null} */}
                                     <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
                                 </div>
                                 <div className={styles.icons}>
                                     {chats[chat].unread && chat !== userData.activeChat
-                                        ? <MsgFull className={styles.full} />
-                                        : <MsgEmpty className={styles.empty} />
+                                        ? <MsgFull onClick={(e) => handleClick(e, chat)} className={styles.full} />
+                                        : <MsgEmpty onClick={(e) => handleClick(e, chat)} className={styles.empty} />
                                     }
                                     {userData.device === 'mobile' &&
                                         <Info onClick={() => dispatchUserData({ type: 'show-details', id: chat, show: true })}/>
