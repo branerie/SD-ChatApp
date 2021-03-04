@@ -12,7 +12,7 @@
     padding: 0 5px;
 }
 
-.title {
+.header {
     color: var(--txt-color);
     text-align: center;
     text-transform: uppercase;
@@ -34,11 +34,13 @@
 
 .project {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     flex-wrap: wrap;
     color: black;
     margin: 1px 0;
-    padding: 10px;
+    /* padding: 10px; */
+    height: 2.5rem;
+    line-height: 2.5rem;
     cursor: pointer;
 }
 
@@ -77,4 +79,30 @@
 .guest.selected {
     background-color: var(--bg-color-guest-sel);
     color: var(--txt-color-sel);
+}
+
+.title {
+    /* background-color: darkolivegreen; */
+    flex-grow: 1;
+    overflow-x: hidden;
+    padding-left: 1rem;
+}
+
+.icons {
+    /* background-color: darkorange; */
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.icons > * {
+    margin: 0 0.4rem;
+}
+
+.empty {
+    fill: var(--txt-contrast-color);
+}
+
+.full {
+    fill: var(--notification-color);
 }

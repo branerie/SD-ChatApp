@@ -17,7 +17,7 @@ const Navigation = () => {
     function loadProfile() {
         dispatchUserData({ type: 'load-profile' })
     }
-    
+
     function loadProjects() {
         dispatchUserData({ type: 'load-projects-mobile' })
     }
@@ -26,11 +26,13 @@ const Navigation = () => {
         if (userData.activeWindow === 'groups') {
             dispatchUserData({ type: 'load-projects-mobile' })
         } else if (userData.activeWindow === 'details') {
-            dispatchUserData({ type: 'load-members-mobile' })
+            dispatchUserData({ type: 'load-members-mobile', payload: {} })
         } else if (userData.activeWindow === 'members') {
-            dispatchUserData({ type: 'load-group', payload: {activeGroup: userData.activeGroup} })
+            dispatchUserData({ type: 'load-site', payload: { site: userData.activeSite } })
         } else if (userData.activeWindow === 'messages') {
-            dispatchUserData({ type: 'load-site', payload: {site: userData.activeSite} })
+            dispatchUserData({ type: 'load-site', payload: { site: userData.activeSite } })
+        } else if (userData.activeWindow === 'settings') {
+            dispatchUserData({ type: 'load-projects-mobile' })
         }
     }
 
@@ -50,12 +52,11 @@ const Navigation = () => {
                     <div className={styles.title}>
                         <div className={`${styles.buttons} ${styles.mobile}`}>
                             <ChatNavButton onClick={loadPrevious} icon='back' />
-                            {userData.activeGroup && userData.activeWindow === 'messages' && <ChatNavButton onClick={loadMembers} icon='projects' />}
                         </div>
                         <ProjectHeader />
                     </div>
                     :
-                    <div>
+                    <div className={styles.title}>
                         <div className={`${styles.buttons} ${styles.mobile}`}>
                             <ChatNavButton onClick={loadProjects} icon='projects' />
                             <ChatNavButton onClick={loadChats} icon='chats' />
