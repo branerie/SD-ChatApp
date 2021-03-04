@@ -1,9 +1,9 @@
 import css from './index.module.css'
 
-const ImageMessage = ({msg}) => {
+const ImageMessage = ({ msg }) => {
     return (
-        <div>
-            {/* todo img element*/}
+        <div className={css.container}>
+            <img src={msg} onClick={() => window.open(msg, '_blank')} />
         </div>
     )
 }

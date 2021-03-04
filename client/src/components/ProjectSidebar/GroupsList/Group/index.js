@@ -15,6 +15,7 @@ const Group = ({ title, gid }) => {
         dispatchUserData({ type: "load-group", payload: { activeGroup } })
     }
 
+
     function loadMembers(gid) {
         dispatchUserData({ type: 'load-members-mobile', payload: {activeGroup: gid} })
     }

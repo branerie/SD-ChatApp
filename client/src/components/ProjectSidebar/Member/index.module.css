@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: space-between;
     background-color: var(--bg-color-chat);
-    margin: 2px 5px;
+    margin: 2px 10px;
     padding: 5px;
     border-radius: 5px;
     cursor: pointer;
@@ -11,6 +11,8 @@
 
 .member {
     display: flex;
+    align-items: center;
+    overflow: hidden;
 }
 
 .container:hover {
@@ -25,13 +27,16 @@
 
 .name {
     margin-left: 10px;
+    margin-right: 3px;
     font-size: 16px;
     color: black;
-    display: flex;
-    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .info {
+    min-width: 1.2rem;
     max-width: 1.2rem;
     margin-right: 10px;
     fill: black;

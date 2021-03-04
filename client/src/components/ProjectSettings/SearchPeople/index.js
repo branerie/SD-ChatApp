@@ -7,7 +7,7 @@ import MenuInput from '../../MenuInput'
 import MenuButton from '../../Buttons/MenuButton'
 import SeparatingLine from '../../SeparatingLine'
 
-const LIMIT = 5
+const LIMIT = 5  
 
 const SearchPeople = () => {
     const { socket } = useContext(SocketContext)
@@ -110,6 +110,7 @@ const SearchPeople = () => {
                                 btnSize='large'
                                 disabled={page <= 1} 
                                 onClick={prevPage} 
+                                icon='back'
                                 title='Previous Page'
                             />
                             <MenuButton 
@@ -117,6 +118,7 @@ const SearchPeople = () => {
                                 disabled={!!error} 
                                 onClick={nextPage}
                                 title='Next Page'
+                                icon='forward'
                                 style={{ marginLeft: '0.5rem' }} 
                             />
                         </div>
@@ -131,7 +133,7 @@ const SearchPeople = () => {
                                 <div className={styles['list-item']}>
                                     <div className={styles.card}>
                                         <UserAvatar picturePath={name.picture} />
-                                        <span>{name.name}</span>
+                                        <span className={styles.name}>{name.name}</span>
                                     </div>
                                     <div className={styles.buttons}>
                                         <MenuButton 
@@ -139,12 +141,14 @@ const SearchPeople = () => {
                                             title='Invite'
                                             btnType='submit'
                                             btnSize='medium'
+                                            icon='accept'
                                             disabled={cannotInvite}
                                         />
                                         <MenuButton 
                                             onClick={() => showMemberInfo(name)} 
                                             title={showInfo[name._id] ? 'Less' : 'More'}
                                             btnSize='medium'
+                                            icon='info'
                                             style={{ marginLeft: '0.5rem' }}
                                          />
                                     </div>

@@ -1,7 +1,7 @@
 import css from './index.module.css'
+import TextArea from '../../Common/TextArea'
 // import sendFile from '../../../icons/attach.svg'
 // import voiceMsg from '../../../icons/record.svg'
-import TextArea from '../../Common/TextArea'
 
 
 const SendMessageBox = () => {
@@ -9,8 +9,8 @@ const SendMessageBox = () => {
         <div className={css.container}>
             {/* <div className={css.file}>
                 <img src={sendFile} alt=''/>
-            </div>
-            <div className={css.voice}>
+            </div> */}
+            {/* <div className={css.voice}>
                 <img src={voiceMsg} alt=''/>
             </div> */}
             <div className={css.text}>

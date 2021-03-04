@@ -29,7 +29,7 @@ const BasicSettings = () => {
                 btnType='submit'
                 btnSize='small'
                 onClick={updateDescription}
-                disabled={description === userData.sites[userData.activeSite].description}
+                disabled={description === userData.sites[userData.activeSite].description || !description}
             />
         </div>
         <SeparatingLine horizontal={true} />

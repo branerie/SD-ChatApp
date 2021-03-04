@@ -7,7 +7,7 @@
 	border: 1px solid black;
 	border-radius: 15px;
     color: var(--txt-color);
-    background-color: var(--bg-color-hover);
+    background-color: var(--bg-color-input);
 }
 
 .input::placeholder {

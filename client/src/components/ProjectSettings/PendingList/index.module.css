@@ -10,12 +10,19 @@
 }
 
 .name {
+	display: inline-block;
 	margin-left: 15px;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .buttons {
 	display: flex;
 	justify-content: flex-end;
+}
+
+.buttons button {
+	margin-left: 0.5rem;
 }
 
 .info {
@@ -29,4 +36,10 @@
 
 .pending {
 	padding: 10px 30px;
+}
+
+@media (max-width: 480px) {
+	.buttons button {
+		margin: 5px 2px;
+	}
 }

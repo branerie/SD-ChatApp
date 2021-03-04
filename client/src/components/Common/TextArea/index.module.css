@@ -17,6 +17,23 @@
 }
 
 .link-emoji {
-    margin-right: 1rem;
+    margin-right: 0.6rem;
+    cursor: pointer;
+}
+
+.image {
+    display: flex;
+    align-items: center;
+    margin: 0 0.6rem;
+    cursor: pointer;
+}
+
+.img-icon {
+    fill: var(--bg-color-btn-msg-box);
+}
+
+.send {
+    fill: var(--bg-color-btn-msg-box);
+    margin-right: 0.6rem;
     cursor: pointer;
 }

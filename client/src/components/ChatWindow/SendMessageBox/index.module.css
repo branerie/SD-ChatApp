@@ -25,6 +25,22 @@
     
 }
 
+.send {
+    height: 100%;
+    padding: 0 0.4rem;
+    border-left: 1px solid black;
+    display: flex;
+    align-items: center;
+    color: var(--txt-color);
+    background-color: var(--bg-color-separator);
+    cursor: pointer;
+}
+
+.send:hover {
+    color: white;
+    background-color: black;
+}
+
 @media (max-width: 480px) {
     .container {
         min-height: 50px;

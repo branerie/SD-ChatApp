@@ -1,55 +1,48 @@
-import { useState, useContext } from 'react'
+import { useContext, useState } from 'react'
 import styles from './index.module.css'
 import Picker from 'emoji-picker-react'
 import TextareaAutosize from 'react-textarea-autosize'
-import { MessagesContext } from '../../../context/MessagesContext'
-import { SocketContext } from '../../../context/SocketContext'
-import useDetectOutsideClick from '../../../utils/useDetectOutsideClick'
+import useDetectOutsideClick from '../../../hooks/useDetectOutsideClick'
 import { replaceEmojis } from '../../../utils/text'
 
-import emotIcon from '../../../icons/emoticon.svg'
+import { MessagesContext } from '../../../context/MessagesContext'
+import { uploadImage } from '../../../utils/image'
+
+import { ReactComponent as FileImage } from '../../../icons/file-image.svg'
+import { ReactComponent as EmojiIcon } from '../../../icons/emoticon.svg'
+import { ReactComponent as SendButton } from '../../../icons/send.svg'
 
 const TextArea = () => {
     const [msg, setMsg] = useState('')
+    const { sendMessage } = useContext(MessagesContext)
     const { ref, isVisible, setIsVisible } = useDetectOutsideClick()
-    const { userData, dispatchUserData } = useContext(MessagesContext)
-    const { socket } = useContext(SocketContext)
 
-    function getKey(e) {
+    const handleMsgSend = () => {
+        sendMessage(msg)
+        setMsg('')
+    }
+    
+    const getKey = e => {
         if (e.key !== 'Enter') return
         e.preventDefault()
-        sendMessage()
+        handleMsgSend()
     }
 
-    function sendMessage() {
-        let recipientType, recipient, site, msgType = 'plain'
-        if (userData.activeChat) {
-            recipientType = 'single-chat-message'
-            recipient = userData.activeChat
-            site = null
-        } else {
-            recipientType = 'group-chat-message'
-            recipient = userData.activeGroup
-            site = userData.activeSite
-        }
+    const handleImageUpload = async (event) => {
+        event.preventDefault()
 
-        if (msg.startsWith('http://') || msg.startsWith('https://')) msgType = 'uri'
-        socket.emit(recipientType, { site, recipient, msg, msgType }, () => {
-            setMsg('')
-            if (recipient === userData.personal._id) return
-            dispatchUserData({
-                type: recipientType,
-                payload: {
-                    src: userData.personal._id,
-                    msg,
-                    type: msgType,
-                    site,
-                    group: recipient,
-                    chat: recipient
-                }
-            })
-        })
-        return
+        const { files } = event.target
+        if (!files || !files[0]) return
+
+        for (let file of files) {
+            const imgLink = await uploadImage(file)
+            if (imgLink.error) {
+                //TODO: Handle image upload error
+                return
+            }
+
+            sendMessage(imgLink, 'image')
+        }
     }
 
     return (
@@ -63,9 +56,12 @@ const TextArea = () => {
                 autoFocus
                 maxRows={3}
             />
-            <div onClick={() => setIsVisible(!isVisible)} className={styles['link-emoji']}>
-                <img src={emotIcon} alt=''/>
-            </div>
+            <label className={styles.image}>
+                <FileImage className={styles['img-icon']} />
+                <input name='imgUpload' type='file' onChange={handleImageUpload} style={{ display: 'none' }} />
+            </label>
+            <EmojiIcon className={styles['link-emoji']} onClick={() => setIsVisible(!isVisible)} />
+            <SendButton className={styles.send} onClick={handleMsgSend} />
             { isVisible &&
                 <div className={styles.emoji} ref={ref}>
                     <Picker onEmojiClick={(e, emojiObj) => setMsg(msg + emojiObj.emoji)} />

@@ -9,8 +9,8 @@ const CloseButton = ({chat}) => {
     const { socket } = useContext(SocketContext)
 
     function handleClick() {
-            socket.emit('close-chat', chat)
-            dispatchUserData({ type: 'close-chat', payload: { chat } })
+        socket.emit('close-chat', chat)
+        dispatchUserData({ type: 'close-chat', payload: { chat } })
     }
 
     return (

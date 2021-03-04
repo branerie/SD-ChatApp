@@ -18,7 +18,7 @@ const MembersList = () => {
     return (
         <div className={styles.container}>
             <div className={styles.header}>{membersCount} MEMBER{membersCount > 1 && 'S'}</div>
-            <ul>
+            <ul className={styles.inner}>
                 {members.map(member => {
                     return (
                     <li key={member}>
