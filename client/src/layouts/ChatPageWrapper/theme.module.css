@@ -1,6 +1,8 @@
 .light {
     --bg-color: whitesmoke;
     --txt-color: black;
+    --bg-contrast-color: black;
+    --txt-contrast-color: white;
     --txt-color-hover: whitesmoke;
     --bg-color-sel: #c0c0c0;
     --bg-color-input: #c0c0c0;
@@ -38,6 +40,8 @@
 .dark {
     --bg-color: #707070;
     --txt-color: whitesmoke;
+    --bg-contrast-color: white;
+    --txt-contrast-color: black;
     --txt-color-hover: black;
     --bg-color-sel: #7bf4f8;
     --bg-color-input: #646262;

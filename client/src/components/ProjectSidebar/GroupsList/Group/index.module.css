@@ -1,8 +1,13 @@
 .group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     background-color: var(--bg-color-group);
     color: black;
     margin: 1px 10px;
-    padding: 10px;
+    /* padding: 10px; */
+    height: 2.5rem;
+    /* line-height: 2.5rem; */
     border-radius: 5px;
     cursor: pointer;
     overflow: hidden;
@@ -18,4 +23,31 @@
 .selected {
     background-color: var(--bg-color-sel);
     color: var(--txt-color-sel);
+}
+
+.title {
+    /* background-color: darkolivegreen; */
+    flex-grow: 1;
+    height: 100%;
+    line-height: 2.5rem;
+    padding-left: 1rem;
+}
+
+.icons {
+    /* background-color: darkorange; */
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.icons > * {
+    margin: 0 0.4rem;
+}
+
+.empty {
+    fill: var(--txt-contrast-color);
+}
+
+.full {
+    fill: var(--notification-color);
 }
