@@ -1,13 +1,13 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
-import { AuthenticateUser } from '../../context/AuthenticationContext'
+// import { AuthenticateUser } from '../../context/AuthenticationContext'
 import { MessagesContext } from '../../context/MessagesContext'
 import ProjectHeader from './ProjectHeader'
 import ChatNavButton from '../Buttons/ChatNavButton'
 import SeparatingLine from '../SeparatingLine'
 
 const Navigation = () => {
-    const { logOut } = AuthenticateUser()
+    // const { logOut } = AuthenticateUser()
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
     function searchProject() {
@@ -65,7 +65,7 @@ const Navigation = () => {
                 <div className={styles.buttons}>
                     <ChatNavButton onClick={searchProject} title='Search' icon='search' />
                     <ChatNavButton onClick={loadProfile} title='Profile' icon='profile' />
-                    <ChatNavButton onClick={logOut} title='Logout' icon='logout' />
+                    {/* <ChatNavButton onClick={logOut} title='Logout' icon='logout' /> */}
                 </div>
             </div>
             <SeparatingLine horizontal={true} />
