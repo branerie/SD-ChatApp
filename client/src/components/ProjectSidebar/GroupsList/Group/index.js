@@ -14,11 +14,14 @@ const Group = ({ title, gid }) => {
         dispatchUserData({ type: "load-group", payload: { activeGroup } })
     }
 
-    return <div
-        className={`${styles.group} ${gid === userData.activeGroup && styles.selected}`}
-        onClick={() => loadGroup(gid)}
-    >
-        {title}</div>
+    return (
+        <div
+            className={`${styles.group} ${gid === userData.activeGroup && styles.selected}`}
+            onClick={() => loadGroup(gid)}
+        >
+            {title}
+        </div>
+    )
 }
 
 export default Group

@@ -22,7 +22,7 @@ const uploadImage = async (imageFile) => {
         return result.url
     } catch (error) {
         //TODO: Handle uploading error
-        console.log(error)
+        return { error: `Failed to upload image ${imageFile}` }
     }
 }
 

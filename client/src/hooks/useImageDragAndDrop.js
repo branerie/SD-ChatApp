@@ -10,19 +10,11 @@ const handleDragOver = event => {
 const useImageDragAndDrop = (elementRef, dropCallback) => {
     const handleDrop = useCallback((event) => {
         event.preventDefault()
-        let files = [...event.dataTransfer.files]
-    
-        const uploadedImages = []
-        files.forEach(file => {
-            if (!file.type.startsWith('image/')) return
-    
-            console.log(file)
-            uploadedImages.push(URL.createObjectURL(file))
-        })
+        if (!event.dataTransfer || !event.dataTransfer.files) return
 
-        if (uploadedImages.length > 0) {
-            dropCallback(uploadedImages)
-        }
+        const imgFiles = Array.from(event.dataTransfer.files).filter(file => file.type.startsWith('image/'))
+
+        if (imgFiles.length > 0) dropCallback(imgFiles)
     }, [dropCallback])
 
     useEffect(() => {

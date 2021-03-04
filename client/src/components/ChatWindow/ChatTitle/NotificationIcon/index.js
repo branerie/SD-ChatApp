@@ -4,7 +4,7 @@ import notificationIcon from '../../../../icons/bell-empty.svg'
 import notificationIconFilled from '../../../../icons/bell-full.svg'
 
 
-const CloseButton = (props) => {
+const CloseButton = () => {
     const [notIconSrc, setNotIconSrc] = useState(notificationIcon)
     const [notIconState, setNotIconState] = useState(false)
 

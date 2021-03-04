@@ -8,13 +8,23 @@ import SendMessageBox from './SendMessageBox'
 
 import { MessagesContext } from '../../context/MessagesContext'
 import useImageDragAndDrop from '../../hooks/useImageDragAndDrop'
+import { uploadImage } from '../../utils/image'
 
 const ChatWindow = () => {
-    const { userData } = useContext(MessagesContext)
-    const [filesToUpload, setFilesToUpload] = useState([])
+    const { userData, sendMessage } = useContext(MessagesContext)
     const messagesRef = useRef()
-    // TODO: Add image drag and drop
-    useImageDragAndDrop(messagesRef, (files) => setFilesToUpload(files))
+    
+    useImageDragAndDrop(messagesRef, async (files) => {
+        for (let file of files) {
+            const imgLink = await uploadImage(file)
+            if (imgLink.error) {
+                //TODO: Handle image upload error
+                return
+            }
+
+            sendMessage(imgLink, 'image')
+        }
+    })
 
     useEffect(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight, [userData])
 

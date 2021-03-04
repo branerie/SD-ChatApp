@@ -12,7 +12,3 @@
     overflow-y: auto;
     scrollbar-width: none;
 }
-
-.container::-webkit-scrollbar {
-    display: none;
-  }

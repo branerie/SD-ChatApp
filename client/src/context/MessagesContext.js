@@ -257,10 +257,40 @@ export default function MessagesContextProvider(props) {
         return () => socket.off('reconnect')
     }, [socket])
 
+    function sendMessage(msg, msgType = 'plain') {
+        let recipientType, recipient, site
+        if (userData.activeChat) {
+            recipientType = 'single-chat-message'
+            recipient = userData.activeChat
+            site = null
+        } else {
+            recipientType = 'group-chat-message'
+            recipient = userData.activeGroup
+            site = userData.activeSite
+        }
+
+        if (msgType !== 'image' && (msg.startsWith('http://') || msg.startsWith('https://'))) msgType = 'uri'
+        socket.emit(recipientType, { site, recipient, msg, msgType }, () => {
+            if (recipient === userData.personal._id) return
+
+            dispatchUserData({
+                type: recipientType,
+                payload: {
+                    src: userData.personal._id,
+                    msg,
+                    type: msgType,
+                    site,
+                    group: recipient,
+                    chat: recipient
+                }
+            })
+        })
+        return
+    }
 
     return (
         <MessagesContext.Provider value={{
-            userData, dispatchUserData
+            userData, dispatchUserData, sendMessage
         }}>
             {props.children}
         </MessagesContext.Provider>

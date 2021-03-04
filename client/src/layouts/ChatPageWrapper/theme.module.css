@@ -26,6 +26,7 @@
     --bg-color-sys-online: springgreen;
     --bg-color-sys-offline: salmon;
     --bg-color-sys-joined: cyan;
+    --bg-color-btn-msg-box: #707070;
     --bg-color-btn-disabled: lightgray;
     --bg-color-btn-submit: #5fb457;
     --bg-color-btn-cancel: #ce4242;
@@ -62,6 +63,7 @@
     --bg-color-sys-online: springgreen;
     --bg-color-sys-offline: salmon;
     --bg-color-sys-joined: cyan;
+    --bg-color-btn-msg-box: #514e4e;
     --bg-color-btn-disabled: gray;
     --bg-color-btn-submit: #5fb457;
     --bg-color-btn-cancel: #ce4242;

@@ -3,10 +3,22 @@
     flex-direction: column;
 }
 
+.inner {
+    max-height: calc((100vh - 6rem) * 0.59);
+    overflow-y: scroll;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.inner::-webkit-scrollbar {
+    display: none;
+}
+
 .header {
     font-size: 12px;
     font-weight: bold;
     color: var(--txt-color);
     display: flex;
     justify-content: center;
+    padding: 3px 0;
 }
