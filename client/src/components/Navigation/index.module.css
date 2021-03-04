@@ -23,13 +23,12 @@
 
 @media (max-width: 480px) {
     .nav {
-        justify-content: space-between;
+        justify-content: space-between;        
     }
     .nav button {
         margin: 10px 5px;
     }
     .mobile {
         display: flex;
-        flex-direction: column;
     }
 }

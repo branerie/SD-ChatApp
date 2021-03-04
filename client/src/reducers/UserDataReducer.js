@@ -38,12 +38,17 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'load-project-settings': {
+            const activeSite = action.payload.activeSite || userData.activeSite
+            const activeGroup = userData.sites[activeSite].lastActiveGroup ||
+                Object.entries(userData.sites[activeSite].groups).find(([gid, group]) => group.name === 'General')[0] ||
+                Object.keys(userData.sites[activeSite].groups)[0] // if General is missing which is not normal
             return {
                 ...userData,
-                // activeSite: false,
-                // activeGroup: false,
+                activeSite,
+                activeGroup,
                 // activeChat: false,
-                activeMenu: 'settings'
+                activeMenu: 'settings',
+                activeWindow: 'settings',
             }
         }
 
@@ -70,10 +75,11 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'load-members-mobile': {
+            const activeGroup = action.payload.activeGroup || userData.activeGroup
             return {
                 ...userData,
                 // activeSite: false,
-                // activeGroup: false,
+                activeGroup,
                 // activeChat: false,
                 activeMenu: false,
                 activeWindow: 'members',
@@ -91,12 +97,29 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'load-site': { // load selected site data
-            let activeSite = action.payload.site
-            let activeGroup = Object.keys(userData.sites[activeSite].groups)[0]
+            const activeSite = action.payload.site
+            const activeGroup = userData.sites[activeSite].lastActiveGroup ||
+                Object.entries(userData.sites[activeSite].groups).find(([gid, group]) => group.name === 'General')[0] ||
+                Object.keys(userData.sites[activeSite].groups)[0] // if General is missing which is not normal
             return {
                 ...userData,
+                ...(userData.device === 'desktop') && {
+                    sites: {
+                        ...userData.sites,
+                        [activeSite]: {
+                            ...userData.sites[activeSite],
+                            groups: {
+                                ...userData.sites[activeSite].groups,
+                                [activeGroup]: {
+                                    ...userData.sites[activeSite].groups[activeGroup],
+                                    unread: false
+                                }
+                            }
+                        },
+                    },
+                },
                 activeSite,
-                activeGroup,
+                activeGroup: userData.device === 'desktop' ? activeGroup : false,
                 activeChat: false,
                 details: null,
                 activeWindow: 'groups',
@@ -112,6 +135,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.sites,
                     [userData.activeSite]: {
                         ...userData.sites[userData.activeSite],
+                        lastActiveGroup: activeGroup, // for desktop version
                         groups: {
                             ...userData.sites[userData.activeSite].groups,
                             [activeGroup]: {
@@ -224,6 +248,8 @@ export default function UserDataReducer(userData, action) {
         case 'group-chat-message': {
             let timestamp = new Date().toUTCString()
             let { src, site, group, msg, type } = action.payload
+            const unread = (group !== userData.activeGroup && src !== userData.personal._id) || //desktop
+                            (group === userData.activeGroup && userData.activeWindow !== 'messages') //mobile
             return {
                 ...userData,
                 sites: {
@@ -238,7 +264,7 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.sites[site].groups[group].messages,
                                     { src, msg, type, timestamp }
                                 ],
-                                unread: group !== userData.activeGroup && src !== userData.personal._id
+                                unread
                             }
                         }
                     }

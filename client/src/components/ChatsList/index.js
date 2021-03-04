@@ -1,9 +1,11 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../context/MessagesContext'
-import NewMessageLight from '../Common/NewMessageLight'
 import UserAvatar from '../Common/UserAvatar'
 import StatusLight from '../Common/StatusLight'
+import { ReactComponent as MsgEmpty } from '../../icons/msg-empty.svg'
+import { ReactComponent as MsgFull } from '../../icons/msg-full.svg'
+import { ReactComponent as Info } from '../../icons/info.svg'
 
 const colors = [styles.red, styles.green, styles.blue, styles.orange]
 
@@ -85,8 +87,17 @@ const ChatsList = ({ isSmallList }) => {
                                     onClick={(e) => handleClick(e, chat)}>
                                     <StatusLight isOnline={checkIsOnline(chat)} size='small' />
                                     <UserAvatar picturePath={checkForPicture(chat)} />
-                                    {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null}
+                                    {/* {chats[chat].unread && chat !== userData.activeChat ? <NewMessageLight /> : null} */}
                                     <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
+                                </div>
+                                <div className={styles.icons}>
+                                    {chats[chat].unread && chat !== userData.activeChat
+                                        ? <MsgFull className={styles.full} />
+                                        : <MsgEmpty className={styles.empty} />
+                                    }
+                                    {userData.device === 'mobile' &&
+                                        <Info onClick={() => dispatchUserData({ type: 'show-details', id: chat, show: true })}/>
+                                    }
                                 </div>
                             </div>
                         )
