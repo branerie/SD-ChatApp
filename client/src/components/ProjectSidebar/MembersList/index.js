@@ -18,19 +18,19 @@ const MembersList = () => {
     return (
         <div className={styles.container}>
             <div className={styles.header}>{membersCount} MEMBER{membersCount > 1 && 'S'}</div>
-            <ul className={styles.inner}>
+            <div className={styles.inner}>
                 {members.map(member => {
                     return (
-                    <li key={member}>
+                    <div key={member}>
                         <Member
                             name={userData.associatedUsers[member].name}
                             id={member}
                             picturePath={userData.associatedUsers[member].picture}
                             isOnline={userData.associatedUsers[member].online}
                         />
-                    </li>
+                    </div>
                 )})}
-            </ul>
+            </div>
         </div>
     )
 }

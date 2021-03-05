@@ -1,10 +1,12 @@
 .container {
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
+    overflow-y: scroll;
+    scrollbar-width: none;
 }
 
 .inner {
-    max-height: calc((100vh - 6rem) * 0.59);
     overflow-y: scroll;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */

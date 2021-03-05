@@ -1,7 +1,14 @@
+.wrapper {
+    flex: 0 1 auto;
+    max-height: 38vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .container {
     display: flex;
     flex-direction: column;
-    max-height: calc((100vh - 6rem) * 0.4);
+    /* max-height: calc((100vh - 6rem) * 0.4); */
     overflow-y: scroll;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
@@ -21,6 +28,10 @@
 
 @media (max-width: 480px) {
     .container {
+        max-height: 100%;
+    }
+
+    .wrapper {
         max-height: 100%;
     }
 }

@@ -12,7 +12,7 @@ const GroupsList = () => {
     })
 
     return (
-        <div>
+        <div className={styles.wrapper}>
             <div className={styles.title}>groups</div>
             <ul className={styles.container}>
                 {groups.map(([gid, group]) => {
