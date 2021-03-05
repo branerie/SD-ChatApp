@@ -523,6 +523,7 @@ module.exports = io => {
                     chat.messages.push({
                         src: msg.source._id,
                         msg: msg.content,
+                        type: msg.type || 'plain',
                         timestamp: msg.createdAt
                     })
                 })
