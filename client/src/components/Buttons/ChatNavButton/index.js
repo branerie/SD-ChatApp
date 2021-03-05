@@ -7,6 +7,7 @@ import { ReactComponent as LeftArrow } from '../../../icons/back.svg'
 import { ReactComponent as Cancel } from '../../../icons/ban.svg'
 import { ReactComponent as Accept } from '../../../icons/check-circle.svg'
 import { ReactComponent as Info } from '../../../icons/info.svg'
+// import { ReactComponent as AddProject } from '../../../icons/plus.svg'
 
 const icons = {
     accept: <Accept />,
@@ -16,16 +17,17 @@ const icons = {
     profile: <Profile />,
     projects: <GroupChat />,
     search: <Search />,
-    back: <LeftArrow />
+    back: <LeftArrow />,
+    // plus: <AddProject />
 }
 
-const ChatNavButton = ({ onClick, title, icon }) => {
+const ChatNavButton = ({ onClick, title, icon, events }) => {
     return (
         <button
-            className={styles.button}
+            className={`${styles.button} `}
             onClick={onClick}>
             <span>{title}</span>
-            <i>{icons[icon]}</i>
+            <i className={events ? styles.events : null}>{icons[icon]}</i>
         </button>
     )
 }

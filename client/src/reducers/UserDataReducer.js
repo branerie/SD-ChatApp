@@ -10,7 +10,7 @@ export default function UserDataReducer(userData, action) {
                 activeGroup: false,
                 activeChat: false,
                 activeMenu: 'projects',
-                activeWindow: 'projects',
+                activeWindow: 'sites',
                 device: setDevice()
             }
         }
@@ -33,9 +33,31 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                activeMenu: 'projects'
+                activeMenu: 'projects',
             }
         }
+
+        // case 'search-project-mobile': {
+        //     return {
+        //         ...userData,
+        //         activeSite: false,
+        //         activeGroup: false,
+        //         activeChat: false,
+        //         activeWindow: 'searchProject',
+        //         activeMenu: false
+        //     }
+        // }
+
+        // case 'new-project-mobile': {
+        //     return {
+        //         ...userData,
+        //         activeSite: false,
+        //         activeGroup: false,
+        //         activeChat: false,
+        //         activeWindow: 'newProject',
+        //         activeMenu: false
+        //     }
+        // }
 
         case 'load-project-settings': {
             const activeSite = action.payload.activeSite || userData.activeSite
@@ -192,7 +214,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case 'close-chat': { // find better solution
+        case 'close-chat': { 
             const { chat } = action.payload
             const { [chat]: _, ...chats } = userData.chats
             return {
@@ -201,7 +223,8 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                activeMenu: 'projects',
+                ...(userData.device === 'desktop') && {activeMenu: 'projects'}, // find better solution
+                ...(userData.device === 'mobile') && {activeWindow: 'chats'},
                 details: null
             }
         }
@@ -248,8 +271,13 @@ export default function UserDataReducer(userData, action) {
         case 'group-chat-message': {
             let timestamp = new Date().toUTCString()
             let { src, site, group, msg, type } = action.payload
-            const unread = (userData.device === 'desktop' && group !== userData.activeGroup && src !== userData.personal._id) || //desktop
-                            (userData.device === 'mobile' && group === userData.activeGroup && userData.activeWindow !== 'messages') //mobile
+            let unread = false
+            if (userData.device === 'desktop') {
+                unread = (src !== userData.personal._id && group !== userData.activeGroup)
+            } else {
+                unread = !(userData.activeWindow === 'messages' && group === userData.activeGroup)
+            }
+
             return {
                 ...userData,
                 sites: {

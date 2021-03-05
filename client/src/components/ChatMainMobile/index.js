@@ -5,6 +5,8 @@ import ChatWindow from '../ChatWindow'
 import ProjectSettings from '../ProjectSettings'
 import ProfileSettings from '../ProfileSettings'
 import ProjectsMenu from '../ProjectsMenu'
+// import SearchProject from '../ProjectsMenu/SearchProjects'
+// import NewProject from '../ProjectsMenu/CreateProject'
 import ProjectsList from '../ProjectsList'
 import GroupsList from '../ProjectSidebar/GroupsList'
 import MembersList from '../ProjectSidebar/MembersList'
@@ -24,6 +26,8 @@ const win = {
     members: <MembersList />,
     messages: <ChatWindow />,
     details: <ProfileInfoBox />,
+    // searchProject: <SearchProject />,
+    // newProject: <NewProject />,
 }
 
 const ChatMainMobile = () => {
@@ -31,14 +35,7 @@ const ChatMainMobile = () => {
 
     return (
         <div className={styles.container}>
-            {/* {userData.activeMenu ? menu[userData.activeMenu] : <ChatWindow />} */}
-            {
-                userData.activeMenu
-                    ? menu[userData.activeMenu]
-                    : win[userData.activeWindow]
-                        // ? <GroupsList />
-                        // : <ProjectsList />
-            }
+            {userData.activeMenu ? menu[userData.activeMenu] : win[userData.activeWindow]}
         </div>
     )
 }
