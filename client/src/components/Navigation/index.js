@@ -1,18 +1,24 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
-// import { AuthenticateUser } from '../../context/AuthenticationContext'
 import { MessagesContext } from '../../context/MessagesContext'
 import ProjectHeader from './ProjectHeader'
 import ChatNavButton from '../Buttons/ChatNavButton'
 import SeparatingLine from '../SeparatingLine'
 
 const Navigation = () => {
-    // const { logOut } = AuthenticateUser()
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
     function searchProject() {
         dispatchUserData({ type: 'search-project' })
     }
+
+    // function searchProjectMobile() {
+    //     dispatchUserData({ type: 'search-project-mobile' })
+    // }
+
+    // function newProjectMobile() {
+    //     dispatchUserData({ type: 'new-project-mobile' })
+    // }
 
     function loadProfile() {
         dispatchUserData({ type: 'load-profile' })
@@ -20,6 +26,10 @@ const Navigation = () => {
 
     function loadProjects() {
         dispatchUserData({ type: 'load-projects-mobile' })
+    }
+
+    function loadChats() {
+        dispatchUserData({ type: 'load-chats-mobile' })
     }
 
     function loadPrevious() {
@@ -36,37 +46,59 @@ const Navigation = () => {
         }
     }
 
-    function loadChats() {
-        dispatchUserData({ type: 'load-chats-mobile' })
+    // set global notification on new project messages or join requests to your projects
+    function getProjectEvents() { // requests or messages
+        let events = false
+        for (const site in userData.sites) {
+            if (events) break // exit outer loop if inner loop breaks
+            if (userData.sites[site].requests && userData.sites[site].requests.length) {
+                events = true
+                break // exit outer loop
+            } else {
+                for (const group in userData.sites[site].groups) {
+                    if (userData.sites[site].groups[group].unread) {
+                        events = true
+                        break // exit inner loop
+                    }
+                }
+            }
+        }
+        return events
     }
 
-    function loadMembers() {
-        dispatchUserData({ type: 'load-members-mobile' })
+    // set global notification on new private messages
+    function getChatEvents() {
+        let events = false
+        for (const chat in userData.chats) {
+            if (userData.chats[chat].unread) {
+                events = true
+                break
+            }
+        }
+        return events
+    }
+
+    // set global notification on pending invitations sent to you
+    function getInvitationEvents() {
+        return userData.invitations && userData.invitations.length
     }
 
     return (
         <>
             <div className={styles.nav}>
-                {userData.activeSite
-                    ?
-                    <div className={styles.title}>
-                        <div className={`${styles.buttons} ${styles.mobile}`}>
-                            <ChatNavButton onClick={loadPrevious} icon='back' />
-                        </div>
-                        <ProjectHeader />
+                <div className={styles.title}>
+                    <div className={`${styles.buttons} ${styles.mobile}`}>
+                        {userData.activeSite
+                            ? <ChatNavButton onClick={loadPrevious} icon='back' events={getProjectEvents()} />
+                            : <ChatNavButton onClick={loadProjects} icon='projects' events={getProjectEvents()} />
+                        }
+                        <ChatNavButton onClick={loadChats} icon='chats' events={getChatEvents()} />
                     </div>
-                    :
-                    <div className={styles.title}>
-                        <div className={`${styles.buttons} ${styles.mobile}`}>
-                            <ChatNavButton onClick={loadProjects} icon='projects' />
-                            <ChatNavButton onClick={loadChats} icon='chats' />
-                        </div>
-                    </div>
-                }
+                    {userData.activeSite && <ProjectHeader />}
+                </div>
                 <div className={styles.buttons}>
-                    <ChatNavButton onClick={searchProject} title='Search' icon='search' />
+                    <ChatNavButton onClick={searchProject} title='New / Search' icon='search' events={getInvitationEvents()} />
                     <ChatNavButton onClick={loadProfile} title='Profile' icon='profile' />
-                    {/* <ChatNavButton onClick={logOut} title='Logout' icon='logout' /> */}
                 </div>
             </div>
             <SeparatingLine horizontal={true} />

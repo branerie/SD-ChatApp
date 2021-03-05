@@ -8,6 +8,10 @@
     cursor: pointer;
 }
 
+.events {
+    fill: tomato;
+}
+
 .button i {
     display: none;
 }
