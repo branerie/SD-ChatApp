@@ -6,7 +6,7 @@ const SiteSchema = new mongoose.Schema({
         unique: true,
         required: true,
         minlength: [4, 'Name too short. Minimum is 4 symbols.'],
-        maxlength: [20, 'Name too long. Maximum is 20 symbols.']
+        maxlength: [50, 'Name too long. Maximum is 50 symbols.']
     },
     description: {
         type: String,

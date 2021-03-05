@@ -4,15 +4,12 @@
     align-items: center;
     background-color: var(--bg-color-group);
     color: black;
-    margin: 1px 10px;
+    margin: 1px 5px;
     /* padding: 10px; */
     height: 2.5rem;
-    /* line-height: 2.5rem; */
+    overflow: hidden;
     border-radius: 5px;
     cursor: pointer;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
 }
 
 .group:hover {
@@ -31,6 +28,9 @@
     height: 100%;
     line-height: 2.5rem;
     padding-left: 1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .icons {
@@ -50,4 +50,11 @@
 
 .full {
     fill: var(--notification-color);
+}
+
+@media (max-width: 480px) {
+    .title {
+        white-space: normal;
+        text-overflow: inherit;
+    }
 }

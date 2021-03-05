@@ -8,32 +8,33 @@ import { ReactComponent as BellFull } from '../../icons/bell-full.svg'
 import { ReactComponent as MsgEmpty } from '../../icons/msg-empty.svg'
 import { ReactComponent as MsgFull } from '../../icons/msg-full.svg'
 
-
 const ProjectsList = ({ isSmallList }) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
     function loadProject(site) {
-        dispatchUserData({ type: "load-site", payload: { site } })
+        dispatchUserData({ type: "load-site", payload: { site: site[0] } })
     }
 
-    function projectSettings(pid) {
+    function loadProjectSettings(pid) {
         dispatchUserData({ type: 'load-project-settings', payload: { activeSite: pid } })
     }
 
     const sites = Object.entries(userData.sites).sort((A, B) => {
         // Sort: own projects alphabetically first, then the rest alphabetically
-        return (B[1].creator === userData.personal._id) - (A[1].creator === userData.personal._id) || A[1].name.localeCompare(B[1].name)
+        return (B[1].creator === userData.personal._id) - (A[1].creator === userData.personal._id) ||
+               A[1].name.localeCompare(B[1].name)
     })
 
-    function avatarLetter(line) {
-        const splitedName = line.split(' ')
-        const firstLatterArray = []
-        for (let i = 0; i < splitedName.length; i++) {
-            firstLatterArray.push(splitedName[i].charAt(0).toUpperCase())
+    function getAvatarLetters(line) {
+        const splitNames = line.split(' ')
+        const firstLetterArray = []
+        
+        const namesLength = Math.min(splitNames.length, 3)
+        for (let i = 0; i < namesLength; i++) {
+            firstLetterArray.push(splitNames[i].charAt(0).toUpperCase())
         }
-        const renderLetter = firstLatterArray.join('')
-        return renderLetter
-
+        
+        return firstLetterArray.join('')
     }
 
     function addClasses(site) {
@@ -55,8 +56,8 @@ const ProjectsList = ({ isSmallList }) => {
                             <div
                                 key={site[0]}
                                 className={addClasses(site)}
-                                onClick={() => loadProject(site[0])}>
-                                {avatarLetter(site[1].name)}
+                                onClick={() => loadProject(site)}>
+                                {getAvatarLetters(site[1].name)}
                             </div>
                         )
                     })}
@@ -70,18 +71,29 @@ const ProjectsList = ({ isSmallList }) => {
                                 key={site[0]}
                                 className={addClasses(site)}                                
                             >
-                                <div onClick={() => loadProject(site[0])} className={styles.title}>{site[1].name}</div>
+                                <div onClick={() => loadProject(site)} className={styles.title}>
+                                    {site[1].name}
+                                </div>
                                 <div className={styles.icons}>
                                     {Object.values(site[1].groups).some(group => group.unread === true)
-                                        ? <MsgFull onClick={() => loadProject(site[0])} className={styles.full} />
-                                        : <MsgEmpty onClick={() => loadProject(site[0])} className={styles.empty} />
+                                        ? <MsgFull onClick={() => loadProject(site)} className={styles.full} />
+                                        : <MsgEmpty onClick={() => loadProject(site)} className={styles.empty} />
                                     }
                                     {owner
                                         ? <>
                                             {site[1].requests && site[1].requests.length > 0
-                                                ? <BellFull onClick={() => projectSettings(site[0])} className={styles.full} />
-                                                : <BellEmpty onClick={() => projectSettings(site[0])} className={styles.empty} />}
-                                            <Gear onClick={() => projectSettings(site[0])} />
+                                                ? 
+                                                <BellFull 
+                                                    onClick={() => loadProjectSettings(site[0])} 
+                                                    className={styles.full} 
+                                                />
+                                                : 
+                                                <BellEmpty 
+                                                    onClick={() => loadProjectSettings(site[0])} 
+                                                    className={styles.empty} 
+                                                />
+                                            }
+                                            <Gear onClick={() => loadProjectSettings(site[0])} />
                                         </>
                                         : <Info />
                                     }

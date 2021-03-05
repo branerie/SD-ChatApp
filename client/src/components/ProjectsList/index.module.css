@@ -48,6 +48,8 @@
     border-radius: 50%;
     width: 40px;
     height: 40px;
+    display: flex;
+    justify-content: center;
 }
 
 .large {    
@@ -84,8 +86,11 @@
 .title {
     /* background-color: darkolivegreen; */
     flex-grow: 1;
-    overflow-x: hidden;
     padding-left: 1rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 5.2rem);
 }
 
 .icons {
@@ -105,4 +110,11 @@
 
 .full {
     fill: var(--notification-color);
+}
+
+@media (max-width: 480px) {
+    .title {
+        white-space: normal;
+        text-overflow: inherit;
+    }
 }

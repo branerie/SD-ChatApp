@@ -45,6 +45,6 @@
 
 @media (max-width: 480px) {
     .title {
-        font-size: 10px;
+        font-size: 1rem;
     }
 }

@@ -15,7 +15,14 @@ const capitalizeFirstLetter = (text) => {
     return `${text[0].toUpperCase()}${text.slice(1)}`
 }
 
+const shortenText = (text, maxLength) => {
+    if (text.length <= maxLength) return text
+
+    return `${text.slice(0, maxLength - 3)}...`
+}
+
 export {
     capitalizeFirstLetter,
-    replaceEmojis
+    replaceEmojis,
+    shortenText
 }

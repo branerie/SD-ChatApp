@@ -1,4 +1,4 @@
-import { useEffect, useContext, useRef, useState } from 'react'
+import { useEffect, useContext, useRef, useCallback } from 'react'
 import styles from './index.module.css'
 import ChatTitle from './ChatTitle'
 import Message from './Message'
@@ -26,7 +26,11 @@ const ChatWindow = () => {
         }
     })
 
-    useEffect(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight, [userData])
+    const scrollDown = useCallback(() => {
+        messagesRef.current.scrollTop = messagesRef.current.scrollHeight
+    }, [])
+
+    useEffect(scrollDown, [userData, scrollDown])
 
     let messages, title
     if (userData.activeChat) {
@@ -49,14 +53,17 @@ const ChatWindow = () => {
                             {thisDate !== prevDate && <DateSeparator date={thisDate} />}
                             {notice
                                 ? <Notice message={{ msg, event }} />
-                                : <Message message={{
-                                    user: userData.associatedUsers[src] ? userData.associatedUsers[src].name : null,
-                                    msg,
-                                    type,
-                                    timestamp,
-                                    own: src === userData.personal._id,
-                                    avatar: userData.associatedUsers[src] ? userData.associatedUsers[src].picture : null
-                                }}
+                                : 
+                                <Message 
+                                    message={{
+                                        user: userData.associatedUsers[src] ? userData.associatedUsers[src].name : null,
+                                        msg,
+                                        type,
+                                        timestamp,
+                                        own: src === userData.personal._id,
+                                        avatar: userData.associatedUsers[src] ? userData.associatedUsers[src].picture : null
+                                    }}
+                                    scrollDown={scrollDown}
                                 />
                             }
                         </div>

@@ -48,6 +48,13 @@
     align-items: center;
 }
 
+@media (max-width: 1024px) {
+    .input-box,
+    .icon {
+        display: none;
+    }
+}
+
 @media (max-width: 480px) {
     .container {
         padding: 5px;
