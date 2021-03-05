@@ -6,6 +6,7 @@ import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 
 import { ReactComponent as InfoButton } from '../../../icons/info.svg'
+import { shortenText } from '../../../utils/text'
 
 const Member = ({ id, name, picturePath, isOnline }) => {
     const { dispatchUserData } = useContext(MessagesContext)

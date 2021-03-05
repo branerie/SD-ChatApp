@@ -1,7 +1,7 @@
 .container {
     display: flex;
-    min-width: 200px;
-    max-width: 265px;
+    min-width: 250px;
+    max-width: 250px;
     /* flex-basis: 225px; */
 }
 

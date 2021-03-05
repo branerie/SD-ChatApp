@@ -4,12 +4,12 @@ import PlainMessage from './PlainMessage'
 import UriMessage from './UriMessage'
 import ImageMessage from './ImageMessage'
 
-const Message = ({ message }) => {
+const Message = ({ message, scrollDown }) => {
 
     const msg = {
         plain: <PlainMessage msg={message.msg}/>,
         uri: <UriMessage msg={message.msg}/>,
-        image: <ImageMessage msg={message.msg}/>
+        image: <ImageMessage msg={message.msg} scrollDown={scrollDown} />
     }
 
     function getTime(timestamp) {

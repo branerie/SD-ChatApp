@@ -3,7 +3,7 @@
     align-items: center;
     justify-content: space-between;
     background-color: var(--bg-color-chat);
-    margin: 2px 10px;
+    margin: 2px 5px;
     padding: 5px;
     border-radius: 5px;
     cursor: pointer;
@@ -30,8 +30,8 @@
     margin-right: 3px;
     font-size: 16px;
     color: black;
-    white-space: nowrap;
     overflow: hidden;
+    white-space: nowrap;
     text-overflow: ellipsis;
 }
 
@@ -46,3 +46,9 @@
     fill: var(--txt-color-hover)
 }
 
+@media (max-width: 480px) {
+    .name {
+        white-space: normal;
+        text-overflow: clip;
+    }
+}

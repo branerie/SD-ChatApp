@@ -18,3 +18,9 @@
     font-size: small;
     padding: 5px 0;
 }
+
+@media (max-width: 480px) {
+    .container {
+        max-height: 100%;
+    }
+}

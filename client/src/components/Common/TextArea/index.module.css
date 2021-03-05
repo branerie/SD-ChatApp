@@ -18,6 +18,8 @@
 
 .link-emoji {
     margin-right: 0.6rem;
+    min-width: 16px;
+    max-width: 16px;
     cursor: pointer;
 }
 
@@ -36,4 +38,6 @@
     fill: var(--bg-color-btn-msg-box);
     margin-right: 0.6rem;
     cursor: pointer;
+    min-width: 16px;
+    max-width: 16px;
 }
