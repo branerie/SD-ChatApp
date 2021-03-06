@@ -270,7 +270,7 @@ export default function UserDataReducer(userData, action) {
 
         case 'group-chat-message': {
             let timestamp = new Date().toUTCString()
-            let { src, site, group, msg, type } = action.payload
+            let { src, site, dst: group, msg, type } = action.payload.msgData
             let unread = false
             if (userData.device === 'desktop') {
                 unread = (src !== userData.personal._id && group !== userData.activeGroup)
@@ -302,7 +302,7 @@ export default function UserDataReducer(userData, action) {
 
         case 'single-chat-message': {
             let timestamp = new Date().toUTCString()
-            let { src, chat, msg, type } = action.payload
+            let { src, dst: chat, msg, type } = action.payload.msgData
             return {
                 ...userData,
                 chats: {
@@ -321,6 +321,53 @@ export default function UserDataReducer(userData, action) {
                                 messages: [{ src, msg, type, timestamp }],
                                 unread: true
                             }
+                    }
+                }
+            }
+        }
+
+        case 'error-message': {
+            const timestamp = new Date().toUTCString()
+            const { activeSite, activeGroup, activeChat } = userData
+            const error = {
+                notice: true,
+                event: 'warning',
+                msg: action.payload.error,
+                timestamp
+            }
+
+            if (activeChat) {
+                return {
+                    ...userData,
+                    chats: {
+                        ...userData.chats,
+                        [activeChat]: {
+                            ...userData.chats[activeChat],
+                            messages: [
+                                ...userData.chats[activeChat].messages || [],
+                                error
+                            ]
+                        }
+                    }
+                }
+            } else {
+                return {
+                    ...userData,
+                    sites: {
+                        ...userData.sites,
+                        [activeSite]: {
+                            ...userData.sites[activeSite],
+                            groups: {
+                                ...userData.sites[activeSite].groups,
+                                [activeGroup]: {
+                                    ...userData.sites[activeSite].groups[activeGroup],
+                                    messages: [
+                                        ...userData.sites[activeSite].groups[activeGroup].messages || [],
+                                        error
+                                    ]
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -677,7 +724,7 @@ export default function UserDataReducer(userData, action) {
 
     function setDevice() {
         if (window.screen.width < 480) return 'mobile'
-        else if (window.screen.width < 1024) return 'tablet'
+        // else if (window.screen.width < 1024) return 'tablet'
         else return 'desktop'
     }
 }
