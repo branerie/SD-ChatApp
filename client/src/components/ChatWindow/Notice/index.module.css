@@ -18,6 +18,10 @@
     background-color: var(--bg-color-sys-offline);
 }
 
+.warning {
+    background-color: var(--bg-color-sys-offline);
+}
+
 .joined {
     background-color: var(--bg-color-sys-joined);
 }

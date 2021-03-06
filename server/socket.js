@@ -35,7 +35,7 @@ module.exports = io => {
         const firstConnection = userIDToSocketIDCache[userData._id].length === 1
         firstConnection && clientsCount++
         socketsCount++
-        sysLog(`Connect @ ${socket.id} (${userData.username}). Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
+        sysLog(`Connect @ ${socket.id} (${userData._id}). Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
 
         const clientData = createUserData(userData, messagePool)
 
@@ -59,7 +59,7 @@ module.exports = io => {
             }
         }
         // console.log(JSON.stringify(clientData, null, 4),'\n','clientData END')
-        socket.emit('welcome-message', { userData: clientData })
+        socket.emit('welcome-message', clientData)
 
         // EVENT LISTENERS SECTION
         // Notify users on disconnect
@@ -87,38 +87,59 @@ module.exports = io => {
                     })
                 })
             }
-            sysLog(`Disconnect @ ${socket.id} (${userData.username}). Reason: ${reason}. Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
+            sysLog(`Disconnect @ ${socket.id} (${userData._id}). Reason: ${reason}. Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
         })
 
         socket.on('disconnect', () => {
             socket.removeAllListeners()
         })
 
-        // Get message from client and send to rest clients
-        socket.on('group-chat-message', async ({ msg, msgType, recipient, site }, callback) => {
-            let newMessage = await db.createPublicMessage(userData._id, recipient, msg, msgType)
-            if (!newMessage) return // validate query
-            sysLog(`Message (group): ${userData.username} >> ${recipient}`)
-            socket.to(recipient).emit('group-chat-message', { src: userData._id.toString(), msg,  type: msgType, group: recipient, site})
+        socket.on('group-chat-message', async (socketData, callback) => {
+            let src = userData._id.toString()
+            const validation = validate.messageData(src, socketData)
+            if (validation.failed) {
+                if (validation.error) callback(validation.error)
+                return
+            }
+
+            const { msg, type, dst } = socketData
+            let newMessage = await db.createPublicMessage(src, dst, msg, type)
+            if (!newMessage.success) {
+                sysLog(`Message from ${src} failed: ${newMessage.error}`)
+                return
+            }
+
+            sysLog(`Message (group): ${userData._id} >> ${dst}`)
+            socket.to(dst).emit('group-chat-message', { src, msg, type, dst, site: newMessage.site })
             callback()
         })
 
-        socket.on('single-chat-message', async ({ msg, msgType, recipient }, callback) => {
+        socket.on('single-chat-message', async (socketData, callback) => {
             let src = userData._id.toString()
-            let newMessage = await db.createPrivateMessage(src, recipient, msg, msgType)
-            if (!newMessage) return // validate query            
-
-            // send message to all sockets associated with recipient if any
-            if (userIDToSocketIDCache[recipient]) {
-                sysLog(`Message (private): ${src} >> ${recipient}`)
-                userIDToSocketIDCache[recipient].forEach(socketID => {
-                    io.to(socketID).emit('single-chat-message', {src, chat: src, msg, type: msgType })
-                })
-            } else {
-                // send offline msg to DB if not in blacklist
-                sysLog(`Message (offline): ${src} >> ${recipient}`)
+            const validation = validate.messageData(src, socketData)
+            if (validation.failed) {
+                if (validation.error) callback(validation.error)
+                return
             }
-            if (recipient !== src) restSocketsUpdate(src, socket.id, 'single-chat-message', { src, chat: recipient, msg, type: msgType })
+
+            const { msg, type, dst } = socketData
+            let newMessage = await db.createPrivateMessage(src, dst, msg, type)
+            if (!newMessage.success) {
+                sysLog(`Message from ${src} failed: ${newMessage.error}`)
+                return
+            }
+
+            // if recipient is online send message to all his connected sockets
+            if (userIDToSocketIDCache[dst]) {
+                userIDToSocketIDCache[dst].forEach(sid => {
+                    io.to(sid).emit('single-chat-message', { src, dst: src, msg, type })
+                })
+            }
+            
+            sysLog(`Message (private): ${src} >> ${dst}`)
+
+            // update rest of sender connected sockets
+            if (dst !== src) restSocketsUpdate(src, socket.id, 'single-chat-message', { src, dst, msg, type })
             callback()
         })
 
@@ -152,7 +173,7 @@ module.exports = io => {
                                     notice: true,
                                     event: 'system',
                                     timestamp: utcTime(),
-                                    msg: `Hello ${userData.name}. Welcome to your new project: ${site}. You can invite members in General group or start creating groups now.`
+                                    msg: `Hello ${userData.name}. Welcome to your new project: ${site}. You can invite members or start creating groups now.`
                                 }]
                             }
                         }
@@ -238,7 +259,7 @@ module.exports = io => {
                     })
                 }
                 const siteData = {
-                    _id: data.site._id, 
+                    _id: data.site._id,
                     name: data.site.name
                 }
                 sysLog(`${userData._id} request to join ${site}`)
@@ -267,7 +288,7 @@ module.exports = io => {
                     site,
                     group
                 })
-                
+
                 let associatedUsers = {}
                 data.generalGroup.members.map(member => associatedUsers[member._id] = {
                     username: member.username,
@@ -507,12 +528,12 @@ module.exports = io => {
                         data
                     }
                 })
-            })            
+            })
             callback(validation.data)
             restSocketsUpdate(userData._id, socket.id, 'update-profile-data', validation.data)
         })
 
-        socket.on('get-chat-history', async(id, callback) => {
+        socket.on('get-chat-history', async (id, callback) => {
             const data = await db.getPrivateMessages(id, userData._id)
             const chat = {
                 messages: []

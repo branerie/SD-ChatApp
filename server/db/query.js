@@ -88,22 +88,24 @@ const getPrivateMessages = async (id, uid) => {
     return { messages, username: party.name }
 }
 
-const createPublicMessage = async (sender, recipient, msg, type) => {
+const createPublicMessage = async (src, dst, msg, type) => {
     // check if group is valid and if user has access to it
-    await Group.findById(recipient)
-    let message = new Message({
-        source: sender,
-        destination: recipient,
-        onModel: 'Group',
-        content: msg,
-        type
-    })
     try {
-        let newMessage = await message.save()
-        // console.log(newMessage)
-        return newMessage
+        const group = await Group.findById(dst)
+        if (group === null) throw new Error(`Group ${dst} not found.`)
+        if (!group.members.includes(src)) throw new Error(`Membership in ${dst} not found.`)
+        // console.log(group);
+        let message = new Message({
+            source: src,
+            destination: dst,
+            onModel: 'Group',
+            content: msg,
+            type
+        })
+        const details = await message.save()
+        return { success: true, details, site: group.site }
     } catch (error) {
-        return false
+        return { success: false, error: error.message }
     }
 }
 
@@ -115,22 +117,22 @@ const removeChat = async (id, chat) => {
     }
 }
 
-const createPrivateMessage = async (sender, recipient, msg, type) => {
-    await User.findByIdAndUpdate(sender, { $addToSet: { chats: [recipient] } })
-    await User.findByIdAndUpdate(recipient, { $addToSet: { chats: [sender] } })
-    let message = new Message({
-        source: sender,
-        destination: recipient,
-        onModel: 'User',
-        content: msg,
-        type
-    })
+const createPrivateMessage = async (src, dst, msg, type) => {
     try {
-        let newMessage = await message.save()
-        // console.log(newMessage)
-        return newMessage
+        // blacklist validation ?
+        await User.findByIdAndUpdate(src, { $addToSet: { chats: [dst] } })
+        await User.findByIdAndUpdate(dst, { $addToSet: { chats: [src] } })
+        let message = new Message({
+            source: src,
+            destination: dst,
+            onModel: 'User',
+            content: msg,
+            type
+        })
+        let details = await message.save()
+        return { success: true, details }
     } catch (error) {
-        return false
+        return { success: false, error: error.message }
     }
 }
 
@@ -291,7 +293,7 @@ const sendRequest = async (sid, uid) => {
         return { success: true, site }
 
     } catch (error) {
-        return {error: error.message}
+        return { error: error.message }
     }
 }
 
@@ -391,7 +393,7 @@ const searchProjects = async (uid, pattern, page) => {
         _id: {
             $nin: excludedSites
         },
-        name: {            
+        name: {
             $regex: pattern,
             $options: 'i'
         }

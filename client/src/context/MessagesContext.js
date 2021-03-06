@@ -15,18 +15,18 @@ export default function MessagesContextProvider(props) {
             document.title = `SmartChat | Loading...`
         })
 
-        socket.on('welcome-message', ({ userData }) => {
+        socket.on('welcome-message', userData => {
             document.title = `SmartChat | ${userData.personal.username}`
             dispatchUserData({ type: 'welcome-message', payload: { userData } })
 
         })
 
-        socket.on('group-chat-message', ({ src, msg, type, group, site }) => {
-            dispatchUserData({ type: 'group-chat-message', payload: { src, msg, type, site, group } })
+        socket.on('group-chat-message', msgData => {
+            dispatchUserData({ type: 'group-chat-message', payload: { msgData } })
         })
 
-        socket.on('single-chat-message', ({ src, chat, msg, type }) => {
-            dispatchUserData({ type: 'single-chat-message', payload: { src, chat, msg, type } })
+        socket.on('single-chat-message', msgData => {
+            dispatchUserData({ type: 'single-chat-message', payload: { msgData } })
         })
 
         socket.on('create-site', siteData => {
@@ -125,33 +125,29 @@ export default function MessagesContextProvider(props) {
         return () => socket.offAny()
     }, [socket])
 
-    function sendMessage(msg, msgType = 'plain') {
-        let recipientType, recipient, site
-        if (userData.activeChat) {
-            recipientType = 'single-chat-message'
-            recipient = userData.activeChat
-            site = null
+    function sendMessage(msg, type = 'plain') {
+        let msgType, dst, site = userData.activeSite
+        if (site) {
+            msgType = 'group-chat-message'
+            dst = userData.activeGroup
         } else {
-            recipientType = 'group-chat-message'
-            recipient = userData.activeGroup
-            site = userData.activeSite
+            msgType = 'single-chat-message'
+            dst = userData.activeChat
         }
 
-        if (msgType !== 'image' && (msg.startsWith('http://') || msg.startsWith('https://'))) msgType = 'uri'
-        socket.emit(recipientType, { site, recipient, msg, msgType }, () => {
-            if (recipient === userData.personal._id) return
+        if (type !== 'image' && (msg.startsWith('http://') || msg.startsWith('https://'))) type = 'uri'
+        let socketData = { msg, type, dst }
+        socket.emit(msgType, socketData, error => {
+            if (error) {
+                dispatchUserData({ type: 'error-message', payload: { error } })
+                return
+            }
 
-            dispatchUserData({
-                type: recipientType,
-                payload: {
-                    src: userData.personal._id,
-                    msg,
-                    type: msgType,
-                    site,
-                    group: recipient,
-                    chat: recipient
-                }
-            })
+            let src = userData.personal._id
+            if (dst === src) return // on personal notes
+
+            let msgData = { msg, type, src, dst, site }
+            dispatchUserData({ type: msgType, payload: { msgData } })
         })
         return
     }
