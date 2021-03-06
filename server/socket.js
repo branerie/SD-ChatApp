@@ -135,7 +135,7 @@ module.exports = io => {
                     io.to(sid).emit('single-chat-message', { src, dst: src, msg, type })
                 })
             }
-            
+
             sysLog(`Message (private): ${src} >> ${dst}`)
 
             // update rest of sender connected sockets
@@ -148,15 +148,12 @@ module.exports = io => {
         })
 
         socket.on('create-site', async (socketData, callback) => { //admin
-            if (!isValid(socketData, userData._id)) return
-            let { site = '', description = '' } = socketData
-            site = String(site).trim()
-            description = String(description).trim()
-            const validation = validate.siteData(site, description)
+            const validation = validate.siteData(userData._id, socketData)
             if (validation.failed) {
-                callback(false, validation.errors)
+                callback(false, validation.error)
                 return
             }
+            const { site, description } = validation.data
             const data = await db.createSite(site, description, userData._id)
             if (data.success) {
                 let groupID = data.groupID.toString()
@@ -164,6 +161,7 @@ module.exports = io => {
                 const siteData = {
                     [data.siteID]: {
                         name: site,
+                        description,
                         creator: userData._id,
                         groups: {
                             [groupID]: {
@@ -187,21 +185,14 @@ module.exports = io => {
             }
         })
 
-        socket.on('create-group', async ({ site, group }, callback) => { //admin
-            if (group) group = group.trim()
-            if (!group) {
-                // Avoid db query but validate it in the schema with required flag. Also set this check on Client Side.
-                sysLog(`${userData._id} @ ${socket.id} attempt to create group with no name in ${site}`)
-                callback(false, ['Group name is required'])
+        socket.on('create-group', async (socketData, callback) => { //admin
+            const validation = validate.groupData(userData._id, socketData)
+            if (validation.failed) {
+                if (validation.error) callback(false, [validation.error])
                 return
             }
 
-            if (group.toLowerCase() === 'general') {
-                // Avoid db query. Also set this check on Client Side.
-                sysLog(`${userData._id} @ ${socket.id} attempt to create General group in ${site}`)
-                callback(false, ['General is reserved name'])
-                return
-            }
+            const { site, group } = socketData
             const data = await db.createGroup(site, group, userData._id)
             if (data.success) {
                 let groupID = data._id.toString()
@@ -486,7 +477,8 @@ module.exports = io => {
                 callback(false, validation.error) // send validation.errors if applicable
                 return
             }
-            const data = await db.searchProjects(userData._id, validation.data.site, validation.data.page)
+            const { site, page } = validation.data
+            const data = await db.searchProjects(userData._id, site, page)
             if (data.success) {
                 callback(true, data.more, data.projects)
             } else {
@@ -495,13 +487,17 @@ module.exports = io => {
         })
 
         socket.on('search-people', async (socketData, callback) => {
-            if (!isValid(socketData, userData._id)) return
-            const { name = '', page = 0 } = socketData
+            const validation = validate.peopleSearch(userData._id, socketData)
+            if (validation.failed) {
+                callback(false, validation.error) // send validation.errors if applicable
+                return
+            }
+            const { name, page } = validation.data
             const data = await db.searchPeople(name, page)
             if (data.success) {
                 callback(true, data.people)
             } else {
-                callback(false)
+                callback(false, 'No results found')
             }
         })
 
@@ -558,7 +554,7 @@ module.exports = io => {
         })
 
         socket.on('change-theme', async theme => {
-            const allowedThemes = ['light', 'dark']
+            const allowedThemes = ['light', 'dark'] // move validation in validate-socket-data
             if (!allowedThemes.includes(theme)) return // log attempt and return
             await db.changeTheme(userData._id, theme)
         })
@@ -582,16 +578,6 @@ module.exports = io => {
             if (socket !== sid) io.sockets.sockets.get(socket).join(gid)
         })
     }
-}
-
-function isValid(object, source) {
-    if (object == null || object == undefined) {
-        sysLog(`Invalid data from ${source} Expected Object - got ${object}`)
-        return false
-    } else if (!object || object.constructor.name !== 'Object') {
-        sysLog(`Invalid data from ${source} Expected Object - got ${object.constructor.name}.`)
-        return false
-    } else return true
 }
 
 function getTime() {

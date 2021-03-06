@@ -46,7 +46,6 @@ const CreateProject = () => {
                     placeholder='Project description...'
                 />
             </div>
-            {/* <button onClick={createSite}>Create</button> */}
             <MenuButton 
                 title='Create' 
                 onClick={createSite} 

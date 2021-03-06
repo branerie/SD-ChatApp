@@ -13,7 +13,7 @@ const SearchPeople = () => {
     const { socket } = useContext(SocketContext)
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
-    const [name, setName] = useState()
+    const [name, setName] = useState('')
     const [page, setPage] = useState(0)
     const [names, setNames] = useState([])
     const [error, setError] = useState(false)
@@ -25,7 +25,7 @@ const SearchPeople = () => {
             if (success) {
                 setNames(data)
             } else {
-                setError("No results found")
+                setError(data)
             }
             setPage(page + 1)
         })
