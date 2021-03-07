@@ -244,9 +244,11 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false },
-                ...(activeConnection) && { activeMenu: false }
+                ...(activeConnection) && { 
+                    activeGroup,
+                    activeChat: false,
+                    activeMenu: false
+                }
             }
         }
 

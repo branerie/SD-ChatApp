@@ -31,25 +31,25 @@ function isObject(src, object) {
     } else return true
 }
 
-const messageData = (src, data) => {
-    if (!isObject(src, data)) return { failed: true }
+const messageData = (src, data, failed = true) => {
+    if (!isObject(src, data)) return { failed }
     const { msg = '', type = 'plain' } = data
-    if (!isString(msg) || trimAll(msg) === '') return { failed: true }
+    if (!isString(msg) || trimAll(msg) === '') return { failed }
     const allowedTypes = ['plain', 'uri', 'image']
     if (!isString(type) || !allowedTypes.includes(type)) {
         sysLog(`Invalid message type from ${src}. Got ${type}.`)
-        return { failed: true }
+        return { failed }
     }
 
     if (type === 'plain' && msg.length > MAX_MSG_LEN) {
         sysLog(`Message length from ${src} exceeded max allowed.`)
-        return { failed: true, error: 'Message not sent: Too long' }
+        return { failed, error: 'Message not sent: Too long' }
     }
-    return { failed: false }
+    return { data }
 }
 
-const profileData = (src, data, errors = []) => {
-    if (!isObject(src, data)) return { failed: true, errors }
+const profileData = (src, data, failed = true, errors = []) => {
+    if (!isObject(src, data)) return { failed, errors }
     const allowedFields = ['name', 'company', 'position', 'email', 'mobile', 'picture']
     const ignoredData = {}
     let invalidData = false
@@ -65,33 +65,63 @@ const profileData = (src, data, errors = []) => {
     // log removed invalid fields but don't fail validation
     // might be misconfiguration on server (check allowedFileds)
     invalidData && sysLog(`Unexpected data from ${src}.\nIgnored data: ${JSON.stringify(ignoredData)}.`)
-    return { failed: false, data }
+    return { data }
 }
 
-const siteData = (site, description, errors = []) => {
-    if (!site) errors.push('Name is required')
-    if (site && site.length < 4) errors.push('Name too short. Minimum is 4 symbols.')
-    if (site && site.length > 50) errors.push('Name too long. Maximum is 50 symbols.')
-    if (description && description.length > 100) errors.push('Description too long. Maximum is 100 symbols.')
-
-    return { failed: errors.length > 0, errors }
+const siteData = (src, data, failed = true) => {
+    if (!isObject(src, data)) return { failed }
+    const { site = '', description = '' } = data
+    if (!isString(site) || !isString(description)) {
+        sysLog(`Invalid data type from ${src}.`)
+        return { failed }
+    }
+    data.site = trimAll(site)
+    data.description = trimAll(description)
+    return { data }
 }
 
-const siteSearch = (src, data) => {
-    if (!isObject(src, data)) return { failed: true }
+const groupData = (src, data, failed = true) => {
+    if (!isObject(src, data)) return { failed }
+    const { group = '' } = data
+    if (!isString(group)) {
+        sysLog(`Invalid data type from ${src}.`)
+        return { failed }
+    }
+
+    data.group = trimAll(group)
+    if (!data.group) return { failed, error: 'Name is required' }
+    if (data.group.toLowerCase() === 'general') return { failed, error: 'General is reserved name' }
+    return { data }
+}
+
+const siteSearch = (src, data, failed = true) => {
+    if (!isObject(src, data)) return { failed }
     if (!isString(data.site) || !isPosInt(data.page)) {
         sysLog(`Invalid data type from ${src}.`)
-        return { failed: true }
+        return { failed }
     }
     data.site = trimAll(data.site)
-    if (!data.site) return { failed: true, error: 'Site is required' }
-    return { failed: false, data }
+    if (!data.site) return { failed, error: 'Site is required' }
+    return { data }
+}
 
+const peopleSearch = (src, data, failed = true) => {
+    console.log('test');
+    if (!isObject(src, data)) return { failed }
+    if (!isString(data.name) || !isPosInt(data.page)) {
+        sysLog(`Invalid data type from ${src}.`)
+        return { failed }
+    }
+    data.name = trimAll(data.name)
+    if (!data.name) return { failed, error: 'Name is required' }
+    return { data }
 }
 
 module.exports = {
     messageData,
     siteSearch,
+    peopleSearch,
     siteData,
+    groupData,
     profileData,
 }

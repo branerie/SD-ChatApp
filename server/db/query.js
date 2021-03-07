@@ -222,7 +222,7 @@ const createGroup = async (site, name, creator) => {
         return { success: true, _id: newGroup._id }
     } catch (error) {
         // add validations in model and check for more errors
-        return { success: false, message: 'error.code' }
+        return { success: false, message: error.message }
     }
 }
 
