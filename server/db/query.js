@@ -88,6 +88,14 @@ const getPrivateMessages = async (id, uid) => {
     return { messages, username: party.name }
 }
 
+const getGroupMessages = async (gid) => {
+    const messages = await Message.find({ destination: gid, onModel: 'Group' }, '-_id -__v -updatedAt').populate({
+        path: 'source',
+        select: 'name username'
+    }).lean()
+    return messages
+}
+
 const createPublicMessage = async (src, dst, msg, type) => {
     // check if group is valid and if user has access to it
     try {
@@ -271,7 +279,25 @@ const addUserToGroup = async (uid, sid, gid, aid) => {
 
         await User.findByIdAndUpdate(uid, { $addToSet: { groups: [gid] } })
         await Group.findByIdAndUpdate(gid, { $addToSet: { members: [uid] } })
-        return { success: true, userData, groupData }
+        const messages = await getGroupMessages(gid)
+        return { success: true, userData, groupData, messages }
+    } catch (error) {
+        if (error.name === "CastError") return `CastError: ${error.message}`
+        return error.message
+    }
+}
+
+const removeUserFromGroup = async (uid, sid, gid, aid) => {
+    try {
+        // check if site is valid and site admin match
+        const siteData = await Site.findOne({ _id: sid, creator: aid })
+        if (siteData === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
+        const groupData = await Group.findOne({ _id: gid, site: sid })
+        if (groupData === null) throw new Error(`Group ${gid} in project ${sid} not found`)
+        if (!groupData.members.includes(uid)) throw new Error(`User ${uid} is not part of group ${gid}.`)
+        await User.findByIdAndUpdate(uid, { $pull: { groups: gid } })
+        await Group.findByIdAndUpdate(gid, { $pull: { members: uid } })
+        return { success: true }
     } catch (error) {
         if (error.name === "CastError") return `CastError: ${error.message}`
         return error.message
@@ -475,6 +501,7 @@ module.exports = {
     createGroup,
     inviteUser,
     addUserToGroup,
+    removeUserFromGroup,
     sendRequest,
     acceptInvitation,
     cancelRequest,

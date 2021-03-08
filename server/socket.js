@@ -367,6 +367,7 @@ module.exports = io => {
             const data = await db.addUserToGroup(member, site, group, userData._id)
             if (data.success) {
                 let online = userIDToSocketIDCache[member] ? true : false
+                console.log(online);
                 let user = {
                     _id: data.userData._id,
                     name: data.userData.name,
@@ -381,19 +382,49 @@ module.exports = io => {
                 })
 
                 if (online) {
+                    let messages = []
+                    data.messages.forEach(msg => {
+                        messages.push({
+                            src: msg.source._id,
+                            msg: msg.content,
+                            type: msg.type || 'plain',
+                            timestamp: msg.createdAt
+                        })
+                    })
+                    messages.push({
+                        notice: true,
+                        event: 'system',
+                        timestamp: utcTime(),
+                        msg: `You have been added to ${data.groupData.name} by Admin.`
+                    })
                     let groupData = {
                         [group]: {
                             name: data.groupData.name,
                             members: [...data.groupData.members.map(m => m._id), data.userData._id],
-                            messages: []
+                            messages, // get old msgs from db ? 
+                            unread: true
                         }
                     }
-
                     userIDToSocketIDCache[member].forEach(socket => {
                         io.sockets.sockets.get(socket).join(group)
                         io.sockets.sockets.get(socket).emit('added-to-group', { site, group: groupData })
                     })
                 }
+                callback()
+            }
+        })
+
+        socket.on('remove-member', async ({ member, site, group }, callback) => {
+            if (member === '') return // stop this on client side also
+            const data = await db.removeUserFromGroup(member, site, group, userData._id)
+            if (data.success) {
+                if (userIDToSocketIDCache[member]) {
+                    userIDToSocketIDCache[member].forEach(socket => {
+                        io.sockets.sockets.get(socket).leave(group)
+                        io.sockets.sockets.get(socket).emit('removed-from-group', { site, group })
+                    })
+                }
+                io.to(group).emit('leave-message', { member, site, group })
                 callback()
             }
         })

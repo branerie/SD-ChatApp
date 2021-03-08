@@ -4,6 +4,7 @@ import { MessagesContext } from "../../../context/MessagesContext"
 import { SocketContext } from "../../../context/SocketContext"
 
 import addArrow from '../../../images/arrow-left.png'
+import remArrow from '../../../images/arrow-right.png'
 import SeparatingLine from "../../SeparatingLine"
 import UserAvatar from "../../Common/UserAvatar"
 
@@ -34,6 +35,13 @@ const GroupsMembership = () => {
         })
     }
 
+    function removeMember(member) {
+        socket.emit("remove-member", {member, site: userData.activeSite, group: activeGroup }, () => {
+            setRestMembers([...restMembers, member])
+            setGroupMembers(groupMembers.filter(m => m !== member))
+        })
+    }
+
     if (groups.length < 2) return null
 
     return (
@@ -61,14 +69,14 @@ const GroupsMembership = () => {
                             groupMembers.map(m => {
                                 if (m === userData.personal._id) return null
                                 return (
-                                    <div
-                                        key={m}
-                                        className={styles['added-user']}
-                                    >
-                                        <UserAvatar picturePath={userData.associatedUsers[m].picture} />
-                                        <span style={{ marginLeft: '5px' }}>
-                                            {userData.associatedUsers[m].name}
-                                        </span>
+                                    <div key={m} className={styles.addmember}>
+                                        <div onClick={() => removeMember(m)} className={styles['add-btn']}>
+                                            <UserAvatar picturePath={userData.associatedUsers[m].picture} />
+                                            <span style={{ marginLeft: '5px' }}>
+                                                {userData.associatedUsers[m].name}
+                                            </span>
+                                            <img alt='Add Link' src={remArrow} className={styles.arrow} />
+                                        </div>
                                     </div>
                                 )
                             })
