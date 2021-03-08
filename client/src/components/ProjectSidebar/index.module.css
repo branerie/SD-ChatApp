@@ -8,8 +8,8 @@
 .inner {
     display: flex; 
     flex-direction: column;
-    /* flex-grow: 1;
-    overflow-y: auto;
+    flex-grow: 1;
+    /* overflow-y: auto;
     scrollbar-width: none; */
     overflow-y: hidden;
     max-height: 100%;
