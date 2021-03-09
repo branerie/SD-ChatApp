@@ -11,7 +11,7 @@ import UserAvatar from "../../Common/UserAvatar"
 const GroupsMembership = () => {
     const { userData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
-    const [activeGroup, setActiveGroup] = useState()
+    const [group, setGroup] = useState('')
     const [groupMembers, setGroupMembers] = useState([])
     const [restMembers, setRestMembers] = useState([])
 
@@ -23,20 +23,20 @@ const GroupsMembership = () => {
 
     function loadGroup(gid) {
         const { members } = userData.sites[userData.activeSite].groups[gid]
-        setActiveGroup(gid)
+        setGroup(gid)
         setGroupMembers(members)
         setRestMembers(siteMembers.filter(m => !members.includes(m)))
     }
 
     function addMember(member) {
-        socket.emit("add-member", { member, site: userData.activeSite, group: activeGroup }, () => {
+        socket.emit("add-member", { member, group }, () => {
             setGroupMembers([...groupMembers, member])
             setRestMembers(restMembers.filter(m => m !== member))
         })
     }
 
     function removeMember(member) {
-        socket.emit("remove-member", {member, site: userData.activeSite, group: activeGroup }, () => {
+        socket.emit("remove-member", {member, group }, () => {
             setRestMembers([...restMembers, member])
             setGroupMembers(groupMembers.filter(m => m !== member))
         })
@@ -51,21 +51,21 @@ const GroupsMembership = () => {
                 <div className={styles.container}>
                     <div className={`${styles.column} ${styles.group}`}>
                         <p className={styles['column-title']}>Select group:</p>
-                        {groups.map(([gid, group]) => {
-                            if (group.name === 'General') return null // sort of continue in map
+                        {groups.map(([id, data]) => {
+                            if (data.name === 'General') return null // sort of continue in map
                             return (
                                 <div
-                                    key={gid}
-                                    onClick={() => loadGroup(gid)}
-                                    className={gid === activeGroup ? styles.selected : styles.listed}
-                                >{group.name}</div>
+                                    key={id}
+                                    onClick={() => loadGroup(id)}
+                                    className={id === group ? styles.selected : styles.listed}
+                                >{data.name}</div>
                             )
                         })
                         }
                     </div>
                     <div className={styles.column}>
                         <p className={styles['column-title']}>Group members:</p>
-                        {activeGroup &&
+                        {group &&
                             groupMembers.map(m => {
                                 if (m === userData.personal._id) return null
                                 return (
@@ -84,7 +84,7 @@ const GroupsMembership = () => {
                     </div>
                     <div className={styles.column}>
                         <p className={styles['column-title']}>Other members:</p>
-                        {activeGroup &&
+                        {group &&
                             restMembers.map(m => {
                                 if (m === userData.personal._id) return null
                                 return (

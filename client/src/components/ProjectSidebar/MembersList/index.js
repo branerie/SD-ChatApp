@@ -13,11 +13,10 @@ const MembersList = () => {
         let B = userData.associatedUsers[b]
         return (b === owner) - (a === owner) || B.online - A.online || A.name.localeCompare(B.name)
     })
-    let membersCount = members.length
 
     return (
         <div className={styles.container}>
-            <div className={styles.header}>{membersCount} MEMBER{membersCount > 1 && 'S'}</div>
+            <div className={styles.header}>MEMBERS: ({members.length})</div>
             <div className={styles.inner}>
                 {members.map(member => {
                     return (

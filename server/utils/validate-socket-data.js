@@ -106,7 +106,6 @@ const siteSearch = (src, data, failed = true) => {
 }
 
 const peopleSearch = (src, data, failed = true) => {
-    console.log('test');
     if (!isObject(src, data)) return { failed }
     if (!isString(data.name) || !isPosInt(data.page)) {
         sysLog(`Invalid data type from ${src}.`)
@@ -117,6 +116,18 @@ const peopleSearch = (src, data, failed = true) => {
     return { data }
 }
 
+const membershipData = (src, data, failed = true) => {
+    // expect object with member and group props and string values representing object id
+    // object id data type and rights will be checked on db
+    if (!isObject(src, data)) return { failed }
+    const { member, group } = data
+    if (!isString(member) || !isString(group)) {
+        sysLog(`Invalid data type from ${src}.`)
+        return { failed }
+    }
+    return { data }
+}
+
 module.exports = {
     messageData,
     siteSearch,
@@ -124,4 +135,5 @@ module.exports = {
     siteData,
     groupData,
     profileData,
+    membershipData
 }

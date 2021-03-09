@@ -590,7 +590,7 @@ export default function UserDataReducer(userData, action) {
                                     {
                                         notice: true,
                                         event: 'warning',
-                                        msg: 'You were taken out from group by Administrator. You will stop recieving messages here and group will disappear from your list on next connect.',
+                                        msg: 'You were taken out by Admin. Group will disappear from your list on next connection.',
                                         timestamp
                                     }
                                 ],

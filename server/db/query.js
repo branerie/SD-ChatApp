@@ -261,46 +261,47 @@ const inviteUser = async (username, sid, aid) => {
     }
 }
 
-const addUserToGroup = async (uid, sid, gid, aid) => {
+const addUserToGroup = async (uid, gid, aid) => {
     try {
-        // check if site is valid and site admin match
-        const siteData = await Site.findOne({ _id: sid, creator: aid })
-        if (siteData === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
+        // check if group created by admin exists
+        const groupData = await Group.findOne({ _id: gid, creator: aid })
+        if (groupData === null) throw new Error(`Group not found or admin mismatch. Group: ${gid}. Admin: ${aid}.`)
         // check if user is valid and exists
-        const userData = await User.findById(uid)
+        const userData = await User.findById(uid, 'name username picture')
         if (userData === null) throw new Error(`User ${uid} not found`)
-        // check if user is a member of project (project general group)
-        const generalGroup = await Group.findOne({ site: sid, name: 'General' }, 'members')
-        if (!generalGroup.members.includes(uid)) throw new Error(`User ${uid} (${userData.username}) is not a member of project ${sid} (${siteData.name})`)
-        // check if group exists and if user is not already a member of this group
-        const groupData = await Group.findOne({ _id: gid, site: sid }).populate({ path: 'members', select: 'name username' })
-        if (groupData === null) throw new Error(`Group ${gid} in project ${sid} not found`)
-        if (groupData.members.map(m => m._id).includes(uid)) throw new Error(`User ${uid} (${userData.username}) is already part of group ${gid} (${groupData.name})`)
+        // check if user is not already a member of this group
+        if (groupData.members.includes(uid)) throw new Error(`User ${uid} is already part of group ${gid}.`)
+        // finally check if user is a member of project (project general group)
+        const generalGroup = await Group.findOne({ site: groupData.site, name: 'General' }, 'members')
+        if (!generalGroup.members.includes(uid)) throw new Error(`User ${uid} is not a member of project ${groupData.site}`)
 
         await User.findByIdAndUpdate(uid, { $addToSet: { groups: [gid] } })
         await Group.findByIdAndUpdate(gid, { $addToSet: { members: [uid] } })
         const messages = await getGroupMessages(gid)
-        return { success: true, userData, groupData, messages }
+        return { userData, groupData, messages }
     } catch (error) {
-        if (error.name === "CastError") return `CastError: ${error.message}`
-        return error.message
+        if (error.name === "CastError") return { error: `CastError: ${error.message}` }
+        return { error: error.message }
     }
 }
 
-const removeUserFromGroup = async (uid, sid, gid, aid) => {
+const removeUserFromGroup = async (uid, gid, aid) => {
     try {
-        // check if site is valid and site admin match
-        const siteData = await Site.findOne({ _id: sid, creator: aid })
-        if (siteData === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
-        const groupData = await Group.findOne({ _id: gid, site: sid })
-        if (groupData === null) throw new Error(`Group ${gid} in project ${sid} not found`)
+        // check if group created by admin exists
+        const groupData = await Group.findOne({ _id: gid, creator: aid })
+        if (groupData === null) throw new Error(`Group not found or admin mismatch. Group: ${gid}. Admin: ${aid}.`)
+        // check if user is valid and exists
+        const userData = await User.findById(uid, 'name username picture')
+        if (userData === null) throw new Error(`User ${uid} not found`)
+        // check if user is a member of this group
         if (!groupData.members.includes(uid)) throw new Error(`User ${uid} is not part of group ${gid}.`)
+
         await User.findByIdAndUpdate(uid, { $pull: { groups: gid } })
         await Group.findByIdAndUpdate(gid, { $pull: { members: uid } })
-        return { success: true }
+        return { site: groupData.site }
     } catch (error) {
-        if (error.name === "CastError") return `CastError: ${error.message}`
-        return error.message
+        if (error.name === "CastError") return { error: `CastError: ${error.message}` }
+        return { error: error.message }
     }
 }
 
