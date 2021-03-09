@@ -85,8 +85,8 @@ export default function MessagesContextProvider(props) {
             dispatchUserData({ type: 'removed-from-group', payload: { socketData } })
         })
 
-        socket.on('join-message', ({ user, site, group }) => {
-            dispatchUserData({ type: 'join-message', payload: { user, site, group } })
+        socket.on('join-message', socketData => {
+            dispatchUserData({ type: 'join-message', payload: { socketData } })
         })
 
         socket.on('leave-message', socketData => {

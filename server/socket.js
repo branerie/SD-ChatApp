@@ -287,6 +287,13 @@ module.exports = io => {
                     picture: member.picture,
                     online: Boolean(userIDToSocketIDCache[member._id])
                 })
+                let messages = oldMessagesOnJoin(data.messages)
+                messages.push({
+                    notice: true,
+                    event: 'system',
+                    timestamp: utcTime(),
+                    msg: `Welcome to ${data.site.name}.`
+                })
                 let siteData = {
                     [site]: {
                         name: data.site.name,
@@ -295,7 +302,8 @@ module.exports = io => {
                             [group]: {
                                 name: 'General',
                                 members: [...Object.keys(associatedUsers), userData._id],
-                                messages: []
+                                messages,
+                                // unread: true
                             }
                         }
                     }
@@ -337,6 +345,13 @@ module.exports = io => {
                         picture: member.picture,
                         online: Boolean(userIDToSocketIDCache[member._id])
                     })
+                    let messages = oldMessagesOnJoin(data.messages)
+                    messages.push({
+                        notice: true,
+                        event: 'system',
+                        timestamp: utcTime(),
+                        msg: `Welcome to ${data.site.name}.`
+                    })
                     let siteData = {
                         [site]: {
                             name: data.site.name,
@@ -345,7 +360,8 @@ module.exports = io => {
                                 [group]: {
                                     name: data.generalGroup.name,
                                     members: [...Object.keys(associatedUsers), user],
-                                    messages: []
+                                    messages,
+                                    unread: true
                                 }
                             }
                         }
@@ -382,15 +398,7 @@ module.exports = io => {
                 })
 
                 if (online) {
-                    let messages = []
-                    data.messages.forEach(msg => {
-                        messages.push({
-                            src: msg.source._id,
-                            msg: msg.content,
-                            type: msg.type || 'plain',
-                            timestamp: msg.createdAt
-                        })
-                    })
+                    let messages = oldMessagesOnJoin(data.messages)
                     messages.push({
                         notice: true,
                         event: 'system',
@@ -595,6 +603,19 @@ module.exports = io => {
         //     callback()
         // })
     })
+
+    function oldMessagesOnJoin(messagesData) {
+        let messages = []
+        messagesData.forEach(msg => {
+            messages.push({
+                src: msg.source._id,
+                msg: msg.content,
+                type: msg.type || 'plain',
+                timestamp: msg.createdAt
+            })
+        })
+        return messages
+    }
 
     function restSocketsUpdate(uid, sid, event, data) {
         // update rest connections when connected from multiply devices

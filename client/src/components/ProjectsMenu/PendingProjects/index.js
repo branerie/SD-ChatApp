@@ -10,9 +10,9 @@ const PendingProjects = () => {
     const { socket } = useContext(SocketContext)
 
     function acceptInvitation(site) {
-        socket.emit('accept-invitation', site, (success, { siteData, associatedUsers, onlineMembers }) => {
+        socket.emit('accept-invitation', site, (success, { siteData, associatedUsers }) => {
             if (success) {
-                dispatchUserData({ type: 'invitation-accepted', payload: { siteData, associatedUsers, onlineMembers, activeConnection: true } })
+                dispatchUserData({ type: 'invitation-accepted', payload: { siteData, associatedUsers, activeConnection: true } })
             }
         })
     }

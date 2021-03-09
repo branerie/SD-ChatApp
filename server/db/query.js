@@ -77,8 +77,8 @@ const getPrivateMessages = async (id, uid) => {
     const party = await User.findById(id)
     const messages = await Message.find({
         $or: [
-            { destination: id, source: uid },
-            { source: id, destination: uid },
+            { source: uid, destination: id, onModel: 'User' },
+            { source: id, destination: uid, onModel: 'User' },
         ]
     }, '-_id -__v -updatedAt').populate({
         path: 'source',
@@ -331,7 +331,8 @@ const acceptInvitation = async (sid, uid) => {
         const generalGroup = await Group.findOne({ site: sid, name: "General" }).populate({ path: 'members', select: 'name username picture' })
         if (generalGroup.members.map(m => m._id).includes(uid)) throw new Error(`You are already a member.`)
         await syncUserAndProjectData(uid, generalGroup._id, sid)
-        return { success: true, site, generalGroup } //? return data (group id,name and members)
+        const messages = await getGroupMessages(generalGroup._id)
+        return { success: true, site, generalGroup, messages } //? return data (group id,name and members)
     } catch (error) {
         return error.message
     }
@@ -347,7 +348,8 @@ const acceptRequest = async (sid, uid, aid) => {
         const userData = await User.findById(uid)
         if (userData === null) throw new Error(`User ${uid} not found`)
         await syncUserAndProjectData(uid, generalGroup._id, sid)
-        return { success: true, site, generalGroup, userData } //? return data (group id,name and members)
+        const messages = await getGroupMessages(generalGroup._id)
+        return { success: true, site, generalGroup, userData, messages } //? return data (group id,name and members)
     } catch (error) {
         return error.message
     }

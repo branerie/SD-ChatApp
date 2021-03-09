@@ -392,7 +392,7 @@ export default function UserDataReducer(userData, action) {
 
         case 'join-message': {
             let timestamp = new Date().toUTCString()
-            let { user, site, group } = action.payload
+            let { user, site, group } = action.payload.socketData
             return {
                 ...userData,
                 sites: {
@@ -678,9 +678,12 @@ export default function UserDataReducer(userData, action) {
                     ...userData.associatedUsers,
                     ...associatedUsers
                 },
-                ...(activeConnection) && { activeSite },
-                ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false }
+                ...(activeConnection) && { 
+                    activeSite, 
+                    activeGroup, 
+                    activeChat: false,
+                    activeMenu: false
+                 },
             }
         }
 
