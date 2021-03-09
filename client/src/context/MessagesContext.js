@@ -77,12 +77,20 @@ export default function MessagesContextProvider(props) {
             dispatchUserData({ type: 'request-accepted', payload: { site, associatedUsers } })
         })
 
-        socket.on('added-to-group', ({ site, group }) => {
-            dispatchUserData({ type: 'added-to-group', payload: { site, group } })
+        socket.on('added-to-group', socketData => {
+            dispatchUserData({ type: 'added-to-group', payload: { socketData } })
         })
 
-        socket.on('join-message', ({ user, site, group }) => {
-            dispatchUserData({ type: 'join-message', payload: { user, site, group } })
+        socket.on('removed-from-group', socketData => {
+            dispatchUserData({ type: 'removed-from-group', payload: { socketData } })
+        })
+
+        socket.on('join-message', socketData => {
+            dispatchUserData({ type: 'join-message', payload: { socketData } })
+        })
+
+        socket.on('leave-message', socketData => {
+            dispatchUserData({ type: 'leave-message', payload: { socketData } })
         })
 
         socket.on('online-message', ({ user }) => {

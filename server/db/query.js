@@ -77,8 +77,8 @@ const getPrivateMessages = async (id, uid) => {
     const party = await User.findById(id)
     const messages = await Message.find({
         $or: [
-            { destination: id, source: uid },
-            { source: id, destination: uid },
+            { source: uid, destination: id, onModel: 'User' },
+            { source: id, destination: uid, onModel: 'User' },
         ]
     }, '-_id -__v -updatedAt').populate({
         path: 'source',
@@ -86,6 +86,14 @@ const getPrivateMessages = async (id, uid) => {
     }).lean()
 
     return { messages, username: party.name }
+}
+
+const getGroupMessages = async (gid) => {
+    const messages = await Message.find({ destination: gid, onModel: 'Group' }, '-_id -__v -updatedAt').populate({
+        path: 'source',
+        select: 'name username'
+    }).lean()
+    return messages
 }
 
 const createPublicMessage = async (src, dst, msg, type) => {
@@ -253,28 +261,47 @@ const inviteUser = async (username, sid, aid) => {
     }
 }
 
-const addUserToGroup = async (uid, sid, gid, aid) => {
+const addUserToGroup = async (uid, gid, aid, online) => {
     try {
-        // check if site is valid and site admin match
-        const siteData = await Site.findOne({ _id: sid, creator: aid })
-        if (siteData === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
+        // check if group created by admin exists
+        const groupData = await Group.findOne({ _id: gid, creator: aid })
+        if (groupData === null) throw new Error(`Group not found or admin mismatch. Group: ${gid}. Admin: ${aid}.`)
         // check if user is valid and exists
-        const userData = await User.findById(uid)
+        const userData = await User.findById(uid, 'name username picture')
         if (userData === null) throw new Error(`User ${uid} not found`)
-        // check if user is a member of project (project general group)
-        const generalGroup = await Group.findOne({ site: sid, name: 'General' }, 'members')
-        if (!generalGroup.members.includes(uid)) throw new Error(`User ${uid} (${userData.username}) is not a member of project ${sid} (${siteData.name})`)
-        // check if group exists and if user is not already a member of this group
-        const groupData = await Group.findOne({ _id: gid, site: sid }).populate({ path: 'members', select: 'name username' })
-        if (groupData === null) throw new Error(`Group ${gid} in project ${sid} not found`)
-        if (groupData.members.map(m => m._id).includes(uid)) throw new Error(`User ${uid} (${userData.username}) is already part of group ${gid} (${groupData.name})`)
+        // check if user is not already a member of this group
+        if (groupData.members.includes(uid)) throw new Error(`User ${uid} is already part of group ${gid}.`)
+        // finally check if user is a member of project (project general group)
+        const generalGroup = await Group.findOne({ site: groupData.site, name: 'General' }, 'members')
+        if (!generalGroup.members.includes(uid)) throw new Error(`User ${uid} is not a member of project ${groupData.site}`)
 
         await User.findByIdAndUpdate(uid, { $addToSet: { groups: [gid] } })
         await Group.findByIdAndUpdate(gid, { $addToSet: { members: [uid] } })
-        return { success: true, userData, groupData }
+        const messages = online ? await getGroupMessages(gid) : []
+        return { userData, groupData, messages }
     } catch (error) {
-        if (error.name === "CastError") return `CastError: ${error.message}`
-        return error.message
+        if (error.name === "CastError") return { error: `CastError: ${error.message}` }
+        return { error: error.message }
+    }
+}
+
+const removeUserFromGroup = async (uid, gid, aid) => {
+    try {
+        // check if group created by admin exists
+        const groupData = await Group.findOne({ _id: gid, creator: aid })
+        if (groupData === null) throw new Error(`Group not found or admin mismatch. Group: ${gid}. Admin: ${aid}.`)
+        // check if user is valid and exists
+        const userData = await User.findById(uid, 'name username picture')
+        if (userData === null) throw new Error(`User ${uid} not found`)
+        // check if user is a member of this group
+        if (!groupData.members.includes(uid)) throw new Error(`User ${uid} is not part of group ${gid}.`)
+
+        await User.findByIdAndUpdate(uid, { $pull: { groups: gid } })
+        await Group.findByIdAndUpdate(gid, { $pull: { members: uid } })
+        return { site: groupData.site }
+    } catch (error) {
+        if (error.name === "CastError") return { error: `CastError: ${error.message}` }
+        return { error: error.message }
     }
 }
 
@@ -305,13 +332,14 @@ const acceptInvitation = async (sid, uid) => {
         const generalGroup = await Group.findOne({ site: sid, name: "General" }).populate({ path: 'members', select: 'name username picture' })
         if (generalGroup.members.map(m => m._id).includes(uid)) throw new Error(`You are already a member.`)
         await syncUserAndProjectData(uid, generalGroup._id, sid)
-        return { success: true, site, generalGroup } //? return data (group id,name and members)
+        const messages = await getGroupMessages(generalGroup._id)
+        return { success: true, site, generalGroup, messages } //? return data (group id,name and members)
     } catch (error) {
         return error.message
     }
 }
 
-const acceptRequest = async (sid, uid, aid) => {
+const acceptRequest = async (sid, uid, aid, online) => {
     try {
         const site = await Site.findOne({ _id: sid, creator: aid })
         if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
@@ -321,7 +349,8 @@ const acceptRequest = async (sid, uid, aid) => {
         const userData = await User.findById(uid)
         if (userData === null) throw new Error(`User ${uid} not found`)
         await syncUserAndProjectData(uid, generalGroup._id, sid)
-        return { success: true, site, generalGroup, userData } //? return data (group id,name and members)
+        const messages = online ? await getGroupMessages(generalGroup._id) : []
+        return { success: true, site, generalGroup, userData, messages } //? return data (group id,name and members)
     } catch (error) {
         return error.message
     }
@@ -475,6 +504,7 @@ module.exports = {
     createGroup,
     inviteUser,
     addUserToGroup,
+    removeUserFromGroup,
     sendRequest,
     acceptInvitation,
     cancelRequest,

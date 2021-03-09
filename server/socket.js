@@ -287,6 +287,13 @@ module.exports = io => {
                     picture: member.picture,
                     online: Boolean(userIDToSocketIDCache[member._id])
                 })
+                let messages = oldMessagesOnJoin(data.messages)
+                messages.push({
+                    notice: true,
+                    event: 'system',
+                    timestamp: utcTime(),
+                    msg: `Welcome to ${data.site.name}.`
+                })
                 let siteData = {
                     [site]: {
                         name: data.site.name,
@@ -295,7 +302,8 @@ module.exports = io => {
                             [group]: {
                                 name: 'General',
                                 members: [...Object.keys(associatedUsers), userData._id],
-                                messages: []
+                                messages,
+                                // unread: true
                             }
                         }
                     }
@@ -312,9 +320,9 @@ module.exports = io => {
         })
 
         socket.on('accept-request', async ({ user, site }, callback) => { // admin
-            const data = await db.acceptRequest(site, user, userData._id)
+            let online = Boolean(userIDToSocketIDCache[user])
+            const data = await db.acceptRequest(site, user, userData._id, online)
             if (data.success) {
-                let online = userIDToSocketIDCache[user] ? true : false
                 let userData = {
                     _id: data.userData._id,
                     username: data.userData.username,
@@ -337,6 +345,13 @@ module.exports = io => {
                         picture: member.picture,
                         online: Boolean(userIDToSocketIDCache[member._id])
                     })
+                    let messages = oldMessagesOnJoin(data.messages)
+                    messages.push({
+                        notice: true,
+                        event: 'system',
+                        timestamp: utcTime(),
+                        msg: `Welcome to ${data.site.name}.`
+                    })
                     let siteData = {
                         [site]: {
                             name: data.site.name,
@@ -345,7 +360,8 @@ module.exports = io => {
                                 [group]: {
                                     name: data.generalGroup.name,
                                     members: [...Object.keys(associatedUsers), user],
-                                    messages: []
+                                    messages,
+                                    unread: true
                                 }
                             }
                         }
@@ -362,40 +378,72 @@ module.exports = io => {
             }
         })
 
-        socket.on('add-member', async ({ member, site, group }, callback) => {
-            if (member === '') return // stop this on client side also
-            const data = await db.addUserToGroup(member, site, group, userData._id)
-            if (data.success) {
-                let online = userIDToSocketIDCache[member] ? true : false
-                let user = {
-                    _id: data.userData._id,
-                    name: data.userData.name,
-                    username: data.userData.username,
-                    picture: data.userData.picture,
-                    online
-                }
-                io.to(group).emit('join-message', {
-                    user,
-                    site,
-                    group
-                })
+        socket.on('add-member', async (socketData, addMember) => {
+            const validation = validate.membershipData(userData._id, socketData)
+            if (validation.failed) return
 
-                if (online) {
-                    let groupData = {
-                        [group]: {
-                            name: data.groupData.name,
-                            members: [...data.groupData.members.map(m => m._id), data.userData._id],
-                            messages: []
-                        }
-                    }
-
-                    userIDToSocketIDCache[member].forEach(socket => {
-                        io.sockets.sockets.get(socket).join(group)
-                        io.sockets.sockets.get(socket).emit('added-to-group', { site, group: groupData })
-                    })
-                }
-                callback()
+            const { member, group } = validation.data
+            const online = Boolean(userIDToSocketIDCache[member])
+            const data = await db.addUserToGroup(member, group, userData._id, online)
+            if (data.error) {
+                sysLog(data.error)
+                return
             }
+
+            const site = data.groupData.site
+            const user = {
+                _id: data.userData._id,
+                name: data.userData.name,
+                username: data.userData.username,
+                picture: data.userData.picture,
+                online
+            }
+            io.to(group).emit('join-message', { user, site, group })
+
+            if (online) {
+                const messages = oldMessagesOnJoin(data.messages)
+                messages.push({
+                    notice: true,
+                    event: 'system',
+                    timestamp: utcTime(),
+                    msg: `You have been added to ${data.groupData.name} by Admin.`
+                })
+                const groupData = {
+                    [group]: {
+                        name: data.groupData.name,
+                        members: [...data.groupData.members, data.userData._id],
+                        messages,
+                        unread: true
+                    }
+                }
+                userIDToSocketIDCache[member].forEach(socket => {
+                    io.sockets.sockets.get(socket).join(group)
+                    io.sockets.sockets.get(socket).emit('added-to-group', { site, group: groupData })
+                })
+            }
+            addMember() // acknowledgement callback
+        })
+
+        socket.on('remove-member', async (socketData, removeMember) => {
+            const validation = validate.membershipData(userData._id, socketData)
+            if (validation.failed) return
+
+            const { member, group } = validation.data
+            const data = await db.removeUserFromGroup(member, group, userData._id)
+            if (data.error) {
+                sysLog(data.error)
+                return
+            }
+
+            const site = data.site
+            if (userIDToSocketIDCache[member]) {
+                userIDToSocketIDCache[member].forEach(socket => {
+                    io.sockets.sockets.get(socket).leave(group)
+                    io.sockets.sockets.get(socket).emit('removed-from-group', { site, group })
+                })
+            }
+            io.to(group).emit('leave-message', { member, site, group })
+            removeMember() // acknowledgement callback
         })
 
         socket.on('reject-invitation', async (site, callback) => {
@@ -564,6 +612,19 @@ module.exports = io => {
         //     callback()
         // })
     })
+
+    function oldMessagesOnJoin(messagesData) {
+        let messages = []
+        messagesData.forEach(msg => {
+            messages.push({
+                src: msg.source._id,
+                msg: msg.content,
+                type: msg.type || 'plain',
+                timestamp: msg.createdAt
+            })
+        })
+        return messages
+    }
 
     function restSocketsUpdate(uid, sid, event, data) {
         // update rest connections when connected from multiply devices

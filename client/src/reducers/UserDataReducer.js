@@ -392,7 +392,7 @@ export default function UserDataReducer(userData, action) {
 
         case 'join-message': {
             let timestamp = new Date().toUTCString()
-            let { user, site, group } = action.payload
+            let { user, site, group } = action.payload.socketData
             return {
                 ...userData,
                 sites: {
@@ -418,6 +418,7 @@ export default function UserDataReducer(userData, action) {
                                         timestamp
                                     }
                                 ],
+                                unread: group !== userData.activeGroup
                             }
                         }
                     }
@@ -429,6 +430,37 @@ export default function UserDataReducer(userData, action) {
                         name: user.name,
                         picture: user.picture,
                         online: user.online
+                    }
+                }
+            }
+        }
+
+        case 'leave-message': {
+            let timestamp = new Date().toUTCString()
+            let { member, site, group } = action.payload.socketData
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        groups: {
+                            ...userData.sites[site].groups,
+                            [group]: {
+                                ...userData.sites[site].groups[group],
+                                members: userData.sites[site].groups[group].members.filter(m => m !== member),
+                                messages: [
+                                    ...userData.sites[site].groups[group].messages,
+                                    {
+                                        notice: true,
+                                        event: 'warning',
+                                        msg: `${userData.associatedUsers[member].name} has left (removed by Admin).`,
+                                        timestamp
+                                    }
+                                ],
+                                unread: group !== userData.activeGroup
+                            }
+                        }
                     }
                 }
             }
@@ -523,7 +555,7 @@ export default function UserDataReducer(userData, action) {
 
 
         case 'added-to-group': {
-            let { site, group } = action.payload
+            let { site, group } = action.payload.socketData
             return {
                 ...userData,
                 sites: {
@@ -532,7 +564,38 @@ export default function UserDataReducer(userData, action) {
                         ...userData.sites[site],
                         groups: {
                             ...userData.sites[site].groups,
-                            ...group
+                            ...group,
+                        }
+                    }
+                },
+            }
+        }
+
+        case 'removed-from-group': {
+            let timestamp = new Date().toUTCString()
+            let { site, group } = action.payload.socketData
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        groups: {
+                            ...userData.sites[site].groups,
+                            [group]: {
+                                ...userData.sites[site].groups[group],
+                                members: [],
+                                messages: [
+                                    ...userData.sites[site].groups[group].messages,
+                                    {
+                                        notice: true,
+                                        event: 'warning',
+                                        msg: 'You were taken out by Admin. Group will disappear from your list on next connection.',
+                                        timestamp
+                                    }
+                                ],
+                                unread: group !== userData.activeGroup
+                            }
                         }
                     }
                 },
@@ -615,9 +678,12 @@ export default function UserDataReducer(userData, action) {
                     ...userData.associatedUsers,
                     ...associatedUsers
                 },
-                ...(activeConnection) && { activeSite },
-                ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false }
+                ...(activeConnection) && { 
+                    activeSite, 
+                    activeGroup, 
+                    activeChat: false,
+                    activeMenu: false
+                 },
             }
         }
 
