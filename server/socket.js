@@ -320,9 +320,9 @@ module.exports = io => {
         })
 
         socket.on('accept-request', async ({ user, site }, callback) => { // admin
-            const data = await db.acceptRequest(site, user, userData._id)
+            let online = Boolean(userIDToSocketIDCache[user])
+            const data = await db.acceptRequest(site, user, userData._id, online)
             if (data.success) {
-                let online = userIDToSocketIDCache[user] ? true : false
                 let userData = {
                     _id: data.userData._id,
                     username: data.userData.username,
@@ -383,14 +383,14 @@ module.exports = io => {
             if (validation.failed) return
 
             const { member, group } = validation.data
-            const data = await db.addUserToGroup(member, group, userData._id)
+            const online = Boolean(userIDToSocketIDCache[member])
+            const data = await db.addUserToGroup(member, group, userData._id, online)
             if (data.error) {
                 sysLog(data.error)
                 return
             }
 
             const site = data.groupData.site
-            const online = Boolean(userIDToSocketIDCache[member])
             const user = {
                 _id: data.userData._id,
                 name: data.userData.name,

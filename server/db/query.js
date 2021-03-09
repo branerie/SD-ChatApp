@@ -261,7 +261,7 @@ const inviteUser = async (username, sid, aid) => {
     }
 }
 
-const addUserToGroup = async (uid, gid, aid) => {
+const addUserToGroup = async (uid, gid, aid, online) => {
     try {
         // check if group created by admin exists
         const groupData = await Group.findOne({ _id: gid, creator: aid })
@@ -277,7 +277,7 @@ const addUserToGroup = async (uid, gid, aid) => {
 
         await User.findByIdAndUpdate(uid, { $addToSet: { groups: [gid] } })
         await Group.findByIdAndUpdate(gid, { $addToSet: { members: [uid] } })
-        const messages = await getGroupMessages(gid)
+        const messages = online ? await getGroupMessages(gid) : []
         return { userData, groupData, messages }
     } catch (error) {
         if (error.name === "CastError") return { error: `CastError: ${error.message}` }
@@ -339,7 +339,7 @@ const acceptInvitation = async (sid, uid) => {
     }
 }
 
-const acceptRequest = async (sid, uid, aid) => {
+const acceptRequest = async (sid, uid, aid, online) => {
     try {
         const site = await Site.findOne({ _id: sid, creator: aid })
         if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
@@ -349,7 +349,7 @@ const acceptRequest = async (sid, uid, aid) => {
         const userData = await User.findById(uid)
         if (userData === null) throw new Error(`User ${uid} not found`)
         await syncUserAndProjectData(uid, generalGroup._id, sid)
-        const messages = await getGroupMessages(generalGroup._id)
+        const messages = online ? await getGroupMessages(generalGroup._id) : []
         return { success: true, site, generalGroup, userData, messages } //? return data (group id,name and members)
     } catch (error) {
         return error.message
