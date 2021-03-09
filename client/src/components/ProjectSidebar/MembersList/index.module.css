@@ -4,6 +4,11 @@
     flex: 1 1 auto;
     overflow-y: scroll;
     scrollbar-width: none;
+    -ms-overflow-style: none;  /* IE and Edge */
+}
+
+.container::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
 }
 
 .inner {
@@ -17,12 +22,11 @@
 }
 
 .header {
-    font-size: 12px;
-    font-weight: bold;
+    font-size: small;
     color: var(--txt-color);
     display: flex;
     justify-content: center;
-    padding: 3px 0;
+    padding: 5px 0;
 }
 
 @media (max-width: 480px) {
