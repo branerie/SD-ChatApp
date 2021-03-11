@@ -46,15 +46,15 @@ module.exports = io => {
             clientData.associatedUsers[user].online = userIsOnline
             if (user !== userData._id.toString() && firstConnection && userIsOnline) {
                 userIDToSocketIDCache[user].forEach(sid => {
-                    io.to(sid).emit('online-message', {
-                        user: {
+                    io.to(sid).emit('online-message', 
+                        {
                             _id: userData._id,
                             name: userData.name,
                             username: userData.username,
                             picture: userData.picture,
                             online: true
                         }
-                    })
+                    )
                 })
             }
         }
@@ -79,12 +79,12 @@ module.exports = io => {
                 })
                 onlineUsers.delete(socket.id)
                 onlineUsers.forEach(sid => {
-                    io.to(sid).emit('quit-message', {
-                        user: {
+                    io.to(sid).emit('quit-message', 
+                        {
                             _id: userData._id,
                             name: userData.name,
                         }
-                    })
+                    )
                 })
             }
             sysLog(`Disconnect @ ${socket.id} (${userData._id}). Reason: ${reason}. Total clients/connections in pool: ${clientsCount}/${socketsCount}.`)
@@ -217,167 +217,6 @@ module.exports = io => {
             }
         })
 
-        socket.on('send-invitation', async ({ user, site }, callback) => { //admin
-            const data = await db.inviteUser(user, site, userData._id)
-            if (data.success) {
-                data.userData.online = Boolean(userIDToSocketIDCache[data.userData._id])
-                if (data.userData.online) {
-                    userIDToSocketIDCache[data.userData._id].forEach(socketID => {
-                        io.to(socketID).emit('add-site-to-invitations', data.siteData)
-                    })
-                }
-                sysLog(`${userData.username} invited ${user} to join ${site}`)
-                callback(true, data.userData)
-                restSocketsUpdate(userData._id, socket.id, 'add-user-to-site-invitations', { site, user: data.userData })
-            } else {
-                sysLog(`Invitation from ${userData.username} to ${user} for ${site} failed: ${data}`)
-            }
-        })
-
-        socket.on('send-request', async (site, callback) => { // user
-            const data = await db.sendRequest(site, userData._id)
-            if (data.success) {
-                if (userIDToSocketIDCache[data.site.creator]) {
-                    const user = {
-                        picture: userData.picture,
-                        username: userData.username,
-                        name: userData.name,
-                        _id: userData._id,
-                        online: true
-                    }
-                    userIDToSocketIDCache[data.site.creator].forEach(socket => {
-                        io.to(socket).emit('add-user-to-site-requests', { site, user })
-                    })
-                }
-                const siteData = {
-                    _id: data.site._id,
-                    name: data.site.name
-                }
-                sysLog(`${userData._id} request to join ${site}`)
-                callback(true, siteData)
-                restSocketsUpdate(userData._id, socket.id, 'add-site-to-requests', siteData)
-            } else {
-                sysLog(`Join request from ${userData._id} to ${site} failed: ${data.error}`)
-            }
-
-        })
-
-        socket.on('accept-invitation', async (site, callback) => {
-            const data = await db.acceptInvitation(site, userData._id)
-            if (data.success) {
-                let user = {
-                    _id: userData._id,
-                    username: userData.username,
-                    name: userData.name,
-                    picture: userData.picture,
-                    online: true
-                }
-                let group = data.generalGroup._id.toString()
-                socket.join(group)
-                socket.to(group).emit('join-message', {
-                    user,
-                    site,
-                    group
-                })
-
-                let associatedUsers = {}
-                data.generalGroup.members.map(member => associatedUsers[member._id] = {
-                    username: member.username,
-                    name: member.name,
-                    picture: member.picture,
-                    online: Boolean(userIDToSocketIDCache[member._id])
-                })
-                let messages = oldMessagesOnJoin(data.messages)
-                messages.push({
-                    notice: true,
-                    event: 'system',
-                    timestamp: utcTime(),
-                    msg: `Welcome to ${data.site.name}.`
-                })
-                let siteData = {
-                    [site]: {
-                        name: data.site.name,
-                        creator: data.site.creator,
-                        groups: {
-                            [group]: {
-                                name: 'General',
-                                members: [...Object.keys(associatedUsers), userData._id],
-                                messages,
-                                // unread: true
-                            }
-                        }
-                    }
-                }
-
-                sysLog(`${userData.username} accepted invitation and joined ${data.site.name}`)
-                callback(true, { siteData, associatedUsers })
-                restSocketsJoin(userData._id, socket.id, group)
-                restSocketsUpdate(userData._id, socket.id, 'invitation-accepted', { siteData, associatedUsers })
-            }
-            else {
-                sysLog(`Join attempt from ${userData.username} to ${site} failed: ${data}`)
-            }
-        })
-
-        socket.on('accept-request', async ({ user, site }, callback) => { // admin
-            let online = Boolean(userIDToSocketIDCache[user])
-            const data = await db.acceptRequest(site, user, userData._id, online)
-            if (data.success) {
-                let userData = {
-                    _id: data.userData._id,
-                    username: data.userData.username,
-                    name: data.userData.name,
-                    picture: data.userData.picture,
-                    online
-                }
-                let group = data.generalGroup._id.toString()
-                io.to(group).emit('join-message', {
-                    user: userData,
-                    site,
-                    group
-                })
-                // if user is online send him data
-                if (online) {
-                    let associatedUsers = {}
-                    data.generalGroup.members.map(member => associatedUsers[member._id] = {
-                        username: member.username,
-                        name: member.name,
-                        picture: member.picture,
-                        online: Boolean(userIDToSocketIDCache[member._id])
-                    })
-                    let messages = oldMessagesOnJoin(data.messages)
-                    messages.push({
-                        notice: true,
-                        event: 'system',
-                        timestamp: utcTime(),
-                        msg: `Welcome to ${data.site.name}.`
-                    })
-                    let siteData = {
-                        [site]: {
-                            name: data.site.name,
-                            creator: data.site.creator,
-                            groups: {
-                                [group]: {
-                                    name: data.generalGroup.name,
-                                    members: [...Object.keys(associatedUsers), user],
-                                    messages,
-                                    unread: true
-                                }
-                            }
-                        }
-                    }
-
-                    userIDToSocketIDCache[user].forEach(socket => {
-                        io.sockets.sockets.get(socket).join(group)
-                        io.sockets.sockets.get(socket).emit('request-accepted', { site: siteData, associatedUsers })
-                    })
-
-                }
-                // callback()
-                sysLog(`Join request from ${user} to join ${site} accepted by admin.`)
-            }
-        })
-
         socket.on('add-member', async (socketData, addMember) => {
             const validation = validate.membershipData(userData._id, socketData)
             if (validation.failed) return
@@ -446,76 +285,296 @@ module.exports = io => {
             removeMember() // acknowledgement callback
         })
 
-        socket.on('reject-invitation', async (site, callback) => {
-            const data = await db.rejectInvitation(site, userData._id)
-            if (data.success) {
-                userIDToSocketIDCache[userData._id].forEach(socket => {
-                    io.to(socket).emit('remove-site-from-invitations', site)
-                })
+        socket.on('send-invitation', async (socketData, callback) => { //admin
+            const validation = validate.userAndSiteId(userData._id, socketData)
+            if (validation.failed) return
 
-                // emit msg to admin to update project pending members list
-                if (userIDToSocketIDCache[data.site.creator]) {
-                    userIDToSocketIDCache[data.site.creator].forEach(socket => {
-                        io.to(socket).emit('remove-user-from-site-invitations', { user: userData._id, site })
-                    })
-                }
+            const { uid, sid } = validation.data
+            const online = Boolean(userIDToSocketIDCache[uid])
+            const data = await db.sendInvitation(uid, sid, userData._id)
+
+            if (data.error) {
+                sysLog(`Invitation from ${userData._id} to ${uid} for ${sid} failed: ${data.error}`)
+                return
             }
-            sysLog(`Invitation for ${userData._id} to join ${site} rejected by user.`)
+
+            if (online) {
+                let siteData = {
+                    _id: sid,
+                    name: data.site.name
+                }
+                userIDToSocketIDCache[uid].forEach(socket => {
+                    io.to(socket).emit('add-site-to-invitations', siteData)
+                })
+            }
+
+            let user = {
+                _id: data.user._id,
+                username: data.user.username,
+                name: data.user.name,
+                picture: data.user.picture,
+                online
+            }
+            sysLog(`${userData._id} invited ${uid} to join ${sid}`)
+            callback(true, { site: sid, user })
+            restSocketsUpdate(userData._id, socket.id, 'add-user-to-site-invitations', { site: sid, user })
+        })
+
+        socket.on('cancel-invitation', async (socketData, callback) => {
+            const validation = validate.userAndSiteId(userData._id, socketData)
+            if (validation.failed) return
+
+            const { uid, sid } = validation.data
+            const data = await db.cancelInvitation(uid, sid, userData._id)
+
+            if (data.error) {
+                sysLog(`${data.error}`)
+                return
+            }
+
+            userIDToSocketIDCache[userData._id].forEach(socket => {
+                io.to(socket).emit('remove-user-from-site-invitations', { uid, sid })
+            })
+
+            if (userIDToSocketIDCache[uid]) {
+                userIDToSocketIDCache[uid].forEach(socket => {
+                    io.to(socket).emit('remove-site-from-invitations', sid)
+                })
+            }
+            sysLog(`Invitation for ${uid} to join ${sid} canceled by admin.`)
             // callback()
         })
 
-        socket.on('cancel-invitation', async ({ user, site }, callback) => {
-            // check site creator and user id from socket
-            const data = await db.cancelInvitation(site, user, userData._id)
-            if (data.success) {
-                userIDToSocketIDCache[userData._id].forEach(socket => {
-                    io.to(socket).emit('remove-user-from-site-invitations', { user, site })
+        socket.on('accept-request', async (socketData, callback) => { // admin
+            const validation = validate.userAndSiteId(userData._id, socketData)
+            if (validation.failed) return
+
+            const { uid, sid } = validation.data
+            const online = Boolean(userIDToSocketIDCache[uid])
+
+            const data = await db.acceptRequest(uid, sid, userData._id, online)
+
+            if (data.error) {
+                sysLog(`${data.error}`)
+                return
+            }
+
+            const user = {
+                _id: data.user._id,
+                username: data.user.username,
+                name: data.user.name,
+                picture: data.user.picture,
+                online
+            }
+            const group = data.group._id.toString()
+            io.to(group).emit('join-message', {
+                user,
+                site: sid,
+                group
+            })
+            // if user is online send him data
+            if (online) {
+                const associatedUsers = {}
+                data.group.members.map(member => associatedUsers[member._id] = {
+                    username: member.username,
+                    name: member.name,
+                    picture: member.picture,
+                    online: Boolean(userIDToSocketIDCache[member._id])
+                })
+                const messages = oldMessagesOnJoin(data.messages)
+                messages.push({
+                    notice: true,
+                    event: 'system',
+                    timestamp: utcTime(),
+                    msg: `Welcome to ${data.site.name}.`
+                })
+                const site = {
+                    [sid]: {
+                        name: data.site.name,
+                        creator: data.site.creator,
+                        groups: {
+                            [group]: {
+                                name: data.group.name,
+                                members: [...Object.keys(associatedUsers), uid],
+                                messages,
+                                unread: true
+                            }
+                        }
+                    }
+                }
+
+                userIDToSocketIDCache[uid].forEach(socket => {
+                    io.sockets.sockets.get(socket).join(group)
+                    io.sockets.sockets.get(socket).emit('request-accepted', { site, associatedUsers })
                 })
 
-                // emit msg to user to update his pending projects list
-                if (userIDToSocketIDCache[user]) {
-                    userIDToSocketIDCache[user].forEach(socket => {
-                        io.to(socket).emit('remove-site-from-invitations', site)
-                    })
-                }
             }
-            sysLog(`Invitation for ${user} to join ${site} canceled by admin.`)
+            // callback()
+            sysLog(`Join request from ${uid} to join ${sid} accepted by admin.`)
+        })
+
+        socket.on('reject-request', async (socketData, callback) => { // admin
+            const validation = validate.userAndSiteId(userData._id, socketData)
+            if (validation.failed) return
+
+            const { uid, sid } = validation.data
+            const data = await db.rejectRequest(uid, sid, userData._id)
+
+            if (data.error) {
+                sysLog(`${data.error}`)
+                return
+            }
+            userIDToSocketIDCache[userData._id].forEach(socket => {
+                io.to(socket).emit('remove-user-from-site-requests', { uid, sid })
+            })
+
+            // emit msg to user to update his pending projects list
+            if (userIDToSocketIDCache[uid]) {
+                userIDToSocketIDCache[uid].forEach(socket => {
+                    io.to(socket).emit('remove-site-from-requests', sid)
+                })
+            }
+            sysLog(`Join request from ${uid} to join ${sid} rejected by admin.`)
             // callback()
         })
 
-        socket.on('reject-request', async ({ user, site }, callback) => { // admin
-            const data = await db.rejectRequest(site, user, userData._id)
-            if (data.success) {
-                userIDToSocketIDCache[userData._id].forEach(socket => {
-                    io.to(socket).emit('remove-user-from-site-requests', { user, site })
-                })
+        socket.on('send-request', async (sid, callback) => { // user
+            const validation = validate.siteId(userData._id, sid)
+            if (validation.failed) return
 
-                // emit msg to user to update his pending projects list
-                if (userIDToSocketIDCache[user]) {
-                    userIDToSocketIDCache[user].forEach(socket => {
-                        io.to(socket).emit('remove-site-from-requests', site)
-                    })
-                }
+            const data = await db.sendRequest(sid, userData._id)
+            if (data.error) {
+                sysLog(`Join request from ${userData._id} to ${sid} failed: ${data.error}`)
+                return
             }
-            sysLog(`Join request from ${user} to join ${site} rejected by admin.`)
+
+            if (userIDToSocketIDCache[data.site.creator]) {
+                const user = {
+                    picture: userData.picture,
+                    username: userData.username,
+                    name: userData.name,
+                    _id: userData._id,
+                    online: true
+                }
+                userIDToSocketIDCache[data.site.creator].forEach(socket => {
+                    io.to(socket).emit('add-user-to-site-requests', { site: sid, user })
+                })
+            }
+
+            const site = {
+                _id: data.site._id,
+                name: data.site.name
+            }
+            userIDToSocketIDCache[userData._id].forEach(socket => {
+                io.to(socket).emit('add-site-to-requests', site)
+            })
+            sysLog(`${userData._id} request to join ${sid}`)
+            // callback(true, site)
+            // restSocketsUpdate(userData._id, socket.id, 'add-site-to-requests', site)
+        })
+
+        socket.on('cancel-request', async (sid, callback) => { // user
+            const validation = validate.siteId(userData._id, sid)
+            if (validation.failed) return
+
+            const data = await db.cancelRequest(sid, userData._id)
+            if (data.error) {
+                sysLog(`${data.error}`)
+                return
+            }
+
+            if (userIDToSocketIDCache[data.site.creator]) {
+                userIDToSocketIDCache[data.site.creator].forEach(socket => {
+                    io.to(socket).emit('remove-user-from-site-requests', { uid: userData._id, sid })
+                })
+            }
+
+            userIDToSocketIDCache[userData._id].forEach(socket => {
+                io.to(socket).emit('remove-site-from-requests', sid)
+            })
+            sysLog(`Join request from ${userData._id} to ${sid} canceled by user.`)
             // callback()
         })
 
-        socket.on('cancel-request', async (site, callback) => { // user
-            const data = await db.cancelRequest(site, userData._id)
-            if (data.success) {
-                userIDToSocketIDCache[userData._id].forEach(socket => {
-                    io.to(socket).emit('remove-site-from-requests', site)
-                })
+        socket.on('accept-invitation', async (sid, callback) => {
+            const validation = validate.siteId(userData._id, sid)
+            if (validation.failed) return
 
-                // emit msg to admin to update project pending members list
-                if (userIDToSocketIDCache[data.site.creator]) {
-                    userIDToSocketIDCache[data.site.creator].forEach(socket => {
-                        io.to(socket).emit('remove-user-from-site-requests', { user: userData._id, site })
-                    })
+            const data = await db.acceptInvitation(sid, userData._id)
+            if (data.error) {
+                sysLog(`Join attempt from ${userData._id} to ${sid} failed: ${data.error}`)
+                return
+            }
+
+            let user = {
+                _id: userData._id,
+                username: userData.username,
+                name: userData.name,
+                picture: userData.picture,
+                online: true
+            }
+            let group = data.group._id.toString()
+            socket.join(group)
+            socket.to(group).emit('join-message', {
+                user,
+                site: sid,
+                group
+            })
+
+            let associatedUsers = {}
+            data.group.members.map(member => associatedUsers[member._id] = {
+                username: member.username,
+                name: member.name,
+                picture: member.picture,
+                online: Boolean(userIDToSocketIDCache[member._id])
+            })
+            let messages = oldMessagesOnJoin(data.messages)
+            messages.push({
+                notice: true,
+                event: 'system',
+                timestamp: utcTime(),
+                msg: `Welcome to ${data.site.name}.`
+            })
+            let siteData = {
+                [sid]: {
+                    name: data.site.name,
+                    creator: data.site.creator,
+                    groups: {
+                        [group]: {
+                            name: 'General',
+                            members: [...Object.keys(associatedUsers), userData._id],
+                            messages,
+                            // unread: true
+                        }
+                    }
                 }
             }
-            sysLog(`Join request from ${userData._id} to ${site} canceled by user.`)
+
+            sysLog(`${userData._id} accepted invitation and joined ${sid}`)
+            callback(true, { siteData, associatedUsers })
+            restSocketsJoin(userData._id, socket.id, group)
+            restSocketsUpdate(userData._id, socket.id, 'invitation-accepted', { siteData, associatedUsers })
+        })
+
+        socket.on('reject-invitation', async (sid, callback) => {
+            const validation = validate.siteId(userData._id, sid)
+            if (validation.failed) return
+
+            const data = await db.rejectInvitation(sid, userData._id)
+            if (data.error) {
+                sysLog(`${data.error}`)
+                return
+            }
+
+            if (userIDToSocketIDCache[data.site.creator]) {
+                userIDToSocketIDCache[data.site.creator].forEach(socket => {
+                    io.to(socket).emit('remove-user-from-site-invitations', { uid: userData._id, sid })
+                })
+            }
+            userIDToSocketIDCache[userData._id].forEach(socket => {
+                io.to(socket).emit('remove-site-from-invitations', sid)
+            })
+            sysLog(`Invitation for ${userData._id} to join ${sid} rejected by user.`)
             // callback()
         })
 
@@ -566,12 +625,12 @@ module.exports = io => {
 
             userIDToSocketIDCache[userData._id].forEach(sid => onlineUsers.delete(sid))
             onlineUsers.forEach(sid => {
-                io.to(sid).emit('profile-update', {
-                    user: {
+                io.to(sid).emit('profile-update', 
+                    {
                         _id: userData._id,
                         data
                     }
-                })
+                )
             })
             callback(validation.data)
             restSocketsUpdate(userData._id, socket.id, 'update-profile-data', validation.data)

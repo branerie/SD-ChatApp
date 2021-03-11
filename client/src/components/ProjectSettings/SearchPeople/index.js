@@ -61,16 +61,15 @@ const SearchPeople = () => {
         }
     }
 
-    function inviteMember(user) {
-        let site = userData.activeSite
-        socket.emit("send-invitation", { user, site }, (success, user) => {
-            console.log(success)
+    function inviteMember(uid) {
+        let sid = userData.activeSite
+        socket.emit("send-invitation", { uid, sid }, (success, invitationData) => {
             if (!success) return
             
-            dispatchUserData({ type: 'add-user-to-site-invitations', payload: { user, site } })
+            dispatchUserData({ type: 'add-user-to-site-invitations', payload: { invitationData } })
 
-            const newNames = names.filter(n => n.username !== user)
-            setNames(newNames)
+            // const newNames = names.filter(n => n.username !== user)
+            // setNames(newNames)
         })
     }
 
@@ -137,7 +136,7 @@ const SearchPeople = () => {
                                     </div>
                                     <div className={styles.buttons}>
                                         <MenuButton 
-                                            onClick={() => inviteMember(name.username)} 
+                                            onClick={() => inviteMember(name._id)} 
                                             title='Invite'
                                             btnType='submit'
                                             btnSize='medium'

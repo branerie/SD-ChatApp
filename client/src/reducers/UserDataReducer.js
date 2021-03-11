@@ -482,7 +482,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'add-user-to-site-invitations': {
-            let { user, site } = action.payload
+            let { user, site } = action.payload.invitationData
             return {
                 ...userData,
                 sites: {
@@ -508,14 +508,14 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'remove-user-from-site-invitations': {
-            let { user, site } = action.payload
+            let { uid, sid } = action.payload.invitationData
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
-                    [site]: {
-                        ...userData.sites[site],
-                        invitations: userData.sites[site].invitations.filter(i => i !== user)
+                    [sid]: {
+                        ...userData.sites[sid],
+                        invitations: userData.sites[sid].invitations.filter(i => i !== uid)
                     }
                 },
             }
@@ -523,14 +523,14 @@ export default function UserDataReducer(userData, action) {
 
 
         case 'remove-user-from-site-requests': {
-            let { user, site } = action.payload
+            let { uid, sid } = action.payload.requestData
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
-                    [site]: {
-                        ...userData.sites[site],
-                        requests: userData.sites[site].requests.filter(r => r !== user)
+                    [sid]: {
+                        ...userData.sites[sid],
+                        requests: userData.sites[sid].requests.filter(r => r !== uid)
                     }
                 },
             }
@@ -538,7 +538,7 @@ export default function UserDataReducer(userData, action) {
 
 
         case 'request-accepted': {
-            let { site, associatedUsers } = action.payload
+            let { site, associatedUsers } = action.payload.socketData
             return {
                 ...userData,
                 sites: {
@@ -637,7 +637,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'add-user-to-site-requests': {
-            let { site, user } = action.payload
+            let { site, user } = action.payload.requestData
             return {
                 ...userData,
                 sites: {
@@ -664,23 +664,22 @@ export default function UserDataReducer(userData, action) {
 
 
         case 'invitation-accepted': {
-            let { siteData, associatedUsers, activeConnection } = action.payload
-            let activeSite = Object.keys(siteData)[0]
-            let activeGroup = Object.keys(siteData[activeSite].groups)[0]
+            let { siteData, associatedUsers } = action.payload.socketData
+            let site = Object.keys(siteData)[0]
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
                     ...siteData
                 },
-                invitations: userData.invitations.filter(i => i._id !== Object.keys(siteData)[0]) || [],
+                invitations: userData.invitations.filter(i => i._id !== site) || [],
                 associatedUsers: {
                     ...userData.associatedUsers,
                     ...associatedUsers
                 },
-                ...(activeConnection) && { 
-                    activeSite, 
-                    activeGroup, 
+                ...(action.payload.activeConnection) && { 
+                    activeSite: site, 
+                    activeGroup: Object.keys(siteData[site].groups)[0],
                     activeChat: false,
                     activeMenu: false
                  },

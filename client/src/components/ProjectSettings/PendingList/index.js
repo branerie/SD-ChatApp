@@ -10,20 +10,20 @@ const PendingList = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
 
-    function cancelInvitation(user) {
-        socket.emit('cancel-invitation', { user, site: userData.activeSite }, () => {
+    function cancelInvitation(uid) {
+        socket.emit('cancel-invitation', { uid, sid: userData.activeSite }, () => {
             // dispatchUserData({ type: 'cancel-invitation', payload: { invitation, site: userData.activeSite } })
         })
     }
 
-    function acceptRequest(user) {
-        socket.emit('accept-request', { user, site: userData.activeSite }, () => {
+    function acceptRequest(uid) {
+        socket.emit('accept-request', { uid, sid: userData.activeSite }, () => {
             // dispatchUserData({ type: 'accept-request', payload: { request, site } })
         })
     }
 
-    function rejectRequest(user) {
-        socket.emit('reject-request', { user, site: userData.activeSite }, () => {
+    function rejectRequest(uid) {
+        socket.emit('reject-request', { uid, sid: userData.activeSite }, () => {
             // dispatchUserData({ type: 'reject-request', payload: { request, site: userData.activeSite } })
         })
     }
