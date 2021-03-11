@@ -57,10 +57,8 @@ const SearchProjects = () => {
     }
 
     function sendRequest(sid) {
-        socket.emit('send-request', sid, (success, siteData) => {
-            if (success) {
-                dispatchUserData({ type: 'add-site-to-requests', payload: { siteData } })
-            }
+        socket.emit('send-request', sid, () => {
+            // dispatchUserData({ type: 'add-site-to-requests', payload: { siteData } })
         })
     }
 

@@ -234,33 +234,6 @@ const createGroup = async (site, name, creator) => {
     }
 }
 
-const inviteUser = async (username, sid, aid) => {
-    try {
-        // check userId from socket and compare to site creator
-        const site = await Site.findById(sid, 'name creator invitations')
-        if (site === null) throw new Error(`Site with id ${sid} not found. Illegal operation.`)
-        if (site.creator.toString() !== aid.toString()) {
-            throw new Error("Site creator doesn't match. Illegal operation.")
-        }
-        const user = await User.findOne({ username })
-        if (user === null) throw new Error(`User ${username} not found.`)
-        if (site.invitations.includes(user._id.toString())) {
-            throw new Error(`Invitation for user ${user._id} (${username}) is already pending.`)
-        }
-        const generalGroup = await Group.findOne({ site: sid, name: "General" }, 'members')
-        if (generalGroup.members.includes(user._id.toString())) throw new Error(`User ${username} is already a member.`)
-
-        if (user.requests && user.requests.includes(sid)) console.log("User should join general group immediately") //todo
-
-        await Site.findByIdAndUpdate(sid, { $addToSet: { invitations: [user._id] } })
-        await User.findByIdAndUpdate(user._id, { $addToSet: { invitations: [site._id] } })
-        return { success: true, userData: { _id: user._id, username, name: user.name, picture: user.picture }, siteData: { _id: site._id, name: site.name } }
-
-    } catch (error) {
-        return error.message
-    }
-}
-
 const addUserToGroup = async (uid, gid, aid, online) => {
     try {
         // check if group created by admin exists
@@ -305,107 +278,159 @@ const removeUserFromGroup = async (uid, gid, aid) => {
     }
 }
 
-const sendRequest = async (sid, uid) => {
+async function verifySitePrivileges(sid, aid) {
     try {
-        const site = await Site.findById(sid)
-        if (site === null) throw new Error(`${sid} doesn't exist.`)
-        const generalGroup = await Group.findOne({ site: site._id, name: "General" }, 'members')
-        if (generalGroup.members.includes(uid)) throw new Error(`You are already a member.`)
-        if (site.requests && site.requests.includes(uid)) throw new Error(`Request already exist.`)
+        const data = await Site.findById(sid)
+        if (data === null) throw new Error(`Site ${sid} not found.`)
+        if (data.creator.toString() !== aid.toString()) throw new Error(`Admin mismatch. Site: ${sid}. Admin: ${aid}`)
+        return data
+    } catch (error) {
+        if (error.name === "CastError") return { error: `CastError: ${error.message}` }
+        return { error: error.message }
+    }
+}
 
-        if (site.invitations && site.invitations.includes(uid)) console.log("User should join general group immediately") // todo
+const sendInvitation = async (uid, sid, aid) => {
+    try {
+        const site = await verifySitePrivileges(sid, aid)
+        if (site.error) throw new Error(site.error)
 
-        await Site.findByIdAndUpdate(site._id, { $addToSet: { requests: [uid] } })
-        await User.findByIdAndUpdate(uid, { $addToSet: { requests: [site._id] } })
-        return { success: true, site }
+        const user = await User.findById(uid, '-password')
+        if (user === null) throw new Error(`User ${uid} not found.`)
+
+        if (site.invitations.includes(uid)) throw new Error(`Invitation for user ${uid} is already pending.`)
+        const generalGroup = await Group.findOne({ site: sid, name: "General" }, 'members')
+        if (generalGroup.members.includes(uid)) throw new Error(`User ${uid} is already a member.`)
+
+        if (user.requests && user.requests.includes(sid)) console.log("User should join general group immediately") //todo
+
+        await Site.findByIdAndUpdate(sid, { $addToSet: { invitations: [uid] } })
+        await User.findByIdAndUpdate(uid, { $addToSet: { invitations: [sid] } })
+        return { user, site }
 
     } catch (error) {
         return { error: error.message }
     }
 }
 
-const acceptInvitation = async (sid, uid) => {
+const cancelInvitation = async (uid, sid, aid) => {
     try {
-        const site = await Site.findById(sid)
-        if (site === null) throw new Error(`${sid} doesn't exist.`)
+        const site = await verifySitePrivileges(sid, aid)
+        if (site.error) throw new Error(site.error)
+
         if (!site.invitations.includes(uid)) throw new Error(`User ${uid} doesn't have invitation for project ${sid}`)
-        const generalGroup = await Group.findOne({ site: sid, name: "General" }).populate({ path: 'members', select: 'name username picture' })
-        if (generalGroup.members.map(m => m._id).includes(uid)) throw new Error(`You are already a member.`)
-        await syncUserAndProjectData(uid, generalGroup._id, sid)
-        const messages = await getGroupMessages(generalGroup._id)
-        return { success: true, site, generalGroup, messages } //? return data (group id,name and members)
+
+        await Site.findByIdAndUpdate(sid, { $pull: { invitations: uid } })
+        await User.findByIdAndUpdate(uid, { $pull: { invitations: sid } })
+        return true
     } catch (error) {
-        return error.message
+        return { error: error.message }
     }
 }
 
-const acceptRequest = async (sid, uid, aid, online) => {
+const acceptRequest = async (uid, sid, aid, online) => {
     try {
-        const site = await Site.findOne({ _id: sid, creator: aid })
-        if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
-        if (!site.requests.includes(uid)) throw new Error(`User ${uid} didn't requested to join project ${sid}`)
-        const generalGroup = await Group.findOne({ site: sid, name: "General" }).populate({ path: 'members', select: 'name username picture' })
-        if (generalGroup.members.map(m => m._id).includes(uid)) throw new Error(`You are already a member.`)
-        const userData = await User.findById(uid)
-        if (userData === null) throw new Error(`User ${uid} not found`)
-        await syncUserAndProjectData(uid, generalGroup._id, sid)
-        const messages = online ? await getGroupMessages(generalGroup._id) : []
-        return { success: true, site, generalGroup, userData, messages } //? return data (group id,name and members)
+        const site = await verifySitePrivileges(sid, aid)
+        if (site.error) throw new Error(site.error)
+
+        const user = await User.findById(uid)
+        if (user === null) throw new Error(`User ${uid} not found`)
+
+        if (!site.requests.includes(uid)) throw new Error(`Request from ${uid} to ${sid} not found.`)
+
+        const group = await Group.findOne({ site: sid, name: "General" }).populate({ path: 'members', select: 'name username picture' })
+        if (group.members.map(m => m._id).includes(uid)) throw new Error(`User ${uid} is already a member.`)
+
+        await syncUserAndProjectData(uid, group._id, sid)
+        const messages = online ? await getGroupMessages(group._id) : []
+        return { user, site, group, messages }
     } catch (error) {
-        return error.message
+        return { error: error.message }
     }
 }
 
-const rejectRequest = async (sid, uid, aid) => {
+const rejectRequest = async (uid, sid, aid) => {
     try {
-        const site = await Site.findOne({ _id: sid, creator: aid })
-        if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
+        const site = await verifySitePrivileges(sid, aid)
+        if (site.error) throw new Error(site.error)
+
         if (!site.requests.includes(uid)) throw new Error(`User ${uid} didn't requested to join project ${sid}`)
+
         await Site.findByIdAndUpdate(sid, { $pull: { requests: uid } })
         await User.findByIdAndUpdate(uid, { $pull: { requests: sid } })
-        return { success: true }
+        return true
     } catch (error) {
-        return error.message
+        return { error: error.message }
+    }
+}
+
+const sendRequest = async (sid, uid) => {
+    try {
+        const site = await Site.findById(sid)
+        if (site === null) throw new Error(`${sid} not found.`)
+
+        const generalGroup = await Group.findOne({ site: sid, name: "General" }, 'members')
+        if (generalGroup.members.includes(uid)) throw new Error(`You are already a member.`)
+
+        if (site.requests && site.requests.includes(uid)) throw new Error(`Request already exist.`)
+
+        if (site.invitations && site.invitations.includes(uid)) console.log("User should join general group immediately") // todo
+
+        await Site.findByIdAndUpdate(sid, { $addToSet: { requests: [uid] } })
+        await User.findByIdAndUpdate(uid, { $addToSet: { requests: [sid] } })
+        return { site }
+
+    } catch (error) {
+        return { error: error.message }
     }
 }
 
 const cancelRequest = async (sid, uid) => {
     try {
         const site = await Site.findById(sid)
-        if (site === null) throw new Error(`Site not found.`)
+        if (site === null) throw new Error(`${sid} not found.`)
+
         if (!site.requests.includes(uid)) throw new Error(`User ${uid} didn't requested to join project ${sid}`)
+
         await Site.findByIdAndUpdate(sid, { $pull: { requests: uid } })
         await User.findByIdAndUpdate(uid, { $pull: { requests: sid } })
-        return { success: true, site }
+        return { site }
     } catch (error) {
-        return error.message
+        return { error: error.message }
     }
 
+}
+
+const acceptInvitation = async (sid, uid) => {
+    try {
+        const site = await Site.findById(sid)
+        if (site === null) throw new Error(`${sid} not found.`)
+
+        if (!site.invitations.includes(uid)) throw new Error(`User ${uid} doesn't have invitation for project ${sid}`)
+
+        const group = await Group.findOne({ site: sid, name: "General" }).populate({ path: 'members', select: 'name username picture' })
+        if (group.members.map(m => m._id).includes(uid)) throw new Error(`You are already a member.`)
+
+        await syncUserAndProjectData(uid, group._id, sid)
+        const messages = await getGroupMessages(group._id)
+        return { site, group, messages }
+    } catch (error) {
+        return { error: error.message }
+    }
 }
 
 const rejectInvitation = async (sid, uid) => {
     try {
         const site = await Site.findById(sid)
-        if (site === null) throw new Error(`Site not found.`)
-        if (!site.invitations.includes(uid)) throw new Error(`User ${uid} doesn't have invitation for project ${sid}`)
-        await Site.findByIdAndUpdate(sid, { $pull: { invitations: uid } })
-        await User.findByIdAndUpdate(uid, { $pull: { invitations: sid } })
-        return { success: true, site }
-    } catch (error) {
-        return error.message
-    }
-}
+        if (site === null) throw new Error(`${sid} not found.`)
 
-const cancelInvitation = async (sid, uid, aid) => {
-    try {
-        const site = await Site.findOne({ _id: sid, creator: aid })
-        if (site === null) throw new Error(`Site not found or admin mismatch. Site: ${sid}. Admin: ${aid}`)
         if (!site.invitations.includes(uid)) throw new Error(`User ${uid} doesn't have invitation for project ${sid}`)
+
         await Site.findByIdAndUpdate(sid, { $pull: { invitations: uid } })
         await User.findByIdAndUpdate(uid, { $pull: { invitations: sid } })
-        return { success: true }
+        return { site }
     } catch (error) {
-        return error.message
+        return { error: error.message }
     }
 }
 
@@ -453,7 +478,7 @@ const searchPeople = async (pattern, page) => {
         'name username picture company position'
     ).skip(skip).limit(limit)
 
-    console.log(people);
+    // console.log(people);
     return { success: people.length > 0, people }
 }
 
@@ -502,7 +527,7 @@ module.exports = {
     createPrivateMessage,
     createSite,
     createGroup,
-    inviteUser,
+    sendInvitation,
     addUserToGroup,
     removeUserFromGroup,
     sendRequest,
