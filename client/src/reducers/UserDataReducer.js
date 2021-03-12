@@ -34,6 +34,7 @@ export default function UserDataReducer(userData, action) {
                 activeGroup: false,
                 activeChat: false,
                 activeMenu: 'projects',
+                activeWindow: 'projects',
             }
         }
 
@@ -114,7 +115,8 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                activeMenu: 'profile'
+                activeMenu: 'profile',
+                activeWindow: 'profile',
             }
         }
 
@@ -223,8 +225,10 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                ...(userData.device === 'desktop') && {activeMenu: 'projects'}, // find better solution
-                ...(userData.device === 'mobile') && {activeWindow: 'chats'},
+                activeMenu: 'projects',
+                activeWindow: 'chats',
+                // ...(userData.device === 'desktop') && {activeMenu: 'projects'}, // find better solution
+                // ...(userData.device === 'mobile') && {activeWindow: 'chats'},
                 details: null
             }
         }
@@ -681,7 +685,8 @@ export default function UserDataReducer(userData, action) {
                     activeSite: site, 
                     activeGroup: Object.keys(siteData[site].groups)[0],
                     activeChat: false,
-                    activeMenu: false
+                    activeMenu: false,
+                    activeWindow: 'messages'
                  },
             }
         }
