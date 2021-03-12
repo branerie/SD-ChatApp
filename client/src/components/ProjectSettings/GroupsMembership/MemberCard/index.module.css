@@ -11,7 +11,7 @@
 	cursor: pointer;
 }
 
-.listed:hover {
+.card:hover {
 	background-color: var(--bg-color-sel);
 }
 
