@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, useEffect } from 'react'
 import styles from './index.module.css'
 import { MessagesContext } from '../../../context/MessagesContext'
 import MenuInput from '../../MenuInput'
@@ -7,7 +7,11 @@ import SeparatingLine from '../../SeparatingLine'
 
 const BasicSettings = () => {
     const { userData } = useContext(MessagesContext)
-    const [description, setDescription] = useState(userData.sites[userData.activeSite].description)
+    const [description, setDescription] = useState('')
+
+    useEffect(() => {
+        setDescription(userData.sites[userData.activeSite].description || '')
+    }, [userData.activeSite])
 
     function updateDescription() { //todo
         // emit event, update db, update ui

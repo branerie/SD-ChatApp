@@ -85,6 +85,10 @@ export default function MessagesContextProvider(props) {
             dispatchUserData({ type: 'removed-from-group', payload: { socketData } })
         })
 
+        socket.on('removed-from-project', socketData => {
+            dispatchUserData({ type: 'removed-from-project', payload: { socketData } })
+        })
+
         socket.on('join-message', socketData => {
             dispatchUserData({ type: 'join-message', payload: { socketData } })
         })

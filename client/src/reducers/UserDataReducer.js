@@ -216,7 +216,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case 'close-chat': { 
+        case 'close-chat': {
             const { chat } = action.payload
             const { [chat]: _, ...chats } = userData.chats
             return {
@@ -248,7 +248,7 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                ...(activeConnection) && { 
+                ...(activeConnection) && {
                     activeGroup,
                     activeChat: false,
                     activeMenu: false
@@ -577,7 +577,8 @@ export default function UserDataReducer(userData, action) {
 
         case 'removed-from-group': {
             let timestamp = new Date().toUTCString()
-            let { site, group } = action.payload.socketData
+            let { site, groups } = action.payload.socketData
+            let group = groups[0]
             return {
                 ...userData,
                 sites: {
@@ -601,6 +602,20 @@ export default function UserDataReducer(userData, action) {
                                 unread: group !== userData.activeGroup
                             }
                         }
+                    }
+                },
+            }
+        }
+
+        case 'removed-from-project': {
+            let { site, groups } = action.payload.socketData
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        groups: removedFromProjectNotice(site, groups)
                     }
                 },
             }
@@ -681,13 +696,13 @@ export default function UserDataReducer(userData, action) {
                     ...userData.associatedUsers,
                     ...associatedUsers
                 },
-                ...(action.payload.activeConnection) && { 
-                    activeSite: site, 
+                ...(action.payload.activeConnection) && {
+                    activeSite: site,
                     activeGroup: Object.keys(siteData[site].groups)[0],
                     activeChat: false,
                     activeMenu: false,
                     activeWindow: 'messages'
-                 },
+                },
             }
         }
 
@@ -775,6 +790,21 @@ export default function UserDataReducer(userData, action) {
 
         default:
             return userData
+    }
+
+    function removedFromProjectNotice(site) {
+        let timestamp = new Date().toUTCString()
+        for (const group in userData.sites[site].groups) {
+            userData.sites[site].groups[group].members = []
+            userData.sites[site].groups[group].messages.push({
+                notice: true,
+                event: 'warning',
+                msg: `You were removed from ${userData.sites[site].name}. It will disappear from your list on next connection.`,
+                timestamp
+            })
+            userData.sites[site].groups[group].unread = group !== userData.activeGroup
+        }
+        return userData.sites[site].groups
     }
 
     function addNotice(member, event) {
