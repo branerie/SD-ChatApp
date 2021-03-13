@@ -46,7 +46,7 @@ module.exports = io => {
             clientData.associatedUsers[user].online = userIsOnline
             if (user !== userData._id.toString() && firstConnection && userIsOnline) {
                 userIDToSocketIDCache[user].forEach(sid => {
-                    io.to(sid).emit('online-message', 
+                    io.to(sid).emit('online-message',
                         {
                             _id: userData._id,
                             name: userData.name,
@@ -79,7 +79,7 @@ module.exports = io => {
                 })
                 onlineUsers.delete(socket.id)
                 onlineUsers.forEach(sid => {
-                    io.to(sid).emit('quit-message', 
+                    io.to(sid).emit('quit-message',
                         {
                             _id: userData._id,
                             name: userData.name,
@@ -106,12 +106,22 @@ module.exports = io => {
             let newMessage = await db.createPublicMessage(src, dst, msg, type)
             if (!newMessage.success) {
                 sysLog(`Message from ${src} failed: ${newMessage.error}`)
+                callback('Message not sent')
                 return
             }
 
-            sysLog(`Message (group): ${userData._id} >> ${dst}`)
-            socket.to(dst).emit('group-chat-message', { src, msg, type, dst, site: newMessage.site })
-            callback()
+            // --- PATCH: 
+            // While socket will not recieve any messages when room is left,
+            // it seems like it can still send message to previously left room
+            // Currently membership check in DB will stop the user from sending the message
+            // so this check is unecessary but that doesn't fix the leak
+            if (io.sockets.adapter.rooms.has(dst) && io.sockets.adapter.rooms.get(dst).has(socket.id)) { // Map of Sets
+                socket.to(dst).emit('group-chat-message', { src, msg, type, dst, site: newMessage.site })
+                callback()
+            } else {
+                sysLog(`Message from ${src} failed: Socket not connected to room.`)
+                callback('Message not sent')
+            }
         })
 
         socket.on('single-chat-message', async (socketData, callback) => {
@@ -274,14 +284,18 @@ module.exports = io => {
                 return
             }
 
-            const site = data.site
+            const { site, groups, event } = data
             if (userIDToSocketIDCache[member]) {
-                userIDToSocketIDCache[member].forEach(socket => {
-                    io.sockets.sockets.get(socket).leave(group)
-                    io.sockets.sockets.get(socket).emit('removed-from-group', { site, group })
+                userIDToSocketIDCache[member].forEach(sid => {
+                    groups.forEach(group => {
+                        io.sockets.sockets.get(sid).leave(group)
+                    })
+                    io.sockets.sockets.get(sid).emit(event, { site, groups })
                 })
             }
-            io.to(group).emit('leave-message', { member, site, group })
+            groups.forEach(group => {
+                io.to(group).emit('leave-message', { member, site, group })
+            })
             removeMember() // acknowledgement callback
         })
 
@@ -625,7 +639,7 @@ module.exports = io => {
 
             userIDToSocketIDCache[userData._id].forEach(sid => onlineUsers.delete(sid))
             onlineUsers.forEach(sid => {
-                io.to(sid).emit('profile-update', 
+                io.to(sid).emit('profile-update',
                     {
                         _id: userData._id,
                         data

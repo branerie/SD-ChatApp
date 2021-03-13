@@ -260,18 +260,31 @@ const addUserToGroup = async (uid, gid, aid, online) => {
 
 const removeUserFromGroup = async (uid, gid, aid) => {
     try {
+        // try not to remove yourself
+        if (uid.toString() === aid.toString()) throw new Error(`${aid}: Can't remove admin.`)
         // check if group created by admin exists
         const groupData = await Group.findOne({ _id: gid, creator: aid })
         if (groupData === null) throw new Error(`Group not found or admin mismatch. Group: ${gid}. Admin: ${aid}.`)
         // check if user is valid and exists
-        const userData = await User.findById(uid, 'name username picture')
+        const userData = await User.findById(uid)
         if (userData === null) throw new Error(`User ${uid} not found`)
         // check if user is a member of this group
         if (!groupData.members.includes(uid)) throw new Error(`User ${uid} is not part of group ${gid}.`)
 
-        await User.findByIdAndUpdate(uid, { $pull: { groups: gid } })
-        await Group.findByIdAndUpdate(gid, { $pull: { members: uid } })
-        return { site: groupData.site }
+        if (groupData.name === 'General') {
+            const matchingGroups = await Group.find({ site: groupData.site, members: uid })
+            const groupIds = matchingGroups.map(m => m._id)
+            await Group.updateMany({
+                site: groupData.site,
+                members: uid
+            }, { $pull: { members: uid } })
+            await User.findByIdAndUpdate(uid, { $pullAll: { groups: groupIds } })
+            return { site: groupData.site, groups: groupIds.map(String), event: 'removed-from-project' }
+        } else {
+            await User.findByIdAndUpdate(uid, { $pull: { groups: gid } })
+            await Group.findByIdAndUpdate(gid, { $pull: { members: uid } })
+            return { site: groupData.site, groups: [gid], event: 'removed-from-group' }
+        }
     } catch (error) {
         if (error.name === "CastError") return { error: `CastError: ${error.message}` }
         return { error: error.message }

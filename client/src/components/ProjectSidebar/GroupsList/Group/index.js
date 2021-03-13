@@ -16,25 +16,28 @@ const Group = ({ title, gid }) => {
         dispatchUserData({ type: "load-group", payload: { activeGroup } })
     }
 
-
     function loadMembers(gid) {
-        dispatchUserData({ type: 'load-members-mobile', payload: {activeGroup: gid} })
+        dispatchUserData({ type: 'load-members-mobile', payload: { activeGroup: gid } })
     }
 
     return (
-        <div
-            className={`${css.group} ${gid === userData.activeGroup && css.selected}`}           
-        >
+        <div className={`${css.group} ${gid === userData.activeGroup && css.selected}`}>
             <div className={css.title} onClick={() => loadGroup(gid)}>{title}</div>
-            <div className={css.icons}>
-                {userData.sites[userData.activeSite].groups[gid].unread 
-                ? <MsgFull onClick={() => loadGroup(gid)} className={css.full} />
-                : <MsgEmpty onClick={() => loadGroup(gid)} className={css.empty}/>
-                }
-                {userData.device === 'mobile' &&
-                    <Members onClick={() => loadMembers(gid)}/>
-                }
-            </div>
+            {userData.sites[userData.activeSite].groups[gid].unread
+                ?
+                <div className={css.icons} onClick={() => loadGroup(gid)} >
+                    <MsgFull className={css.full} />
+                </div>
+                :
+                <div className={css.icons} onClick={() => loadGroup(gid)} >
+                    <MsgEmpty className={css.empty} />
+                </div>
+            }
+            {userData.device === 'mobile' &&
+                <div className={css.icons} onClick={() => loadMembers(gid)} >
+                    <Members />
+                </div>
+            }
         </div>
     )
 }
