@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const SiteSchema = new mongoose.Schema({
     name: {
         type: String,
-        unique: true,
+        // unique: true,
         required: [true, 'Name is required.'],
         minlength: [4, 'Name too short. Minimum is 4 symbols.'],
         maxlength: [50, 'Name too long. Maximum is 50 symbols.']
@@ -12,6 +12,9 @@ const SiteSchema = new mongoose.Schema({
         type: String,
         default: '',
         maxlength: [100, 'Description too long. Maximum is 100 symbols.']
+    },
+    logo: {
+        type: String
     },
     creator: {
         type: 'ObjectId',

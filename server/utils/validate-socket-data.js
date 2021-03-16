@@ -70,12 +70,16 @@ const profileData = (src, data, failed = true, errors = []) => {
 
 const siteData = (src, data, failed = true) => {
     if (!isObject(src, data)) return { failed }
-    const { site = '', description = '' } = data
-    if (!isString(site) || !isString(description)) {
+    const { sid = '', site = '', description = '', logo = '' } = data
+    if (!isString(sid) || !isString(site) || !isString(description) || !isString(logo)) {
         sysLog(`Invalid data type from ${src}.`)
         return { failed }
     }
     data.site = trimAll(site)
+    if (!data.site) {
+        sysLog(`Project name not specified from ${src}.`)
+        return { failed, error: 'Project name is required' }
+    }
     data.description = trimAll(description)
     return { data }
 }

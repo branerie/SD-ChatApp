@@ -35,10 +35,8 @@
 .project {
     display: flex;
     justify-content: space-between;
-    flex-wrap: wrap;
     color: black;
     margin: 1px 0;
-    /* padding: 10px; */
     height: 2.5rem;
     line-height: 2.5rem;
     cursor: pointer;
@@ -86,11 +84,18 @@
 .title {
     /* background-color: darkolivegreen; */
     flex-grow: 1;
-    padding-left: 1rem;
-    overflow: hidden;
+    display: flex;
+    padding-left: 5px;
+    overflow-x: hidden;
+    /* max-width: calc(100% - 5.2rem); */
+    width: 100%;
+}
+
+.name {
+    overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    max-width: calc(100% - 5.2rem);
+    margin-left: 5px;
 }
 
 .icons {

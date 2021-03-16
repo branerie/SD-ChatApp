@@ -1,0 +1,24 @@
+.pic-container {
+    width: 150px;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.profile-picture {
+    width: 100%;
+    height: auto;
+    align-self: center;
+    margin-top: 10px;
+    /* border: 1px solid black; */
+}
+
+.btn-change {
+    width: 100%;
+    height: 2rem;
+}
+
+@media (max-width: 480px) {
+	.pic-container {
+		margin-right: 0;
+	}
+}

@@ -724,6 +724,22 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
+        case 'update-project-settings': {
+            const { sid, name, description, logo } = action.payload.data
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [sid]: {
+                        ...userData.sites[sid],
+                        name,
+                        description,
+                        logo
+                    }
+                }
+            }
+        }
+
         case 'profile-update': {
             const { user } = action.payload
             return {

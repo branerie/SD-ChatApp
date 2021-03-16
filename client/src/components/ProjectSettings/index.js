@@ -1,4 +1,4 @@
-import styles from './index.module.css'
+import css from './index.module.css'
 import BasicSettings from './BasicSettings'
 import AddGroup from './AddGroup'
 import SearchPeople from './SearchPeople'
@@ -7,13 +7,13 @@ import PendingList from './PendingList'
 
 const ProjectSettings = () => {
     return (
-        <div className={styles.menu}>
-            <h3 className={styles.title}>Project Settings</h3>
+        <div className={css.menu}>
+            <h3 className={css.title}>Project Settings</h3>
             <BasicSettings />
-            <AddGroup />
-            <SearchPeople />
             <GroupsMembership />
+            <AddGroup />
             <PendingList />
+            <SearchPeople />
         </div>
     )
 }

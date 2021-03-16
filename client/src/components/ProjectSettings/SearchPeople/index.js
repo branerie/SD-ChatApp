@@ -166,7 +166,6 @@ const SearchPeople = () => {
                 </ul>
             }
         </div>
-        <SeparatingLine horizontal={true} />
         </>
     )
 }

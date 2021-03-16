@@ -650,6 +650,33 @@ module.exports = io => {
             restSocketsUpdate(userData._id, socket.id, 'update-profile-data', validation.data)
         })
 
+        socket.on('update-project-settings', async (socketData, callback) => {
+            const validation = validate.siteData(userData._id, socketData)
+            if (validation.failed) {
+                callback(false, validation.error) // send validation.errors if applicable
+                return
+            }
+
+            const { sid, site, description, logo } = validation.data
+            const data = await db.updateProjectSettings(userData._id, sid, site, description, logo)
+
+            if (data.error) {
+                sysLog(data.error)
+                if (data.userErrors) callback(false, ...data.userErrors)
+                return
+            }
+            
+            const siteData = {
+                sid: data.site._id,
+                name: data.site.name,
+                description: data.site.description,
+                logo: data.site.logo
+            }
+            callback(true, siteData)
+            // todo 
+            // update rest sockets and send changes to users associated with project
+        })
+
         socket.on('get-chat-history', async (id, callback) => {
             const data = await db.getPrivateMessages(id, userData._id)
             const chat = {

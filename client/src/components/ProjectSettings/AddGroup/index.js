@@ -4,6 +4,7 @@ import { MessagesContext } from "../../../context/MessagesContext"
 import { SocketContext } from "../../../context/SocketContext"
 import MenuInput from '../../MenuInput'
 import MenuButton from '../../Buttons/MenuButton'
+import SeparatingLine from '../../SeparatingLine'
 
 const AddGroup = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
@@ -32,37 +33,40 @@ const AddGroup = () => {
     }
 
     return (
-        <div className={styles['menu-field']}>
-            <div className={styles['form-control']} >
-                <p>Add new group</p>
-                <MenuInput
-                    value={group} 
-                    onChange={e => setGroup(e.target.value)}
-                    placeholder='Group name...'
+        <>
+            <div className={styles['menu-field']}>
+                <div className={styles['form-control']} >
+                    <p>Add new group</p>
+                    <MenuInput
+                        value={group}
+                        onChange={e => setGroup(e.target.value)}
+                        placeholder='Group name...'
+                    />
+                </div>
+                <MenuButton
+                    title='Add &amp; Open'
+                    btnSize='medium'
+                    onClick={() => addGroup(true)}
+                    disabled={isDisabled}
+                    style={{ marginLeft: '0.5rem' }}
                 />
+                <MenuButton
+                    title='Add'
+                    btnType='submit'
+                    btnSize='small'
+                    onClick={() => addGroup(false)}
+                    disabled={isDisabled}
+                />
+                {errors.length > 0 &&
+                    <ul className={styles.errors}>
+                        {errors.map((error, index) => {
+                            return <li key={index}><small>{error}</small></li>
+                        })}
+                    </ul>
+                }
             </div>
-            <MenuButton 
-                title='Add &amp; Open'
-                btnSize='medium'
-                onClick={() => addGroup(true)}
-                disabled={isDisabled}
-                style={{ marginLeft: '0.5rem' }}
-            />
-            <MenuButton 
-                title='Add'
-                btnType='submit'
-                btnSize='small'
-                onClick={() => addGroup(false)}
-                disabled={isDisabled}
-            />
-            {errors.length > 0 &&
-                <ul className={styles.errors}>
-                    {errors.map((error, index) => {
-                        return <li key={index}><small>{error}</small></li>
-                    })}
-                </ul>
-            }
-        </div>
+            <SeparatingLine horizontal={true} />
+        </>
     )
 }
 

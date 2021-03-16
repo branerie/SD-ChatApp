@@ -1,5 +1,19 @@
+.container {
+	display: flex;
+	justify-content: space-between;
+	margin: 0 30px;
+}
+
+.menu-field {
+	flex-grow: 1;
+}
+
+.menu-field button {
+	float: right;
+	margin-bottom: 10px;
+}
+
 .form-control {
-	display: inline-block;
 	margin: 10px 0px;
 	width: 100%;
 }
@@ -9,24 +23,24 @@
 	padding: 5px;
 	height: 40px;
 	width: 100%;
-	/* border: none; */
     border-radius: 15px;
     outline: none;
 }
-
-.menu-field {
-	padding: 0 30px;
-	margin-bottom: 10px;
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
+.errors {
+	color: var(--notification-color);
+	margin-left: 20px;
 }
 
-.menu-field button {
-	/* float: right; */
-	/* margin-bottom: 10px; */
+.errors li {
+	padding: 0;
 }
 
-.menu-field hr {
-	clear: right;
+@media (max-width: 480px) {
+	.container {
+		flex-direction: column;
+		align-items: center;
+	}
+	.menu-field {
+		width: 100%;
+	}
 }
