@@ -6,6 +6,10 @@ const getFaceCroppedImageUrl = (imagePath) => {
     return `https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload/w_1200,h_1200,c_crop,f_png,g_face,r_max/w_200/${imagePath}`
 }
 
+const getRoundedImageUrl = (imagePath) => {
+    return `https://res.cloudinary.com/${process.env.REACT_APP_CLOUDINARY_NAME}/image/upload/f_png,r_max/w_200/${imagePath}`
+}
+
 const uploadImage = async (imageFile) => {
     //TODO: switch to signed uploads
     try {
@@ -29,5 +33,6 @@ const uploadImage = async (imageFile) => {
 export {
     getFullImageUrl,
     getFaceCroppedImageUrl,
+    getRoundedImageUrl,
     uploadImage
 }

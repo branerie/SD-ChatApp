@@ -21,19 +21,21 @@ const Member = ({ id, name, picturePath, isOnline }) => {
     return (
         <div className={styles.container}>
             <div className={styles.member} onClick={openPrivateChat}>
-                <div className={styles.status}>
-                    <StatusLight userId={id} isOnline={isOnline} size='small' />
-                </div>
                 <UserAvatar picturePath={picturePath} />
                 <div className={styles.name}>
                     {name}
                 </div>
             </div>
-            <InfoButton 
-                className={styles.info} 
-                alt='Link to user info' 
-                onClick={() => dispatchUserData({ type: 'show-details', id, show: true })}
-            />
+            <div className={styles.icons}>
+                <div className={styles.status}>
+                    <StatusLight userId={id} isOnline={isOnline} size='small' />
+                </div>
+                <InfoButton
+                    className={styles.info}
+                    alt='Link to user info'
+                    onClick={() => dispatchUserData({ type: 'show-details', id, show: true })}
+                />
+            </div>
         </div>
     )
 }

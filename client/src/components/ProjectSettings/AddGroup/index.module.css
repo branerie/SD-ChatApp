@@ -8,23 +8,17 @@
 	padding: 5px;
 	height: 40px;
 	width: 100%;
-	/* border: none; */
     border-radius: 15px;
     outline: none;
 }
 
 .menu-field {
 	margin: 0 30px;
-	border-bottom: 2px solid black;
 }
 
 .menu-field button {
 	float: right;
 	margin-bottom: 10px;
-}
-
-.menu-field hr {
-	clear: right;
 }
 
 .errors {

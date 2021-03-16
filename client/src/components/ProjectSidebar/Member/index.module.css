@@ -20,6 +20,10 @@
     color: var(--txt-color-sel);
 }
 
+.icons {
+    display: flex;
+}
+
 .status {
     display: flex;
     align-items: center;

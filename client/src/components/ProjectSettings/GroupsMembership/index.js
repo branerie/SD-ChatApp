@@ -104,7 +104,6 @@ const GroupsMembership = () => {
                     }
                 </div>
             </div>
-            <SeparatingLine horizontal={true} />
         </>
     )
 }

@@ -43,7 +43,7 @@ const getUserData = async (id) => {
             select: 'name username picture'
         }, {
             path: 'site',
-            select: 'name description creator invitations requests',
+            select: 'name description logo creator invitations requests',
             populate: {
                 path: 'invitations requests',
                 select: 'name username picture'
@@ -177,6 +177,26 @@ const createSite = async (name, description, creator) => {
         } else {
             return { success: false, errors: ['Something went wrong.'] }
         }
+    }
+}
+
+const updateProjectSettings = async (aid, sid, name, description, logo) => {
+    try {
+        const siteCheck = await verifySitePrivileges(sid, aid)
+        if (siteCheck.error) throw new Error(siteCheck.error)
+
+        const filters = { _id: sid, creator: aid }
+        const updates = { name, description, logo }
+        const options = { new: true, runValidators: true }
+
+        const site = await Site.findOneAndUpdate(filters, updates, options)
+        return { site }
+    } catch (error) {
+        if (error.name === 'ValidationError') {
+            const userErrors = Object.keys(error.errors).map(e => error.errors[e].message)
+            return { error: userErrors, userErrors }
+        }
+        return { error: error.message }
     }
 }
 
@@ -554,6 +574,7 @@ module.exports = {
     searchProjects,
     searchPeople,
     updateProfileData,
+    updateProjectSettings,
     changeTheme
     // updateAccessTime
 }

@@ -85,11 +85,11 @@ const ChatsList = ({ isSmallList }) => {
                                 <div
                                     className={chat === userData.activeChat ? `${styles.selected} ${styles.chat}` : styles.chat}
                                     onClick={(e) => handleClick(e, chat)}>
-                                    <StatusLight isOnline={checkIsOnline(chat)} size='small' />
                                     <UserAvatar picturePath={checkForPicture(chat)} />
                                     <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
                                 </div>
                                 <div className={styles.icons}>
+                                    <StatusLight isOnline={checkIsOnline(chat)} size='small' />
                                     {chats[chat].unread && chat !== userData.activeChat
                                         ? <MsgFull onClick={(e) => handleClick(e, chat)} className={styles.full} />
                                         : <MsgEmpty onClick={(e) => handleClick(e, chat)} className={styles.empty} />

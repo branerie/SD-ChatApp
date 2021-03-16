@@ -37,7 +37,7 @@ const PendingList = () => {
 
     return (
         <div className={styles.pending}>
-            <p>Pending</p>
+            <p>Pending list</p>
             {hasInvitations && (
                 <ul><span>Invitations</span>
                     {userData.sites[userData.activeSite].invitations.map(user => {
