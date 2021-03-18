@@ -3,9 +3,7 @@ import css from './index.module.css'
 import { MessagesContext } from '../../../../context/MessagesContext'
 // import { SocketContext } from '../../../../../context/SocketContext'
 
-import { ReactComponent as MsgEmpty } from '../../../../icons/msg-empty.svg'
-import { ReactComponent as MsgFull } from '../../../../icons/msg-full.svg'
-import { ReactComponent as Members } from '../../../../icons/chat-group.svg'
+import Icon from '../../../Common/Icon'
 
 const Group = ({ title, gid }) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
@@ -23,21 +21,15 @@ const Group = ({ title, gid }) => {
     return (
         <div className={`${css.group} ${gid === userData.activeGroup && css.selected}`}>
             <div className={css.title} onClick={() => loadGroup(gid)}>{title}</div>
-            {userData.sites[userData.activeSite].groups[gid].unread
-                ?
-                <div className={css.icons} onClick={() => loadGroup(gid)} >
-                    <MsgFull className={css.full} />
-                </div>
-                :
-                <div className={css.icons} onClick={() => loadGroup(gid)} >
-                    <MsgEmpty className={css.empty} />
-                </div>
-            }
-            {userData.device === 'mobile' &&
-                <div className={css.icons} onClick={() => loadMembers(gid)} >
-                    <Members />
-                </div>
-            }
+            <div className={css.icons}>
+                {userData.sites[userData.activeSite].groups[gid].unread > 0 &&
+                    <Icon icon='msg' count={userData.sites[userData.activeSite].groups[gid].unread} onClick={() => loadGroup(gid)} />
+                }
+                {userData.device === 'mobile' &&
+                    <Icon icon='members' onClick={() => loadMembers(gid)} />
+                }
+
+            </div>
         </div>
     )
 }

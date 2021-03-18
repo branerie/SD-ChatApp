@@ -1,7 +1,7 @@
 .container {
     display: flex;
     flex-direction: column;
-    flex: 1 1 auto;
+    /* flex: 1 1 auto; */
     overflow-y: scroll;
     scrollbar-width: none;
     -ms-overflow-style: none;  /* IE and Edge */
@@ -12,6 +12,7 @@
 }
 
 .inner {
+    max-width: 100%;
     overflow-y: scroll;
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
@@ -19,14 +20,6 @@
 
 .inner::-webkit-scrollbar {
     display: none;
-}
-
-.header {
-    font-size: small;
-    color: var(--txt-color);
-    display: flex;
-    justify-content: center;
-    padding: 5px 0;
 }
 
 @media (max-width: 480px) {

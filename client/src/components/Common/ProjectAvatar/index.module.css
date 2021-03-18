@@ -1,4 +1,4 @@
-.avatar {
+.container {
     width: 2.5rem;
     height: 2.5rem;
     flex-shrink: 0;
@@ -7,13 +7,9 @@
     align-items: center;
 }
 
-.profile-pic {
+.logo {
     border-radius: 50%;
     width: 90%;
     height: 90%;
     align-self: center;
-}
-
-.pic-rounded {
-    border-radius: 50%;
 }

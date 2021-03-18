@@ -8,6 +8,7 @@ const ProjectSidebar = () => {
         <div className={styles.container}>
             <div className={styles.inner}>
                 <GroupsList />
+                <SeparatingLine horizontal={true} />
                 <MembersList />
             </div>
             <SeparatingLine horizontal={false} />

@@ -1,24 +1,26 @@
 import { useContext } from 'react'
-import styles from './index.module.css'
-import { MessagesContext } from '../../context/MessagesContext'
-import { ReactComponent as Gear } from '../../icons/gear.svg'
-import { ReactComponent as Info } from '../../icons/info.svg'
-import { ReactComponent as BellEmpty } from '../../icons/bell-empty.svg'
-import { ReactComponent as BellFull } from '../../icons/bell-full.svg'
-import { ReactComponent as MsgEmpty } from '../../icons/msg-empty.svg'
-import { ReactComponent as MsgFull } from '../../icons/msg-full.svg'
+import css from './index.module.css'
 
+import ListHeader from '../Common/ListHeader'
 import ProjectAvatar from '../Common/ProjectAvatar'
+import Icon from '../Common/Icon'
+
+import { MessagesContext } from '../../context/MessagesContext'
 
 const ProjectsList = ({ isSmallList }) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
 
-    function loadProject(site) {
-        dispatchUserData({ type: 'load-site', payload: { site: site[0] } })
+    function loadProject(pid) {
+        dispatchUserData({ type: 'load-site', payload: { site: pid } })
     }
 
     function loadProjectSettings(pid) {
         dispatchUserData({ type: 'load-project-settings', payload: { activeSite: pid } })
+    }
+
+    function loadProjectInfo(pid) {
+        // todo: get project information
+        console.log(pid)
     }
 
     const sites = Object.entries(userData.sites).sort((A, B) => {
@@ -27,84 +29,56 @@ const ProjectsList = ({ isSmallList }) => {
             A[1].name.localeCompare(B[1].name)
     })
 
-    function getAvatarLetters(line) {
-        const splitNames = line.split(' ')
-        const firstLetterArray = []
-
-        const namesLength = Math.min(splitNames.length, 3)
-        for (let i = 0; i < namesLength; i++) {
-            firstLetterArray.push(splitNames[i].charAt(0).toUpperCase())
-        }
-
-        return firstLetterArray.join('')
+    function setAbbreviation(string) {
+        return string.split(' ', 3).map(word => word[0]).join('')
     }
 
-    function addClasses(site) {
-        const classList = [styles.project]
-        classList.push(site[1].creator === userData.personal._id ? styles.owner : styles.guest)
-        classList.push(isSmallList ? styles.small : styles.large)
-        site[0] === userData.activeSite && classList.push(styles.selected)
+    function setClasses(id, owner) {
+        const classList = [css.card]
+        classList.push(isSmallList ? css.small : css.large)
+        classList.push(owner ? css.owner : css.guest)
+        id === userData.activeSite && classList.push(css.selected)
         return classList.join(' ')
     }
 
     return (
-        <div className={`${styles.container} ${isSmallList ? styles.shrink : styles.expand}`}>
-            <div className={styles.header}>Projects</div>
-            { isSmallList
-                ?
-                <div className={styles.list}>
-                    {sites.map(site => {
+        <div className={`${css.container} ${isSmallList ? css.shrink : css.expand}`}>
+            <ListHeader title={`projects (${sites.length})`}/>
+            <div className={css.list}>
+                {isSmallList
+                    ? sites.map(([id, site]) => {
+                        let owner = site.creator === userData.personal._id
                         return (
                             <div
-                                key={site[0]}
-                                className={addClasses(site)}
-                                onClick={() => loadProject(site)}>
-                                {site[1].logo ? <ProjectAvatar picturePath={site[1].logo} /> : getAvatarLetters(site[1].name)}
+                                key={id}
+                                className={setClasses(id, owner)}
+                                onClick={() => loadProject(id)}>
+                                {site.logo ? <ProjectAvatar picturePath={site.logo} /> : setAbbreviation(site.name)}
                             </div>
                         )
-                    })}
-                </div>
-                :
-                <div className={styles.list}>
-                    {sites.map(site => {
-                        let owner = site[1].creator === userData.personal._id
+                    })
+                    : sites.map(([id, site]) => {
+                        let owner = site.creator === userData.personal._id
+                        let requests = site.requests?.length
+                        let messages = Object.values(site.groups).filter(group => group.unread).length
                         return (
-                            <div key={site[0]} className={addClasses(site)}>
-                                <div className={styles.title} onClick={() => loadProject(site)} >
-                                    <ProjectAvatar picturePath={site[1].logo} />
-                                    <div className={styles.name}>
-                                        {site[1].name}
-                                    </div>
+                            <div key={id} className={setClasses(id, owner)}>
+                                <div className={css.title} onClick={() => loadProject(id)} >
+                                    <ProjectAvatar picturePath={site.logo} />
+                                    <div className={css.name}>{site.name}</div>
                                 </div>
-                                <div className={styles.icons}>
-                                    {Object.values(site[1].groups).some(group => group.unread === true)
-                                        ? <MsgFull onClick={() => loadProject(site)} className={styles.full} />
-                                        : <MsgEmpty onClick={() => loadProject(site)} className={styles.empty} />
-                                    }
+                                <div className={css.icons}>
+                                    {messages > 0 && <Icon icon='msg' count={messages} onClick={() => loadProject(id)} />}
                                     {owner
-                                        ? <>
-                                            {site[1].requests && site[1].requests.length > 0
-                                                ?
-                                                <BellFull
-                                                    onClick={() => loadProjectSettings(site[0])}
-                                                    className={styles.full}
-                                                />
-                                                :
-                                                <BellEmpty
-                                                    onClick={() => loadProjectSettings(site[0])}
-                                                    className={styles.empty}
-                                                />
-                                            }
-                                            <Gear onClick={() => loadProjectSettings(site[0])} />
-                                        </>
-                                        : <Info />
+                                        ? <Icon icon={requests > 0 ? 'bell' : 'gear'} count={requests} onClick={() => loadProjectSettings(id)} />
+                                        : <Icon icon='info' onClick={() => loadProjectInfo(id)} />
                                     }
                                 </div>
                             </div>
                         )
-                    })}
-                </div>
-            }
+                    })
+                }
+            </div>
         </div>
     )
 }

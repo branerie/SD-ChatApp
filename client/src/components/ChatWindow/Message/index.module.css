@@ -1,39 +1,107 @@
-.container {
+.header {
     display: flex;
-    padding: 10px 15px;
-    margin: 4px 12px;
+    align-items: center;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    padding: 0px 15px;
+}
+
+.main {
+    display: flex;
+    padding: 0px 15px;
+}
+
+.container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 2px 10px;
+    margin: 1px 0px;
     background-color: var(--bg-color-message);
     border-radius: 10px;
+    max-width: 50vw;
+}
+
+.self {
+    align-items: flex-end;
+}
+
+.rest {
+    align-items: flex-start;
+}
+
+.self.first::after {
+    content: "";
+    position: absolute;
+    border-bottom: 12px solid var(--bg-color-message);
+    bottom: 100%;
+    right: 1rem;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+
+.rest.first::before {
+    content: "";
+    position: absolute;
+    border-bottom: 12px solid var(--bg-color-message);
+    bottom: 100%;
+    left: 1rem;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+}
+
+.self.next::after {
+    content: "";
+    position: absolute;
+    border-bottom: 4px solid var(--bg-color-message);
+    right: 12px;
+    bottom: 100%;
+    border-right: 2px solid var(--bg-color-message);
+}
+
+.rest.next::before {
+    content: "";
+    position: absolute;
+    border-bottom: 4px solid var(--bg-color-message);
+    left: 12px;
+    bottom: 100%;
+    border-right: 2px solid var(--bg-color-message);
 }
 
 .own {
     flex-direction: row-reverse;
-    background-color: var(--bg-color-own-message);
-}
-
-.data {
-    margin: 0 10px;
-    display: flex;
-    flex-direction: column;
-}
-
-.owndata {
-    align-items: flex-end;
 }
 
 .name {
-    font-size: 13px;
+    background-color: var(--bg-color-chat);
+    border-radius: 12px;
+    font-size: 12px;
+    margin: 0 5px;
+    padding: 0 5px;
 }
 
 .time {
-    font-style: italic;
-    font-size: 12px;
-    color: var(--txt-color-chat);
+    font-size: x-small;
+}
+
+.rest > .time {
+    align-self: flex-end;
+}
+
+.self > .time {
+    align-self: flex-start;
 }
 
 .message {
-    overflow-x: hidden;
-    max-width: 50vw;
+    padding-top: 5px;
+    overflow-x: auto;
+    max-width: 100%;
     word-wrap: break-word;
     white-space: pre-wrap;
+}
+
+@media (max-width: 480px) {
+    .container {
+        max-width: 90vw;
+    }
 }
