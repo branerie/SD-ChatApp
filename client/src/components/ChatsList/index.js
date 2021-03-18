@@ -1,17 +1,14 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
-import { MessagesContext } from '../../context/MessagesContext'
-import UserAvatar from '../Common/UserAvatar'
-import StatusLight from '../Common/StatusLight'
-import { ReactComponent as MsgEmpty } from '../../icons/msg-empty.svg'
-import { ReactComponent as MsgFull } from '../../icons/msg-full.svg'
-import { ReactComponent as Info } from '../../icons/info.svg'
 
-const colors = [styles.red, styles.green, styles.blue, styles.orange]
+import ListHeader from '../Common/ListHeader'
+import UserAvatar from '../Common/UserAvatar'
+import Icon from '../Common/Icon'
+
+import { MessagesContext } from '../../context/MessagesContext'
 
 const ChatsList = ({ isSmallList }) => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
-    let colorIndex = 0
 
     function handleClick(e, chat) {
         if (e.target.nodeName === 'BUTTON') return
@@ -19,83 +16,56 @@ const ChatsList = ({ isSmallList }) => {
         dispatchUserData({ type: "load-chat", payload: { chat } })
     }
 
-    const checkIsOnline = (id) => userData.associatedUsers[id].online
+    function showUserInfo(id) {
+        dispatchUserData({ type: 'show-details', id, show: true })
+    }
 
-    const checkForPicture = (id) => userData.associatedUsers[id].picture
-
-    function addClasses(chat) {
-        const classList = [styles.smallList]
-
-        if (checkIsOnline(chat)) {
-            classList.push(styles.online)
-        } else {
-            classList.push(styles.offline)
-        }
-
-        if (chat === userData.activeChat) classList.push(styles.selected)
-
-        if (!checkForPicture(chat)) {
-            const currentColorIndex = colorIndex % colors.length
-            const currentColor = colors[currentColorIndex]
-            classList.push(currentColor)
-        }
-
-        colorIndex++
-
+    function setClasses(chat) {
+        const classList = [styles.card]
+        classList.push(isSmallList ? styles.small : styles.large)
+        classList.push(userData.associatedUsers[chat].online ? styles.online : styles.offline)
+        chat === userData.activeChat && classList.push(styles.selected)
         return classList.join(' ')
     }
 
-    function avatarLetter(line) {
-        const splitedName = line.split(' ')
-        const firstLatterArray = []
-        for (let i = 0; i < splitedName.length; i++) {
-            firstLatterArray.push(splitedName[i].charAt(0).toUpperCase())
-        }
-        const renderLetter = firstLatterArray.join('')
-        return renderLetter
-
+    function setAbbreviation(string) {
+        return string.split(' ', 3).map(word => word[0]).join('')
     }
 
-    const chats = userData.chats
+    const chats = Object.keys(userData.chats)
     // Sort: Non. Default is in the order they are opened
 
     return (
-        <div className={styles.container}>
-            <div className={styles['chats-title']}>chats</div>
-            <div className={styles['chats-container']}>
+        <div className={`${styles.container} ${isSmallList ? styles.shrink : styles.expand}`}>
+            <ListHeader title={`chats (${chats.length})`}/>
+            <div className={styles.list}>
                 {isSmallList
-                    ?
-                    Object.keys(chats).map(chat => {
-                        const picForAvatar = checkForPicture(chat)
+                    ? chats.map(chat => {
                         return (
                             <div
                                 key={chat}
-                                className={addClasses(chat)}
+                                className={setClasses(chat)}
                                 onClick={(e) => handleClick(e, chat)}>
-                                {picForAvatar
-                                    ? <UserAvatar picturePath={picForAvatar} />
-                                    : <div>{avatarLetter(userData.associatedUsers[chat].name)}</div>}
+                                {userData.associatedUsers[chat].picture
+                                    ? <UserAvatar picturePath={userData.associatedUsers[chat].picture} />
+                                    : setAbbreviation(userData.associatedUsers[chat].name)
+                                }
                             </div>
                         )
                     })
-                    :
-                    Object.keys(chats).map(chat => {
+                    : chats.map(chat => {
                         return (
-                            <div key={chat} className={styles.list}>
-                                <div
-                                    className={chat === userData.activeChat ? `${styles.selected} ${styles.chat}` : styles.chat}
-                                    onClick={(e) => handleClick(e, chat)}>
-                                    <UserAvatar picturePath={checkForPicture(chat)} />
-                                    <span className={styles['user-name']}>{userData.associatedUsers[chat].name}</span>
+                            <div key={chat} className={setClasses(chat)}>
+                                <div className={styles.title} onClick={(e) => handleClick(e, chat)}>
+                                    <UserAvatar picturePath={userData.associatedUsers[chat].picture} onlineStatus={true} isOnline={userData.associatedUsers[chat].online}/>
+                                    <div className={styles.name}>{userData.associatedUsers[chat].name}</div>
                                 </div>
                                 <div className={styles.icons}>
-                                    <StatusLight isOnline={checkIsOnline(chat)} size='small' />
-                                    {chats[chat].unread && chat !== userData.activeChat
-                                        ? <MsgFull onClick={(e) => handleClick(e, chat)} className={styles.full} />
-                                        : <MsgEmpty onClick={(e) => handleClick(e, chat)} className={styles.empty} />
+                                    {userData.chats[chat].unread > 0 && chat !== userData.activeChat
+                                        && <Icon icon='msg' count={userData.chats[chat].unread} onClick={(e) => handleClick(e, chat)}/>
                                     }
                                     {userData.device === 'mobile' &&
-                                        <Info onClick={() => dispatchUserData({ type: 'show-details', id: chat, show: true })}/>
+                                        <Icon icon='info' onClick={() => showUserInfo(chat)} />
                                     }
                                 </div>
                             </div>

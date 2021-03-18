@@ -136,7 +136,7 @@ export default function UserDataReducer(userData, action) {
                                 ...userData.sites[activeSite].groups,
                                 [activeGroup]: {
                                     ...userData.sites[activeSite].groups[activeGroup],
-                                    unread: false
+                                    unread: 0
                                 }
                             }
                         },
@@ -164,7 +164,7 @@ export default function UserDataReducer(userData, action) {
                             ...userData.sites[userData.activeSite].groups,
                             [activeGroup]: {
                                 ...userData.sites[userData.activeSite].groups[activeGroup],
-                                unread: false
+                                unread: 0
                             }
                         }
                     },
@@ -184,7 +184,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.chats,
                     [chat]: {
                         ...userData.chats[chat],
-                        unread: false
+                        unread: 0
                     }
                 },
                 activeSite: false,
@@ -204,7 +204,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.chats,
                     [id]: {
                         ...chat,
-                        unread: false
+                        unread: 0
                     }
                 },
                 activeSite: false,
@@ -277,11 +277,11 @@ export default function UserDataReducer(userData, action) {
         case 'group-chat-message': {
             let timestamp = new Date().toUTCString()
             let { src, site, dst: group, msg, type } = action.payload.msgData
-            let unread = false
+            let unread = userData.sites[site].groups[group].unread || 0
             if (userData.device === 'desktop') {
-                unread = (src !== userData.personal._id && group !== userData.activeGroup)
+                if (src !== userData.personal._id && group !== userData.activeGroup) unread++
             } else {
-                unread = !(userData.activeWindow === 'messages' && group === userData.activeGroup)
+                if (!(userData.activeWindow === 'messages' && group === userData.activeGroup)) unread++
             }
 
             return {
@@ -309,6 +309,7 @@ export default function UserDataReducer(userData, action) {
         case 'single-chat-message': {
             let timestamp = new Date().toUTCString()
             let { src, dst: chat, msg, type } = action.payload.msgData
+            let unread = userData.chats[chat].unread || 0
             return {
                 ...userData,
                 chats: {
@@ -321,11 +322,11 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.chats[chat].messages || [],
                                     { src, msg, type, timestamp }
                                 ],
-                                unread: chat !== userData.activeChat && src !== userData.personal._id
+                                unread: chat !== userData.activeChat && src !== userData.personal._id  ? unread + 1 : 0
                             }
                             : {
                                 messages: [{ src, msg, type, timestamp }],
-                                unread: true
+                                unread: 1
                             }
                     }
                 }
@@ -422,7 +423,7 @@ export default function UserDataReducer(userData, action) {
                                         timestamp
                                     }
                                 ],
-                                unread: group !== userData.activeGroup
+                                unread: group !== userData.activeGroup ? userData.sites[site].groups[group].unread + 1 : 0
                             }
                         }
                     }
@@ -462,7 +463,7 @@ export default function UserDataReducer(userData, action) {
                                         timestamp
                                     }
                                 ],
-                                unread: group !== userData.activeGroup
+                                unread: group !== userData.activeGroup ? userData.sites[site].groups[group].unread + 1 : 0
                             }
                         }
                     }
@@ -599,7 +600,7 @@ export default function UserDataReducer(userData, action) {
                                         timestamp
                                     }
                                 ],
-                                unread: group !== userData.activeGroup
+                                unread: group !== userData.activeGroup ? userData.sites[site].groups[group].unread + 1 : 0
                             }
                         }
                     }
@@ -818,7 +819,7 @@ export default function UserDataReducer(userData, action) {
                 msg: `You were removed from ${userData.sites[site].name}. It will disappear from your list on next connection.`,
                 timestamp
             })
-            userData.sites[site].groups[group].unread = group !== userData.activeGroup
+            userData.sites[site].groups[group].unread = group !== userData.activeGroup ? userData.sites[site].groups[group].unread + 1 : 0
         }
         return userData.sites[site].groups
     }

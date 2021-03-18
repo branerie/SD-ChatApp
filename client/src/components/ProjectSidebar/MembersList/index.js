@@ -1,6 +1,8 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
 import Member from '../Member'
+import ListHeader from '../../Common/ListHeader'
+
 import { MessagesContext } from '../../../context/MessagesContext'
 
 const MembersList = () => {
@@ -16,14 +18,14 @@ const MembersList = () => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.header}>MEMBERS: ({members.length})</div>
+            <ListHeader title={`members (${members.length})`}/>
             <div className={styles.inner}>
                 {members.map(member => {
                     return (
                     <div key={member}>
                         <Member
-                            name={userData.associatedUsers[member].name}
                             id={member}
+                            name={userData.associatedUsers[member].name}
                             picturePath={userData.associatedUsers[member].picture}
                             isOnline={userData.associatedUsers[member].online}
                         />

@@ -10,24 +10,28 @@ import SeparatingLine from '../../SeparatingLine'
 const BasicSettings = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
-    const [site, setSite] = useState('')
-    const [description, setDescription] = useState('')
+    const [site, setSite] = useState()
+    const [description, setDescription] = useState()
+    const [disabled, setDisabled] = useState(true)
     const [errors, setErrors] = useState([])
 
     useEffect(() => {
         setErrors([])
-        setSite(userData.sites[userData.activeSite].name || '')
+        setSite(userData.sites[userData.activeSite].name)
         setDescription(userData.sites[userData.activeSite].description || '')
+        setDisabled(true)
     }, [userData])
 
     function changeName(e) {
         setErrors([])
         setSite(e.target.value)
+        setDisabled(e.target.value === site)
     }
 
     function changeDescription(e) {
         setErrors([])
         setDescription(e.target.value)
+        setDisabled(e.target.value === description)
     }
 
     function updateProjectSettings() { //todo
@@ -64,7 +68,7 @@ const BasicSettings = () => {
                         btnType='submit'
                         btnSize='small'
                         onClick={updateProjectSettings}
-                        disabled={site === userData.sites[userData.activeSite].name && description === userData.sites[userData.activeSite].description}
+                        disabled={disabled}
                     />
                     {errors.length > 0 &&
                         <ul className={styles.errors}>

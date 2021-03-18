@@ -12,14 +12,6 @@
     padding: 0 5px;
 }
 
-.header {
-    color: var(--txt-color);
-    text-align: center;
-    text-transform: uppercase;
-    font-size: small;
-    padding: 5px 0;
-}
-
 .list {
     display: flex;
     flex-direction: column;
@@ -32,26 +24,29 @@
     width: 0px;            
 }
 
-.project {
-    display: flex;
-    justify-content: space-between;
-    color: black;
-    margin: 1px 0;
+.card {
+    box-sizing: border-box;
     height: 2.5rem;
     line-height: 2.5rem;
+    margin: 1px 0;
     cursor: pointer;
 }
 
 .small {
+    width: 2.5rem;
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
+    text-align: center;
+    text-transform: uppercase;
 }
 
 .large {    
+    display: flex;
+    justify-content: space-between;
     border-radius: 5px;
+}
+
+.large.selected {
+    border-left: 5px solid red;
 }
 
 .owner {
@@ -62,6 +57,7 @@
     background-color: var(--bg-color-sel);
     color: var(--txt-color-sel);
 }
+
 .owner.selected {
     background-color: var(--bg-color-sel);
     color: var(--txt-color-sel);
@@ -86,7 +82,7 @@
     flex-grow: 1;
     display: flex;
     padding-left: 5px;
-    overflow-x: hidden;
+    overflow: hidden;
     /* max-width: calc(100% - 5.2rem); */
     width: 100%;
 }
@@ -99,22 +95,7 @@
 }
 
 .icons {
-    /* background-color: darkorange; */
     display: flex;
-    align-items: center;
-    height: 100%;
-}
-
-.icons > * {
-    margin: 0 0.4rem;
-}
-
-.empty {
-    fill: var(--txt-contrast-color);
-}
-
-.full {
-    fill: var(--notification-color);
 }
 
 @media (max-width: 480px) {

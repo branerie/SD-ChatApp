@@ -1,7 +1,7 @@
 .container {
     display: flex;
-    min-width: 250px;
     max-width: 250px;
+    min-width: 250px;
     /* flex-basis: 225px; */
 }
 
@@ -9,9 +9,10 @@
     display: flex; 
     flex-direction: column;
     flex-grow: 1;
-    /* overflow-y: auto;
-    scrollbar-width: none; */
+    overflow-y: auto;
+    scrollbar-width: none;
     overflow-y: hidden;
     max-height: 100%;
     max-width: calc(100% - 5px);
+    max-width: 100%;
 }

@@ -13,7 +13,7 @@ import { uploadImage } from '../../utils/image'
 const ChatWindow = () => {
     const { userData, sendMessage } = useContext(MessagesContext)
     const messagesRef = useRef()
-    
+
     useImageDragAndDrop(messagesRef, async (files) => {
         for (let file of files) {
             const imgLink = await uploadImage(file)
@@ -48,20 +48,22 @@ const ChatWindow = () => {
                 {messages.map(({ src, msg, type, timestamp, notice, event }, i) => {
                     let thisDate = new Date(timestamp).toDateString()
                     let prevDate = i > 0 ? new Date(messages[i - 1].timestamp).toDateString() : undefined
+                    let newDate = thisDate !== prevDate
+                    let sameUser = i > 0 && !newDate && messages[i].src === messages[i - 1].src
                     return (
                         <div key={i} >
-                            {thisDate !== prevDate && <DateSeparator date={thisDate} />}
+                            {newDate && <DateSeparator date={thisDate} />}
                             {notice
                                 ? <Notice message={{ msg, event }} />
-                                : 
-                                <Message 
+                                : <Message
                                     message={{
-                                        user: userData.associatedUsers[src] ? userData.associatedUsers[src].name : null,
+                                        user: userData.associatedUsers[src] ? userData.associatedUsers[src].name : undefined,
+                                        sameUser,
                                         msg,
                                         type,
                                         timestamp,
                                         own: src === userData.personal._id,
-                                        avatar: userData.associatedUsers[src] ? userData.associatedUsers[src].picture : null
+                                        avatar: userData.associatedUsers[src] ? userData.associatedUsers[src].picture : undefined
                                     }}
                                     scrollDown={scrollDown}
                                 />

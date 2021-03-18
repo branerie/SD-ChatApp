@@ -1,6 +1,8 @@
 import { useContext } from 'react'
 import styles from './index.module.css'
 import Group from './Group'
+import ListHeader from '../../Common/ListHeader'
+
 import { MessagesContext } from '../../../context/MessagesContext'
 
 const GroupsList = () => {
@@ -13,7 +15,7 @@ const GroupsList = () => {
 
     return (
         <div className={styles.wrapper}>
-            <div className={styles.title}>groups</div>
+            <ListHeader title={`groups (${groups.length})`}/>
             <ul className={styles.container}>
                 {groups.map(([gid, group]) => {
                     return (

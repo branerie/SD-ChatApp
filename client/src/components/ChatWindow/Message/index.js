@@ -7,8 +7,8 @@ import ImageMessage from './ImageMessage'
 const Message = ({ message, scrollDown }) => {
 
     const msg = {
-        plain: <PlainMessage msg={message.msg}/>,
-        uri: <UriMessage msg={message.msg}/>,
+        plain: <PlainMessage msg={message.msg} />,
+        uri: <UriMessage msg={message.msg} />,
         image: <ImageMessage msg={message.msg} scrollDown={scrollDown} />
     }
 
@@ -17,21 +17,20 @@ const Message = ({ message, scrollDown }) => {
     }
 
     return (
-        <div className={`${styles.container} ${message.own && styles.own}`}>
-            <UserAvatar picturePath={message.avatar} />
-            <div className={`${styles.data} ${message.own && styles.owndata}`}>
-                <div className={styles.name}>
-                    {message.user}
+        <>
+            {!message.sameUser &&
+                <div className={`${styles.header} ${message.own && styles.own}`}>
+                    <div><UserAvatar picturePath={message.avatar} /></div>
+                    <div className={styles.name}>{message.user ? message.user : 'Unknown user'}</div>
                 </div>
-                <div className={styles.time}>
-                    {getTime(message.timestamp)}
-                </div>
-                <div className={styles.message}>
-                    {msg[message.type]}
+            }
+            <div className={`${styles.main} ${message.own && styles.own} ${message.sameUser ? styles.next : styles.first}`}>
+                <div className={`${styles.container} ${message.own ? styles.self : styles.rest} ${message.sameUser ? styles.next : styles.first}`}>
+                    <div className={styles.message}>{msg[message.type]}</div>
+                    <div className={styles.time}>{getTime(message.timestamp)}</div>
                 </div>
             </div>
-        </div>
-
+        </>
     )
 }
 
