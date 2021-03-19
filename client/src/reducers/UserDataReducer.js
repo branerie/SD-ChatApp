@@ -741,6 +741,26 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
+        case 'change-group-name': {
+            const { sid, gid, name } = action.payload.data
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [sid]: {
+                        ...userData.sites[sid],
+                        groups: {
+                            ...userData.sites[sid].groups,
+                            [gid]: {
+                                ...userData.sites[sid].groups[gid],
+                                name
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         case 'profile-update': {
             const { user } = action.payload
             return {

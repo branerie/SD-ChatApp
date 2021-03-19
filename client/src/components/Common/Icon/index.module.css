@@ -30,3 +30,11 @@
 .notification {
     fill: var(--notification-color);
 }
+
+.apply {
+    fill: var(--bg-color-btn-submit)
+}
+
+.cancel {
+    fill: var(--bg-color-btn-cancel)
+}

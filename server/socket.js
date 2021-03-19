@@ -677,6 +677,33 @@ module.exports = io => {
             // update rest sockets and send changes to users associated with project
         })
 
+        socket.on('change-group-name', async (socketData, callback) => {
+            const validation = validate.groupData(userData._id, socketData)
+            if (validation.failed) {
+                if (validation.error) callback(false, [validation.error])
+                return
+            }
+
+            const { gid, group } = socketData
+            const data = await db.changeGroupName(gid, group, userData._id)
+
+            if (data.error) {
+                sysLog(data.error)
+                if (data.userErrors) callback(false, data.userErrors)
+                return
+            }
+
+            const groupData = {
+                sid: data.group.site,
+                gid: data.group._id,
+                name: data.group.name,
+            }
+
+            callback(true, groupData)
+            // todo 
+            // update rest sockets and send changes to users associated with project
+        })
+
         socket.on('get-chat-history', async (id, callback) => {
             const data = await db.getPrivateMessages(id, userData._id)
             const chat = {

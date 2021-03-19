@@ -1,3 +1,26 @@
+.edit {
+	background-color: var(--bg-color-own-project);
+	display: flex;
+	justify-content: space-between;
+	min-height: 44px;
+	border: 1px solid black;
+	border-radius: 0.5rem;
+	margin: 1px 0;
+}
+
+.input {
+	background-color: gray;
+	color: white;
+	border: none;
+	border-right: 1px solid black;;
+	border-radius: 0.5rem 0 0 0.5rem;
+	outline: none;
+	flex-grow: 1;
+	font-family: "Balsamiq Sans", cursive;
+	font-size: 1rem;
+	padding-left: 10px;
+}
+
 .card {
 	margin: 1px 0;
 	min-height: 44px;
@@ -22,6 +45,7 @@
 
 .name {
 	/* background-color: aqua; */
+	flex-grow: 1;
 	display: flex;
 	align-items: center;
 	font-family: "Balsamiq Sans", cursive;
@@ -35,4 +59,17 @@
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
+}
+
+.icons {
+	display: flex;
+}
+
+.errors {
+	color: var(--notification-color);
+	margin-left: 20px;
+}
+
+.errors li {
+	padding: 0;
 }

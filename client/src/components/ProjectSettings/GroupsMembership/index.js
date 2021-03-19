@@ -3,7 +3,6 @@ import styles from './index.module.css'
 import { MessagesContext } from '../../../context/MessagesContext'
 import { SocketContext } from '../../../context/SocketContext'
 
-import SeparatingLine from '../../SeparatingLine'
 import MemberCard from './MemberCard'
 import GroupCard from './GroupCard'
 
@@ -59,6 +58,7 @@ const GroupsMembership = () => {
                             return (
                                 <GroupCard
                                     key={id}
+                                    id={id}
                                     name={data.name}
                                     selected={id === group}
                                     onClick={() => loadGroup(id)}

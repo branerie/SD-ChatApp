@@ -4,13 +4,19 @@ import { ReactComponent as Info } from '../../../icons/info.svg'
 import { ReactComponent as Bell } from '../../../icons/bell-full.svg'
 import { ReactComponent as Msg } from '../../../icons/comment.svg'
 import { ReactComponent as Members } from '../../../icons/chat-group.svg'
+import { ReactComponent as Edit } from '../../../icons/edit.svg'
+import { ReactComponent as OK } from '../../../icons/check-circle.svg'
+import { ReactComponent as Cancel } from '../../../icons/times-circle.svg'
 
 const icons = {
     gear: <Gear />,
     info: <Info />,
     bell: <Bell className={css.notification}/>,
     msg: <Msg className={css.notification}/>,
-    members: <Members />
+    members: <Members />,
+    edit: <Edit />,
+    ok: <OK className={css.apply}/>,
+    cancel: <Cancel className={css.cancel}/>
 }
 
 const Icon = ({icon, count = 0, onClick}) => {

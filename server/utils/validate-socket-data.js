@@ -86,8 +86,8 @@ const siteData = (src, data, failed = true) => {
 
 const groupData = (src, data, failed = true) => {
     if (!isObject(src, data)) return { failed }
-    const { group = '' } = data
-    if (!isString(group)) {
+    const { gid = '', group = '' } = data
+    if (!isString(gid) || !isString(group)) {
         sysLog(`Invalid data type from ${src}.`)
         return { failed }
     }

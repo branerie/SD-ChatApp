@@ -34,7 +34,7 @@ const BasicSettings = () => {
         setDisabled(e.target.value === description)
     }
 
-    function updateProjectSettings() { //todo
+    function updateProjectSettings() {
         const logo = userData.sites[userData.activeSite].logo || ''
         socket.emit('update-project-settings', { sid: userData.activeSite, site, description, logo }, (success, data) => {
             if (success) dispatchUserData({ type: 'update-project-settings', payload: { data } })
