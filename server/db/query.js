@@ -1,4 +1,5 @@
 const { User, Site, Group, Message } = require('../models')
+const UserError = require('../errors/user')
 
 const registerUser = async (username, password) => {
     const user = new User({
@@ -251,6 +252,27 @@ const createGroup = async (site, name, creator) => {
     } catch (error) {
         // add validations in model and check for more errors
         return { success: false, message: error.message }
+    }
+}
+
+const changeGroupName = async (gid, name, aid) => {
+    try {
+        const groupCheck = await Group.findOne({ _id: gid, creator: aid })
+        if (groupCheck === null) throw new Error('Permission error')
+    
+        const nameCheck = await Group.findOne({ name: { $regex: new RegExp(`^${name}$`, "i") }, site: groupCheck.site })
+        if (nameCheck !== null) throw new UserError('Group exists')
+    
+        const filters = { _id: gid, creator: aid }
+        const updates = { name }
+        const options = { new: true, runValidators: true }
+
+        const group = await Group.findOneAndUpdate(filters, updates, options)
+        return { group }
+        
+    } catch (error) {
+        if (error instanceof UserError) return { error: error.message , userErrors: [error.message]}
+        return { error: error.message }
     }
 }
 
@@ -560,6 +582,7 @@ module.exports = {
     createPrivateMessage,
     createSite,
     createGroup,
+    changeGroupName,
     sendInvitation,
     addUserToGroup,
     removeUserFromGroup,

@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     margin-top: 20px;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
     padding: 0px 15px;
 }
 
@@ -33,7 +33,7 @@
 .self.first::after {
     content: "";
     position: absolute;
-    border-bottom: 12px solid var(--bg-color-message);
+    border-bottom: 4px solid var(--bg-color-message);
     bottom: 100%;
     right: 1rem;
     border-right: 4px solid transparent;
@@ -43,7 +43,7 @@
 .rest.first::before {
     content: "";
     position: absolute;
-    border-bottom: 12px solid var(--bg-color-message);
+    border-bottom: 4px solid var(--bg-color-message);
     bottom: 100%;
     left: 1rem;
     border-right: 4px solid transparent;
@@ -93,7 +93,7 @@
 }
 
 .message {
-    padding-top: 5px;
+    padding-top: 2px;
     overflow-x: auto;
     max-width: 100%;
     word-wrap: break-word;
