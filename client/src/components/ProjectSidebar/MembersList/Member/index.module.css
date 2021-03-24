@@ -4,7 +4,7 @@
     height: 2.5rem;
     line-height: 2.5rem;
     background-color: var(--bg-color-chat);
-    margin: 2px 5px;
+    margin: 1px 5px;
     border-radius: 5px;
     cursor: pointer;
 }

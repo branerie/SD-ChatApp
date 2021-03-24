@@ -5,14 +5,14 @@ import SeparatingLine from '../SeparatingLine'
 
 const ProjectSidebar = () => {
     return (
-        <div className={styles.container}>
-            <div className={styles.inner}>
+        <>
+            <div className={styles.container}>
                 <GroupsList />
                 <SeparatingLine horizontal={true} />
                 <MembersList />
             </div>
             <SeparatingLine horizontal={false} />
-        </div>
+        </>
     )
 }
 

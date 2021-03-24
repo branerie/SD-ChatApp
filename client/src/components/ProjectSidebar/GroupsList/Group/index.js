@@ -18,8 +18,14 @@ const Group = ({ title, gid }) => {
         dispatchUserData({ type: 'load-members-mobile', payload: { activeGroup: gid } })
     }
 
+    function setClasses(gid) {
+        const classList = [css.group]
+        gid === userData.activeGroup && classList.push(css.selected)
+        return classList.join(' ')
+    }
+
     return (
-        <div className={`${css.group} ${gid === userData.activeGroup && css.selected}`}>
+        <div className={setClasses(gid)}>
             <div className={css.title} onClick={() => loadGroup(gid)}>{title}</div>
             <div className={css.icons}>
                 {userData.sites[userData.activeSite].groups[gid].unread > 0 &&
