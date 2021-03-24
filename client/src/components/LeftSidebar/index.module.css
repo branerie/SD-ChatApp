@@ -3,17 +3,10 @@
     flex-direction: column;
 }
 
-.expand {
-    min-width: 250px;
-    max-width: 250px;
+.large {
+    width: 250px;
 }
 
-.shrink {
-    min-width: 75px;
+.small {
+    width: 75px;
 }
-
-/* @media (max-width: 480px) {
-    .container {
-        display: none;
-    }
-} */

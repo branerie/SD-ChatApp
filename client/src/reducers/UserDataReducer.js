@@ -11,9 +11,17 @@ export default function UserDataReducer(userData, action) {
                 activeChat: false,
                 activeMenu: 'projects',
                 activeWindow: 'sites',
+                listSize: 'large',
                 device: setDevice()
             }
         }
+
+        case 'change-list-size': {
+            return {
+                ...userData,
+                listSize: userData.listSize === 'large' ? 'small' : 'large'
+            }
+        } 
 
         case 'change-theme': {
             const { theme } = action.payload

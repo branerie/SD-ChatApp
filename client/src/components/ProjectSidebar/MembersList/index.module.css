@@ -1,29 +1,6 @@
 .container {
+    /* flex: 1 1 auto; */
     display: flex;
     flex-direction: column;
-    /* flex: 1 1 auto; */
-    overflow-y: scroll;
-    scrollbar-width: none;
-    -ms-overflow-style: none;  /* IE and Edge */
-}
-
-.container::-webkit-scrollbar {
-    display: none; /* Chrome, Safari and Opera */
-}
-
-.inner {
-    max-width: 100%;
-    overflow-y: scroll;
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
-}
-
-.inner::-webkit-scrollbar {
-    display: none;
-}
-
-@media (max-width: 480px) {
-    .inner {
-        max-height: 100%;
-    }
+    overflow-y: hidden;
 }

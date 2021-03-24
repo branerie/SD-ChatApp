@@ -1,7 +1,8 @@
 import { useContext } from 'react'
-import styles from './index.module.css'
-import Member from '../Member'
+import css from './index.module.css'
+import Member from './Member'
 import ListHeader from '../../Common/ListHeader'
+import ListItems from '../../Common/ListItems'
 
 import { MessagesContext } from '../../../context/MessagesContext'
 
@@ -17,21 +18,19 @@ const MembersList = () => {
     })
 
     return (
-        <div className={styles.container}>
-            <ListHeader title={`members (${members.length})`}/>
-            <div className={styles.inner}>
-                {members.map(member => {
-                    return (
-                    <div key={member}>
-                        <Member
-                            id={member}
-                            name={userData.associatedUsers[member].name}
-                            picturePath={userData.associatedUsers[member].picture}
-                            isOnline={userData.associatedUsers[member].online}
-                        />
-                    </div>
-                )})}
-            </div>
+        <div className={css.container}>
+            <ListHeader title={`members (${members.length})`} />
+            <ListItems>
+                {members.map(member =>
+                    <Member
+                        key={member}
+                        id={member}
+                        name={userData.associatedUsers[member].name}
+                        picturePath={userData.associatedUsers[member].picture}
+                        isOnline={userData.associatedUsers[member].online}
+                    />
+                )}
+            </ListItems>
         </div>
     )
 }
