@@ -1,6 +1,9 @@
 import { useContext } from 'react'
-import styles from './index.module.css'
-import Member from '../Member'
+import css from './index.module.css'
+import Member from './Member'
+import ListHeader from '../../Common/ListHeader'
+import ListItems from '../../Common/ListItems'
+
 import { MessagesContext } from '../../../context/MessagesContext'
 
 const MembersList = () => {
@@ -13,24 +16,21 @@ const MembersList = () => {
         let B = userData.associatedUsers[b]
         return (b === owner) - (a === owner) || B.online - A.online || A.name.localeCompare(B.name)
     })
-    let membersCount = members.length
 
     return (
-        <div className={styles.container}>
-            <div className={styles.header}>{membersCount} MEMBER{membersCount > 1 && 'S'}</div>
-            <div className={styles.inner}>
-                {members.map(member => {
-                    return (
-                    <div key={member}>
-                        <Member
-                            name={userData.associatedUsers[member].name}
-                            id={member}
-                            picturePath={userData.associatedUsers[member].picture}
-                            isOnline={userData.associatedUsers[member].online}
-                        />
-                    </div>
-                )})}
-            </div>
+        <div className={css.container}>
+            <ListHeader title={`members (${members.length})`} />
+            <ListItems>
+                {members.map(member =>
+                    <Member
+                        key={member}
+                        id={member}
+                        name={userData.associatedUsers[member].name}
+                        picturePath={userData.associatedUsers[member].picture}
+                        isOnline={userData.associatedUsers[member].online}
+                    />
+                )}
+            </ListItems>
         </div>
     )
 }

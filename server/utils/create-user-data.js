@@ -55,6 +55,7 @@ const createUserData = (userData, messagePool) => {
                 name: site.name,
                 description: site.description,
                 creator: site.creator,
+                logo: site.logo || '',
                 groups: {}
             }
             if (site.creator.toString() === userData._id.toString()) {

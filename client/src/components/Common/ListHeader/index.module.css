@@ -1,0 +1,7 @@
+.header {
+    color: var(--txt-color);
+    text-align: center;
+    text-transform: uppercase;
+    font-size: small;
+    padding: 5px 0;
+}

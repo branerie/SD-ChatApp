@@ -20,6 +20,9 @@ const menu = {
 }
 
 const win = {
+    projects: <ProjectsMenu />,
+    profile: <ProfileSettings />,
+    settings: <ProjectSettings />,
     chats: <ChatsList />,
     sites: <ProjectsList />,
     groups: <GroupsList />,
@@ -35,7 +38,8 @@ const ChatMainMobile = () => {
 
     return (
         <div className={styles.container}>
-            {userData.activeMenu ? menu[userData.activeMenu] : win[userData.activeWindow]}
+            {/* {userData.activeMenu ? menu[userData.activeMenu] : win[userData.activeWindow]} */}
+            {win[userData.activeWindow]}
         </div>
     )
 }

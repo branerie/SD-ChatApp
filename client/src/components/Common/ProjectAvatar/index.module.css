@@ -1,0 +1,15 @@
+.container {
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    border-radius: 50%;
+    width: 90%;
+    height: 90%;
+    align-self: center;
+}

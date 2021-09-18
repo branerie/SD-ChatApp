@@ -1,18 +1,12 @@
 .container {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    height: 2.5rem;
+    line-height: 2.5rem;
     background-color: var(--bg-color-chat);
-    margin: 2px 5px;
-    padding: 5px;
+    margin: 1px 5px;
     border-radius: 5px;
     cursor: pointer;
-}
-
-.member {
-    display: flex;
-    align-items: center;
-    overflow: hidden;
 }
 
 .container:hover {
@@ -20,35 +14,28 @@
     color: var(--txt-color-sel);
 }
 
-.status {
+.title {
+    flex-grow: 1;
     display: flex;
     align-items: center;
+    overflow: hidden;
+    padding-left: 5px;
 }
 
 .name {
-    margin-left: 10px;
-    margin-right: 3px;
-    font-size: 16px;
-    color: black;
-    overflow: hidden;
+    margin-left: 5px;
+    overflow-x: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-.info {
-    min-width: 1.2rem;
-    max-width: 1.2rem;
-    margin-right: 10px;
-    fill: black;
-}
-
-.info:hover {
-    fill: var(--txt-color-hover)
+.icons {
+    display: flex;
 }
 
 @media (max-width: 480px) {
     .name {
         white-space: normal;
-        text-overflow: clip;
+        text-overflow: inherit;
     }
 }

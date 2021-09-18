@@ -1,19 +1,19 @@
 import { useContext } from 'react'
-import styles from './index.module.css'
+import css from './index.module.css'
 import ProjectsList from '../ProjectsList'
 import SeparatingLine from '../SeparatingLine'
 import ChatsList from '../ChatsList'
 import { MessagesContext } from '../../context/MessagesContext'
 
-const LeftSidebar = ({ isSmallList }) => {
+const LeftSidebar = () => {
     const { userData } = useContext(MessagesContext)
 
     return (
-        <div className={`${styles.container} ${isSmallList ? styles.shrink : styles.expand}`}>
-            <ProjectsList isSmallList={isSmallList} />
+        <div className={`${css.container} ${css[userData.listSize]}`}>
+            <ProjectsList />
             {Object.keys(userData.chats).length > 0 && <>
                 <SeparatingLine horizontal={true} />
-                <ChatsList isSmallList={isSmallList} />
+                <ChatsList />
             </>}
         </div>
     )

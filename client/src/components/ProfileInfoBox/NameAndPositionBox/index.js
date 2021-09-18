@@ -9,12 +9,6 @@ const Name = ({ isOnline, name, position }) => {
                 <div className={styles['name']}>
                     {name}
                 </div>
-                <div className={styles['status-light']} >
-                    <StatusLight
-                        isOnline={isOnline}
-                        size={'small'}
-                    />
-                </div>
             </div>
             <div className={styles['position-box']}>
                 {position && position}

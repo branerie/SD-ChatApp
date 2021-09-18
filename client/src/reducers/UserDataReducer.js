@@ -11,9 +11,17 @@ export default function UserDataReducer(userData, action) {
                 activeChat: false,
                 activeMenu: 'projects',
                 activeWindow: 'sites',
+                listSize: 'large',
                 device: setDevice()
             }
         }
+
+        case 'change-list-size': {
+            return {
+                ...userData,
+                listSize: userData.listSize === 'large' ? 'small' : 'large'
+            }
+        } 
 
         case 'change-theme': {
             const { theme } = action.payload
@@ -34,6 +42,7 @@ export default function UserDataReducer(userData, action) {
                 activeGroup: false,
                 activeChat: false,
                 activeMenu: 'projects',
+                activeWindow: 'projects',
             }
         }
 
@@ -114,7 +123,8 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                activeMenu: 'profile'
+                activeMenu: 'profile',
+                activeWindow: 'profile',
             }
         }
 
@@ -134,7 +144,7 @@ export default function UserDataReducer(userData, action) {
                                 ...userData.sites[activeSite].groups,
                                 [activeGroup]: {
                                     ...userData.sites[activeSite].groups[activeGroup],
-                                    unread: false
+                                    unread: 0
                                 }
                             }
                         },
@@ -162,7 +172,7 @@ export default function UserDataReducer(userData, action) {
                             ...userData.sites[userData.activeSite].groups,
                             [activeGroup]: {
                                 ...userData.sites[userData.activeSite].groups[activeGroup],
-                                unread: false
+                                unread: 0
                             }
                         }
                     },
@@ -182,7 +192,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.chats,
                     [chat]: {
                         ...userData.chats[chat],
-                        unread: false
+                        unread: 0
                     }
                 },
                 activeSite: false,
@@ -202,7 +212,7 @@ export default function UserDataReducer(userData, action) {
                     ...userData.chats,
                     [id]: {
                         ...chat,
-                        unread: false
+                        unread: 0
                     }
                 },
                 activeSite: false,
@@ -214,7 +224,7 @@ export default function UserDataReducer(userData, action) {
             }
         }
 
-        case 'close-chat': { 
+        case 'close-chat': {
             const { chat } = action.payload
             const { [chat]: _, ...chats } = userData.chats
             return {
@@ -223,8 +233,10 @@ export default function UserDataReducer(userData, action) {
                 activeSite: false,
                 activeGroup: false,
                 activeChat: false,
-                ...(userData.device === 'desktop') && {activeMenu: 'projects'}, // find better solution
-                ...(userData.device === 'mobile') && {activeWindow: 'chats'},
+                activeMenu: 'projects',
+                activeWindow: 'chats',
+                // ...(userData.device === 'desktop') && {activeMenu: 'projects'}, // find better solution
+                // ...(userData.device === 'mobile') && {activeWindow: 'chats'},
                 details: null
             }
         }
@@ -244,7 +256,7 @@ export default function UserDataReducer(userData, action) {
                         }
                     }
                 },
-                ...(activeConnection) && { 
+                ...(activeConnection) && {
                     activeGroup,
                     activeChat: false,
                     activeMenu: false
@@ -273,11 +285,11 @@ export default function UserDataReducer(userData, action) {
         case 'group-chat-message': {
             let timestamp = new Date().toUTCString()
             let { src, site, dst: group, msg, type } = action.payload.msgData
-            let unread = false
+            let unread = userData.sites[site].groups[group].unread || 0
             if (userData.device === 'desktop') {
-                unread = (src !== userData.personal._id && group !== userData.activeGroup)
+                if (src !== userData.personal._id && group !== userData.activeGroup) unread++
             } else {
-                unread = !(userData.activeWindow === 'messages' && group === userData.activeGroup)
+                if (!(userData.activeWindow === 'messages' && group === userData.activeGroup)) unread++
             }
 
             return {
@@ -305,6 +317,7 @@ export default function UserDataReducer(userData, action) {
         case 'single-chat-message': {
             let timestamp = new Date().toUTCString()
             let { src, dst: chat, msg, type } = action.payload.msgData
+            let unread = userData.chats[chat].unread || 0
             return {
                 ...userData,
                 chats: {
@@ -317,11 +330,11 @@ export default function UserDataReducer(userData, action) {
                                     ...userData.chats[chat].messages || [],
                                     { src, msg, type, timestamp }
                                 ],
-                                unread: chat !== userData.activeChat && src !== userData.personal._id
+                                unread: chat !== userData.activeChat && src !== userData.personal._id  ? unread + 1 : 0
                             }
                             : {
                                 messages: [{ src, msg, type, timestamp }],
-                                unread: true
+                                unread: 1
                             }
                     }
                 }
@@ -392,7 +405,7 @@ export default function UserDataReducer(userData, action) {
 
         case 'join-message': {
             let timestamp = new Date().toUTCString()
-            let { user, site, group } = action.payload
+            let { user, site, group } = action.payload.socketData
             return {
                 ...userData,
                 sites: {
@@ -418,6 +431,7 @@ export default function UserDataReducer(userData, action) {
                                         timestamp
                                     }
                                 ],
+                                unread: group !== userData.activeGroup ? userData.sites[site].groups[group].unread + 1 : 0
                             }
                         }
                     }
@@ -429,6 +443,37 @@ export default function UserDataReducer(userData, action) {
                         name: user.name,
                         picture: user.picture,
                         online: user.online
+                    }
+                }
+            }
+        }
+
+        case 'leave-message': {
+            let timestamp = new Date().toUTCString()
+            let { member, site, group } = action.payload.socketData
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        groups: {
+                            ...userData.sites[site].groups,
+                            [group]: {
+                                ...userData.sites[site].groups[group],
+                                members: userData.sites[site].groups[group].members.filter(m => m !== member),
+                                messages: [
+                                    ...userData.sites[site].groups[group].messages,
+                                    {
+                                        notice: true,
+                                        event: 'warning',
+                                        msg: `${userData.associatedUsers[member].name} has left (removed by Admin).`,
+                                        timestamp
+                                    }
+                                ],
+                                unread: group !== userData.activeGroup ? userData.sites[site].groups[group].unread + 1 : 0
+                            }
+                        }
                     }
                 }
             }
@@ -450,7 +495,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'add-user-to-site-invitations': {
-            let { user, site } = action.payload
+            let { user, site } = action.payload.invitationData
             return {
                 ...userData,
                 sites: {
@@ -476,14 +521,14 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'remove-user-from-site-invitations': {
-            let { user, site } = action.payload
+            let { uid, sid } = action.payload.invitationData
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
-                    [site]: {
-                        ...userData.sites[site],
-                        invitations: userData.sites[site].invitations.filter(i => i !== user)
+                    [sid]: {
+                        ...userData.sites[sid],
+                        invitations: userData.sites[sid].invitations.filter(i => i !== uid)
                     }
                 },
             }
@@ -491,14 +536,14 @@ export default function UserDataReducer(userData, action) {
 
 
         case 'remove-user-from-site-requests': {
-            let { user, site } = action.payload
+            let { uid, sid } = action.payload.requestData
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
-                    [site]: {
-                        ...userData.sites[site],
-                        requests: userData.sites[site].requests.filter(r => r !== user)
+                    [sid]: {
+                        ...userData.sites[sid],
+                        requests: userData.sites[sid].requests.filter(r => r !== uid)
                     }
                 },
             }
@@ -506,7 +551,7 @@ export default function UserDataReducer(userData, action) {
 
 
         case 'request-accepted': {
-            let { site, associatedUsers } = action.payload
+            let { site, associatedUsers } = action.payload.socketData
             return {
                 ...userData,
                 sites: {
@@ -523,7 +568,7 @@ export default function UserDataReducer(userData, action) {
 
 
         case 'added-to-group': {
-            let { site, group } = action.payload
+            let { site, group } = action.payload.socketData
             return {
                 ...userData,
                 sites: {
@@ -532,8 +577,54 @@ export default function UserDataReducer(userData, action) {
                         ...userData.sites[site],
                         groups: {
                             ...userData.sites[site].groups,
-                            ...group
+                            ...group,
                         }
+                    }
+                },
+            }
+        }
+
+        case 'removed-from-group': {
+            let timestamp = new Date().toUTCString()
+            let { site, groups } = action.payload.socketData
+            let group = groups[0]
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        groups: {
+                            ...userData.sites[site].groups,
+                            [group]: {
+                                ...userData.sites[site].groups[group],
+                                members: [],
+                                messages: [
+                                    ...userData.sites[site].groups[group].messages,
+                                    {
+                                        notice: true,
+                                        event: 'warning',
+                                        msg: 'You were taken out by Admin. Group will disappear from your list on next connection.',
+                                        timestamp
+                                    }
+                                ],
+                                unread: group !== userData.activeGroup ? userData.sites[site].groups[group].unread + 1 : 0
+                            }
+                        }
+                    }
+                },
+            }
+        }
+
+        case 'removed-from-project': {
+            let { site, groups } = action.payload.socketData
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [site]: {
+                        ...userData.sites[site],
+                        groups: removedFromProjectNotice(site, groups)
                     }
                 },
             }
@@ -574,7 +665,7 @@ export default function UserDataReducer(userData, action) {
         }
 
         case 'add-user-to-site-requests': {
-            let { site, user } = action.payload
+            let { site, user } = action.payload.requestData
             return {
                 ...userData,
                 sites: {
@@ -601,23 +692,26 @@ export default function UserDataReducer(userData, action) {
 
 
         case 'invitation-accepted': {
-            let { siteData, associatedUsers, activeConnection } = action.payload
-            let activeSite = Object.keys(siteData)[0]
-            let activeGroup = Object.keys(siteData[activeSite].groups)[0]
+            let { siteData, associatedUsers } = action.payload.socketData
+            let site = Object.keys(siteData)[0]
             return {
                 ...userData,
                 sites: {
                     ...userData.sites,
                     ...siteData
                 },
-                invitations: userData.invitations.filter(i => i._id !== Object.keys(siteData)[0]) || [],
+                invitations: userData.invitations.filter(i => i._id !== site) || [],
                 associatedUsers: {
                     ...userData.associatedUsers,
                     ...associatedUsers
                 },
-                ...(activeConnection) && { activeSite },
-                ...(activeConnection) && { activeGroup },
-                ...(activeConnection) && { activeChat: false }
+                ...(action.payload.activeConnection) && {
+                    activeSite: site,
+                    activeGroup: Object.keys(siteData[site].groups)[0],
+                    activeChat: false,
+                    activeMenu: false,
+                    activeWindow: 'messages'
+                },
             }
         }
 
@@ -634,6 +728,42 @@ export default function UserDataReducer(userData, action) {
                     [userData.personal._id]: {
                         ...userData.associatedUsers[userData.personal._id],
                         ...newData
+                    }
+                }
+            }
+        }
+
+        case 'update-project-settings': {
+            const { sid, name, description, logo } = action.payload.data
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [sid]: {
+                        ...userData.sites[sid],
+                        name,
+                        description,
+                        logo
+                    }
+                }
+            }
+        }
+
+        case 'change-group-name': {
+            const { sid, gid, name } = action.payload.data
+            return {
+                ...userData,
+                sites: {
+                    ...userData.sites,
+                    [sid]: {
+                        ...userData.sites[sid],
+                        groups: {
+                            ...userData.sites[sid].groups,
+                            [gid]: {
+                                ...userData.sites[sid].groups[gid],
+                                name
+                            }
+                        }
                     }
                 }
             }
@@ -705,6 +835,21 @@ export default function UserDataReducer(userData, action) {
 
         default:
             return userData
+    }
+
+    function removedFromProjectNotice(site) {
+        let timestamp = new Date().toUTCString()
+        for (const group in userData.sites[site].groups) {
+            userData.sites[site].groups[group].members = []
+            userData.sites[site].groups[group].messages.push({
+                notice: true,
+                event: 'warning',
+                msg: `You were removed from ${userData.sites[site].name}. It will disappear from your list on next connection.`,
+                timestamp
+            })
+            userData.sites[site].groups[group].unread = group !== userData.activeGroup ? userData.sites[site].groups[group].unread + 1 : 0
+        }
+        return userData.sites[site].groups
     }
 
     function addNotice(member, event) {

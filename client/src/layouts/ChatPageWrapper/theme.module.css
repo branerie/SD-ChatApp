@@ -49,8 +49,8 @@
     --bg-color-separator: #514e4e;
     --txt-color-sel: black;
     --bg-color-own-project: #65c2c5;
-    --bg-color-guest-project: slategray;
-    --bg-color-guest-sel: lightslategray;
+    --bg-color-guest-project: lightslategray;
+    --bg-color-guest-sel: darkgray;
     --bg-color-message: #f0f0f0;
     --bg-color-own-message: #e5f1db;
     --bg-color-group: #65c2c5;

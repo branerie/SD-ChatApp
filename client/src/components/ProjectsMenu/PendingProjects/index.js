@@ -9,16 +9,16 @@ const PendingProjects = () => {
     const { userData, dispatchUserData } = useContext(MessagesContext)
     const { socket } = useContext(SocketContext)
 
-    function acceptInvitation(site) {
-        socket.emit('accept-invitation', site, (success, { siteData, associatedUsers, onlineMembers }) => {
+    function acceptInvitation(sid) {
+        socket.emit('accept-invitation', sid, (success, socketData) => {
             if (success) {
-                dispatchUserData({ type: 'invitation-accepted', payload: { siteData, associatedUsers, onlineMembers, activeConnection: true } })
+                dispatchUserData({ type: 'invitation-accepted', payload: { socketData, activeConnection: true } })
             }
         })
     }
 
-    function rejectInvitation(site) {
-        socket.emit('reject-invitation', site, () => {
+    function rejectInvitation(sid) {
+        socket.emit('reject-invitation', sid, () => {
             // dispatchUserData({ type: 'reject-invitation', payload: { invitation } })
         })
     }
@@ -27,8 +27,8 @@ const PendingProjects = () => {
         console.log(site)
     }
 
-    function cancelRequest(site) {
-        socket.emit('cancel-request', site, () => {
+    function cancelRequest(sid) {
+        socket.emit('cancel-request', sid, () => {
             // dispatchUserData({ type: 'cancel-request', payload: { request } })
         })
     }

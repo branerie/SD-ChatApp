@@ -1,120 +1,14 @@
 .container {
+    min-height: 6rem;
     display: flex;
     flex-direction: column;
     overflow-y: hidden;
 }
 
-.shrink {
-    align-items: center;
-}
-
-.expand {
-    padding: 0 5px;
-}
-
-.header {
-    color: var(--txt-color);
-    text-align: center;
-    text-transform: uppercase;
-    font-size: small;
-    padding: 5px 0;
-}
-
-.list {
-    display: flex;
-    flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: auto;
-    scrollbar-width: none;
-}
-
-.list::-webkit-scrollbar {
-    width: 0px;            
-}
-
-.project {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    color: black;
-    margin: 1px 0;
-    /* padding: 10px; */
-    height: 2.5rem;
-    line-height: 2.5rem;
-    cursor: pointer;
-}
-
 .small {
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-}
-
-.large {    
-    border-radius: 5px;
-}
-
-.owner {
-    background-color: var(--bg-color-own-project);
-}
-
-.owner:hover {
-    background-color: var(--bg-color-sel);
-    color: var(--txt-color-sel);
-}
-.owner.selected {
-    background-color: var(--bg-color-sel);
-    color: var(--txt-color-sel);
-}
-
-.guest {
-    background-color: var(--bg-color-guest-project);
-}
-
-.guest:hover {
-    background-color: var(--bg-color-guest-sel);
-    color: var(--txt-color-sel);
-}
-
-.guest.selected {
-    background-color: var(--bg-color-guest-sel);
-    color: var(--txt-color-sel);
-}
-
-.title {
-    /* background-color: darkolivegreen; */
-    flex-grow: 1;
-    padding-left: 1rem;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: calc(100% - 5.2rem);
-}
-
-.icons {
-    /* background-color: darkorange; */
-    display: flex;
     align-items: center;
-    height: 100%;
 }
 
-.icons > * {
-    margin: 0 0.4rem;
-}
-
-.empty {
-    fill: var(--txt-contrast-color);
-}
-
-.full {
-    fill: var(--notification-color);
-}
-
-@media (max-width: 480px) {
-    .title {
-        white-space: normal;
-        text-overflow: inherit;
-    }
+.large {
+    padding: 0 5px;
 }

@@ -70,20 +70,24 @@ const profileData = (src, data, failed = true, errors = []) => {
 
 const siteData = (src, data, failed = true) => {
     if (!isObject(src, data)) return { failed }
-    const { site = '', description = '' } = data
-    if (!isString(site) || !isString(description)) {
+    const { sid = '', site = '', description = '', logo = '' } = data
+    if (!isString(sid) || !isString(site) || !isString(description) || !isString(logo)) {
         sysLog(`Invalid data type from ${src}.`)
         return { failed }
     }
     data.site = trimAll(site)
+    if (!data.site) {
+        sysLog(`Project name not specified from ${src}.`)
+        return { failed, error: 'Project name is required' }
+    }
     data.description = trimAll(description)
     return { data }
 }
 
 const groupData = (src, data, failed = true) => {
     if (!isObject(src, data)) return { failed }
-    const { group = '' } = data
-    if (!isString(group)) {
+    const { gid = '', group = '' } = data
+    if (!isString(gid) || !isString(group)) {
         sysLog(`Invalid data type from ${src}.`)
         return { failed }
     }
@@ -106,7 +110,6 @@ const siteSearch = (src, data, failed = true) => {
 }
 
 const peopleSearch = (src, data, failed = true) => {
-    console.log('test');
     if (!isObject(src, data)) return { failed }
     if (!isString(data.name) || !isPosInt(data.page)) {
         sysLog(`Invalid data type from ${src}.`)
@@ -117,6 +120,40 @@ const peopleSearch = (src, data, failed = true) => {
     return { data }
 }
 
+const membershipData = (src, data, failed = true) => {
+    // expect object with member and group props and string values representing object id
+    // object id data type and rights will be checked on db
+    if (!isObject(src, data)) return { failed }
+    const { member, group } = data
+    if (!isString(member) || !isString(group)) {
+        sysLog(`Invalid data type from ${src}.`)
+        return { failed }
+    }
+    return { data }
+}
+
+const userAndSiteId = (src, data, failed = true) => {
+    // expect object with uid and sid props and string values representing object id
+    // object id data type and rights will be checked on db
+    if (!isObject(src, data)) return { failed }
+    const { uid, sid } = data
+    if (!isString(uid) || !isString(sid)) {
+        sysLog(`Invalid data type from ${src}.`)
+        return { failed }
+    }
+    return { data }
+}
+
+const siteId = (src, site, failed = true) => {
+    // expect string with site id 
+    // object id data type will be checked on db
+    if (!isString(site)) {
+        sysLog(`Invalid data type from ${src}.`)
+        return { failed }
+    }
+    return site
+}
+
 module.exports = {
     messageData,
     siteSearch,
@@ -124,4 +161,7 @@ module.exports = {
     siteData,
     groupData,
     profileData,
+    membershipData,
+    userAndSiteId,
+    siteId
 }

@@ -1,0 +1,64 @@
+.card {
+    background-color: var(--bg-color-own-project);
+    box-sizing: border-box;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    margin: 1px 0;
+    cursor: pointer;
+}
+
+.small {
+    width: 2.5rem;
+    border-radius: 50%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.large {    
+    display: flex;
+    justify-content: space-between;
+    border-radius: 5px;
+}
+
+.large.selected {
+    border-left: 5px solid red;
+}
+
+.large:hover {
+    background-color: var(--bg-color-sel);
+    color: var(--txt-color-sel);
+}
+
+.title {
+    /* background-color: darkolivegreen; */
+    flex-grow: 1;
+    display: flex;
+    padding-left: 5px;
+    overflow: hidden;
+    /* max-width: calc(100% - 5.2rem); */
+    width: 100%;
+}
+
+.selected {
+    background-color: var(--bg-color-sel);
+    color: var(--txt-color-sel);
+}
+
+.name {
+    overflow-x: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-left: 5px;
+}
+
+.small.online {
+    background-color: var(--online-color);
+}
+
+.small.offline {
+    background-color: var(--offline-color);
+}
+
+.icons {
+    display: flex;
+}
