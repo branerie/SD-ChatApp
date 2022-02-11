@@ -1,5 +1,5 @@
-const controllers = require("../controllers/all")
+const controllers = require('../controllers/all')
 
 module.exports = app => {
-    app.use("/", controllers.user)
+    app.use('/', controllers.user)
 }

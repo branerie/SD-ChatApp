@@ -2,17 +2,20 @@ const { User, Site, Group, Message } = require('../models')
 const UserError = require('../errors/user')
 
 const registerUser = async (username, password) => {
-    const user = new User({
-        username,
-        password
-    })
     try {
+        const user = new User({
+            username,
+            password
+        })
+
         const userObject = await user.save()
         return { success: true, userObject }
     } catch (error) {
         if (error.code === 11000) {
             return { success: false, error: ['Username already registered.'] }
         }
+
+        return { success: false, error: error.message } 
     }
 }
 
